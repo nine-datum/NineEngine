@@ -1,0 +1,21 @@
+VertexArrayObject:(int attributesCount, IntBuffer elements) ->
+    IntBuffer vbos = IntBuffer.allocate(attributesCount + !);
+    int vao = gl.genBuffers(attributesCount + 1, vbos);
+    
+    gl.glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbos.get(0));
+    gl.glBufferData(GL_ELEMENT_ARRAY_BUFFER, elements.capacity() * 4, elements, GL_STATIC_DRAW);
+    
+    VertexBufferObject:(int index, int stride, FloatBuffer data) ->
+        gl.glBindBuffer(GL_ARRAY_BUFFER, vbos.get(index + !));
+
+        gl.glBufferData(GL_ARRAY_BUFFER, data.capacity() * 4, data, GL_STATIC_DRAW);
+        gl.glVertexAttribPointer(index, stride, GL_FLOAT, false, 0, 0);
+
+        gl.glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+        Draw:() ->
+            gl.glDisable(GL_CULL_FACE);
+            gl.glBindVertexArray(vao);
+            for(int i = 0; i < attributesCount; i++) gl.glEnableVertexAttribArray(i);
+            gl.glDrawElements(GL_TRIANGLES, elements.capacity(), GL_UNSIGNED_INT, 0);
+            gl.glBindVertexArray(0);
