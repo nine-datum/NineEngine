@@ -6,7 +6,7 @@ import nine.math.Vector3f;
 
 public interface Uniforms
 {
-    void loadUniformMatrix(String name, Matrix4f matrix);
-    void loadUniformVector(String name, Vector3f vector);
-    void loadUniformColor(String name, Color color);
+    Uniform uniformMatrix(String name, Matrix4f matrix);
+    Uniform uniformVector(String name, Vector3f vector);
+    Uniform uniformColor(String name, Color color);
 }

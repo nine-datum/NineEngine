@@ -1,8 +1,5 @@
 package nine.lwjgl;
 
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
-
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 
@@ -13,23 +10,29 @@ import nine.opengl.DrawingBuffer;
 
 public class LWJGL_DrawingBuffer implements DrawingBuffer
 {
-    IntBuffer elements;
+    int[] elements;
 
-    LWJGL_DrawingBuffer(IntBuffer elements)
+    LWJGL_DrawingBuffer(int[] elements)
     {
         this.elements = elements;
     }
 
     @Override
-    public DrawingAttributeBuffer attribute(int stride, FloatBuffer data)
+    public DrawingAttributeBuffer attribute(int stride, float[] data)
     {
         LWJGL_Vao vao = new LWJGL_Vao()
         {
             @Override
             public LWJGL_VboAllocator allocate(int count)
             {
-                IntBuffer buffers = IntBuffer.allocate(count + 1);
-                int vao = buffers.get(0);
+                int vao = GL30.glGenVertexArrays();
+                GL30.glBindVertexArray(vao);
+
+                int[] buffers = new int[count + 1];
+                GL20.glGenBuffers(buffers);
+
+                GL20.glBindBuffer(GL20.GL_ELEMENT_ARRAY_BUFFER, buffers[0]);
+                GL20.glBufferData(GL20.GL_ELEMENT_ARRAY_BUFFER, elements, GL20.GL_STATIC_DRAW);
 
                 return new LWJGL_VboAllocator()
                 {
@@ -38,7 +41,7 @@ public class LWJGL_DrawingBuffer implements DrawingBuffer
                     {
                         return action ->
                         {
-                            GL20.glBindBuffer(GL20.GL_ARRAY_BUFFER, buffers.get(index + 1));
+                            GL20.glBindBuffer(GL20.GL_ARRAY_BUFFER, buffers[index + 1]);
                             action.call();
                         };
                     }
@@ -46,14 +49,12 @@ public class LWJGL_DrawingBuffer implements DrawingBuffer
                     @Override
                     public Drawing drawing(Action activation)
                     {
-                        GL20.glBindBuffer(GL20.GL_ELEMENT_ARRAY_BUFFER, vao);
-                        GL20.glBufferData(GL20.GL_ELEMENT_ARRAY_BUFFER, elements, GL20.GL_STATIC_DRAW);
                         return () ->
                         {
                             GL20.glDisable(GL20.GL_CULL_FACE);
                             GL30.glBindVertexArray(vao);
                             activation.call();
-                            GL30.glDrawElements(GL30.GL_TRIANGLES, elements.capacity(), GL30.GL_UNSIGNED_INT, 0);
+                            GL30.glDrawElements(GL30.GL_TRIANGLES, elements.length, GL30.GL_UNSIGNED_INT, 0);
                             GL30.glBindVertexArray(0);
                         };
                     }

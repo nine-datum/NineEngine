@@ -1,8 +1,6 @@
 package nine.opengl;
 
-import java.nio.FloatBuffer;
-
 public interface DrawingBuffer
 {
-    DrawingAttributeBuffer attribute(int stride, FloatBuffer data);
+    DrawingAttributeBuffer attribute(int stride, float[] data);
 }

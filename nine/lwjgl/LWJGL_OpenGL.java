@@ -1,13 +1,20 @@
 package nine.lwjgl;
 
-import java.nio.IntBuffer;
-
 import nine.opengl.DrawingBuffer;
+import nine.opengl.OpenGL;
+import nine.opengl.ShaderCompiler;
 
-public class LWJGL_OpenGL
+public class LWJGL_OpenGL implements OpenGL
 {
-    public DrawingBuffer vao(IntBuffer elements)
+    @Override
+    public DrawingBuffer vao(int[] elements)
     {
         return new LWJGL_DrawingBuffer(elements);
+    }
+
+    @Override
+    public ShaderCompiler compiler()
+    {
+        return new LWJGL_ShaderCompiler();
     }
 }

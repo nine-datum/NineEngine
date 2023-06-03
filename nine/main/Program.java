@@ -4,6 +4,18 @@ import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
 import org.lwjgl.system.*;
 
+import nine.io.FileStorage;
+import nine.io.Storage;
+import nine.lwjgl.LWJGL_OpenGL;
+import nine.math.Matrix4fScale;
+import nine.math.Vector3fStruct;
+import nine.opengl.Drawing;
+import nine.opengl.OpenGL;
+import nine.opengl.Shader;
+import nine.opengl.Uniform;
+import nine.opengl.shader.FileShaderSource;
+import nine.opengl.shader.ShaderVersionMacro;
+
 import java.nio.*;
 
 import static org.lwjgl.glfw.Callbacks.*;
@@ -35,6 +47,8 @@ public class Program {
 		// Setup an error callback. The default implementation
 		// will print the error message in System.err.
 		GLFWErrorCallback.createPrint(System.err).set();
+
+		
 
 		// Initialize GLFW. Most GLFW functions will not work before doing this.
 		if ( !glfwInit() )
@@ -94,11 +108,54 @@ public class Program {
 
 		// Set the clear color
 		glClearColor(1.0f, 0.0f, 0.0f, 0.0f);
+		
+		float[] positions = new float[]
+		{
+			0f, 0f, 0f,
+			1f, 0f, 0f,
+			1f, 1f, 0f,
+			0f, 1f, 0f
+		};
+		float[] uvs = new float[]
+		{
+			0f, 0f,
+			1f, 0f,
+			1f, 1f,
+			0f, 1f
+		};
+		int[] indices = new int[]
+		{
+			0, 1, 2,
+			2, 3, 0
+		};
+
+		Storage storage = new FileStorage();
+
+		OpenGL gl = new LWJGL_OpenGL();
+		Shader shader = gl.compiler().createProgram(
+			new FileShaderSource(storage.open("shaders/vertex.glsl"), new ShaderVersionMacro("400")),
+			new FileShaderSource(storage.open("shaders/fragment.glsl"), new ShaderVersionMacro("400")), acceptor ->
+		{
+			acceptor.call(0, "position");
+			acceptor.call(1, "texcoord");
+		});
+		Drawing drawing = gl.vao(indices)
+			.attribute(3, positions)
+			.attribute(2, uvs).drawing();
+		Uniform transform = shader.uniforms().uniformMatrix("transform", new Matrix4fScale(new Vector3fStruct(100f, 100f, 100f)));
 
 		// Run the rendering loop until the user has attempted to close
 		// the window or has pressed the ESCAPE key.
 		while ( !glfwWindowShouldClose(window) ) {
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
+
+			GL20.glViewport(0, 0, 150, 150);
+			
+			shader.play(() ->
+			{
+				transform.load();
+				drawing.draw();
+			});
 
 			glfwSwapBuffers(window); // swap the color buffers
 

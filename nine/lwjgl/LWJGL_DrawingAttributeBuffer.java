@@ -1,7 +1,5 @@
 package nine.lwjgl;
 
-import java.nio.FloatBuffer;
-
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 
@@ -13,11 +11,11 @@ public class LWJGL_DrawingAttributeBuffer implements DrawingAttributeBuffer
 {
     int index;
     int stride;
-    FloatBuffer data;
+    float[] data;
     LWJGL_DrawingAttributeBuffer previous;
     LWJGL_Vao vao;
     
-    private LWJGL_DrawingAttributeBuffer(LWJGL_Vao vao, int index, int stride, FloatBuffer data, LWJGL_DrawingAttributeBuffer previous)
+    private LWJGL_DrawingAttributeBuffer(LWJGL_Vao vao, int index, int stride, float[] data, LWJGL_DrawingAttributeBuffer previous)
     {
         this.index = index;
         this.stride = stride;
@@ -26,7 +24,7 @@ public class LWJGL_DrawingAttributeBuffer implements DrawingAttributeBuffer
         this.vao = vao;
     }
 
-    LWJGL_DrawingAttributeBuffer(LWJGL_Vao vao, int index, int stride, FloatBuffer data)
+    LWJGL_DrawingAttributeBuffer(LWJGL_Vao vao, int index, int stride, float[] data)
     {
         this.index = index;
         this.stride = stride;
@@ -35,7 +33,7 @@ public class LWJGL_DrawingAttributeBuffer implements DrawingAttributeBuffer
     }
 
     @Override
-    public DrawingAttributeBuffer attribute(int stride, FloatBuffer data)
+    public DrawingAttributeBuffer attribute(int stride, float[] data)
     {
         return new LWJGL_DrawingAttributeBuffer(vao, index + 1, stride, data, this);
     }
