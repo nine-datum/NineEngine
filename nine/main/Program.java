@@ -12,7 +12,7 @@ import nine.math.Vector3fStruct;
 import nine.opengl.Drawing;
 import nine.opengl.OpenGL;
 import nine.opengl.Shader;
-import nine.opengl.Uniform;
+import nine.opengl.ShaderPlayer;
 import nine.opengl.shader.FileShaderSource;
 import nine.opengl.shader.ShaderVersionMacro;
 
@@ -60,7 +60,7 @@ public class Program {
 		glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE); // the window will be resizable
 
 		// Create the window
-		window = glfwCreateWindow(300, 300, "Hello World!", NULL, NULL);
+		window = glfwCreateWindow(500, 500, "Hello World!", NULL, NULL);
 		if ( window == NULL )
 			throw new RuntimeException("Failed to create the GLFW window");
 
@@ -139,23 +139,22 @@ public class Program {
 			acceptor.call(0, "position");
 			acceptor.call(1, "texcoord");
 		});
+		
+		ShaderPlayer player = shader.player(uniform -> uniform.uniformMatrix(
+			"transform",
+			new Matrix4fScale(
+				new Vector3fStruct(0.5f, 0.5f, 1f))));
+		
 		Drawing drawing = gl.vao(indices)
 			.attribute(3, positions)
 			.attribute(2, uvs).drawing();
-		Uniform transform = shader.uniforms().uniformMatrix("transform", new Matrix4fScale(new Vector3fStruct(100f, 100f, 100f)));
 
 		// Run the rendering loop until the user has attempted to close
 		// the window or has pressed the ESCAPE key.
 		while ( !glfwWindowShouldClose(window) ) {
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
-
-			GL20.glViewport(0, 0, 150, 150);
 			
-			shader.play(() ->
-			{
-				transform.load();
-				drawing.draw();
-			});
+			player.play(drawing);
 
 			glfwSwapBuffers(window); // swap the color buffers
 

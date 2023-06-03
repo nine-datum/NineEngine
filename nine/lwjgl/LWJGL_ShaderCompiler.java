@@ -9,11 +9,12 @@ import nine.drawing.Color;
 import nine.drawing.ColorFloatStruct;
 import nine.math.Matrix4f;
 import nine.math.Vector3f;
-import nine.opengl.Drawing;
 import nine.opengl.Shader;
 import nine.opengl.ShaderAttribute;
 import nine.opengl.ShaderCompiler;
+import nine.opengl.ShaderPlayer;
 import nine.opengl.ShaderSource;
+import nine.opengl.UniformBinding;
 import nine.opengl.Uniform;
 import nine.opengl.Uniforms;
 
@@ -56,17 +57,9 @@ public class LWJGL_ShaderCompiler implements ShaderCompiler
         return new Shader()
         {
             @Override
-            public void play(Drawing drawing)
+            public ShaderPlayer player(UniformBinding handler)
             {
-                GL20.glUseProgram(program);
-                drawing.draw();
-                GL20.glUseProgram(0);
-            }
-
-            @Override
-            public Uniforms uniforms()
-            {
-                return new Uniforms()
+                Uniform uniform = handler.uniform(new Uniforms()
                 {
                     @Override
                     public Uniform uniformMatrix(String name, Matrix4f matrix)
@@ -100,6 +93,13 @@ public class LWJGL_ShaderCompiler implements ShaderCompiler
                             GL20.glUniform4f(location, r, g, b, a);
                         });
                     }
+                });
+                return drawing ->
+                {
+                    GL20.glUseProgram(program);
+                    uniform.load();
+                    drawing.draw();
+                    GL20.glUseProgram(0);
                 };
             }
         };
