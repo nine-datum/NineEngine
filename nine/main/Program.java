@@ -7,8 +7,19 @@ import org.lwjgl.system.*;
 import nine.io.FileStorage;
 import nine.io.Storage;
 import nine.lwjgl.LWJGL_OpenGL;
+import nine.math.Matrix4f;
+import nine.math.Matrix4fMul;
+import nine.math.Matrix4fPerspective;
 import nine.math.Matrix4fScale;
+import nine.math.Matrix4fTranslation;
+import nine.math.ValueFloat;
+import nine.math.ValueFloatAdd;
+import nine.math.ValueFloatMul;
+import nine.math.ValueFloatSin;
+import nine.math.Time;
+import nine.math.ValueFloatStruct;
 import nine.math.Vector3fStruct;
+import nine.math.Vector3fZ;
 import nine.opengl.Drawing;
 import nine.opengl.OpenGL;
 import nine.opengl.Shader;
@@ -139,11 +150,31 @@ public class Program {
 			acceptor.call(0, "position");
 			acceptor.call(1, "texcoord");
 		});
+
+		ValueFloat lerp = new ValueFloatMul(
+			new ValueFloatStruct(0.5f),
+			new ValueFloatAdd(new ValueFloatStruct(1f), new ValueFloatSin(new Time())));
+
+
+		Matrix4f projection = new Matrix4fMul(new Matrix4fPerspective(
+			new ValueFloatStruct(1f),
+			new ValueFloatStruct(0.3f),
+			new ValueFloatStruct(0.1f),
+			new ValueFloatStruct(100f)),
+			new Matrix4fTranslation(
+				new Vector3fZ(
+					new ValueFloatAdd(
+						new ValueFloatStruct(5f),
+						new ValueFloatMul(
+							lerp,
+							new ValueFloatStruct(10f))))));
 		
 		ShaderPlayer player = shader.player(uniform -> uniform.uniformMatrix(
 			"transform",
-			new Matrix4fScale(
-				new Vector3fStruct(0.5f, 0.5f, 1f))));
+			new Matrix4fMul(
+				new Matrix4fScale(
+					new Vector3fStruct(0.5f, 0.5f, 1f)),
+					projection)));
 		
 		Drawing drawing = gl.vao(indices)
 			.attribute(3, positions)
