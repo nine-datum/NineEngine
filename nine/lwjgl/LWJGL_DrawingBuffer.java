@@ -51,7 +51,7 @@ public class LWJGL_DrawingBuffer implements DrawingBuffer
                     {
                         return () ->
                         {
-                            GL20.glDisable(GL20.GL_CULL_FACE);
+                            GL20.glEnable(GL20.GL_CULL_FACE);
                             GL30.glBindVertexArray(vao);
                             activation.call();
                             GL30.glDrawElements(GL30.GL_TRIANGLES, elements.length, GL30.GL_UNSIGNED_INT, 0);

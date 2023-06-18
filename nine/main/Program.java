@@ -9,7 +9,9 @@ import nine.io.Storage;
 import nine.lwjgl.LWJGL_OpenGL;
 import nine.math.Matrix4f;
 import nine.math.Matrix4fMul;
+import nine.math.Matrix4fMulChain;
 import nine.math.Matrix4fPerspective;
+import nine.math.Matrix4fRotationY;
 import nine.math.Matrix4fScale;
 import nine.math.Matrix4fTranslation;
 import nine.math.ValueFloat;
@@ -120,25 +122,55 @@ public class Program {
 		// Set the clear color
 		glClearColor(1.0f, 0.0f, 0.0f, 0.0f);
 		
-		float[] positions = new float[]
-		{
-			0f, 0f, 0f,
-			1f, 0f, 0f,
-			1f, 1f, 0f,
-			0f, 1f, 0f
-		};
-		float[] uvs = new float[]
-		{
-			0f, 0f,
-			1f, 0f,
-			1f, 1f,
-			0f, 1f
-		};
-		int[] indices = new int[]
-		{
-			0, 1, 2,
-			2, 3, 0
-		};
+		float[] positions =
+        {
+            -0.5f, 0f, -3f,
+            0.5f, 0f, -3f,
+            1.5f, 1f, 0f,
+            2.5f, 5f, -3f,
+            1.5f, 6f, 0f,
+            -1.5f, 6f, 0f,
+            -2.5f, 5f, -3f,
+            -1.5f, 1f, 0f,
+            -0.5f, 2f, 3f,
+            0.5f, 2f, 3f,
+            0.5f, 4f, 3f,
+            -0.5f, 5f, 3f
+        };
+
+		float[] uvs = new float[positions.length / 3 * 2];
+		for(int i = 0; i < uvs.length; i++) uvs[i] = (1f / uvs.length) * i;
+
+        int[] indices =
+        {
+            0,6,3,
+            3,1,0,
+
+            1,3,2,
+            0,7,6,
+
+            6,5,4,
+            4,3,6,
+
+            5,6,11,
+            3,4,10,
+
+            4,5,11,
+            11,10,4,
+
+            6,7,8,
+            8,11,6,
+            3,10,9,
+            9,2,3,
+
+            10,11,8,
+            8,9,10,
+
+            8,7,0,
+            1,2,9,
+            9,8,0,
+            0,1,9
+        };
 
 		Storage storage = new FileStorage();
 
@@ -153,7 +185,7 @@ public class Program {
 
 		ValueFloat lerp = new ValueFloatMul(
 			new ValueFloatStruct(0.5f),
-			new ValueFloatAdd(new ValueFloatStruct(1f), new ValueFloatSin(new Time())));
+			new ValueFloatAdd(new ValueFloatStruct(1f), new ValueFloatSin(new ValueFloatStruct(0f))));
 
 
 		Matrix4f projection = new Matrix4fMul(new Matrix4fPerspective(
@@ -164,17 +196,18 @@ public class Program {
 			new Matrix4fTranslation(
 				new Vector3fZ(
 					new ValueFloatAdd(
-						new ValueFloatStruct(5f),
+						new ValueFloatStruct(10f),
 						new ValueFloatMul(
 							lerp,
 							new ValueFloatStruct(10f))))));
 		
 		ShaderPlayer player = shader.player(uniform -> uniform.uniformMatrix(
 			"transform",
-			new Matrix4fMul(
+			new Matrix4fMulChain(
+				projection,
+				new Matrix4fRotationY(new Time()),
 				new Matrix4fScale(
-					new Vector3fStruct(0.5f, 0.5f, 1f)),
-					projection)));
+					new Vector3fStruct(0.3f, 0.3f, 0.2f)))));
 		
 		Drawing drawing = gl.vao(indices)
 			.attribute(3, positions)

@@ -7,7 +7,8 @@ public final class Matrix4fPerspective implements Matrix4f
     ValueFloat far;
     ValueFloat near;
 
-    public Matrix4fPerspective(ValueFloat aspect, ValueFloat fov, ValueFloat near, ValueFloat far) {
+    public Matrix4fPerspective(ValueFloat aspect, ValueFloat fov, ValueFloat near, ValueFloat far)
+    {
         this.aspect = aspect;
         this.fov = fov;
         this.far = far;
