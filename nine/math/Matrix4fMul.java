@@ -18,10 +18,10 @@ public class Matrix4fMul implements Matrix4f
         {
             acceptor.call(index ->
             {
-                int i = index % 4;
-                int j = index / 4;
+                int i = index & 3;
+                int j = index >> 2;
                 int startA = i;
-                int startB = j * 4;
+                int startB = j << 2;
 
                 return ea.at(startA) * eb.at(startB) +
                         ea.at(startA + 4) * eb.at(startB + 1) +

@@ -73,7 +73,7 @@ public class Program {
 		glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE); // the window will be resizable
 
 		// Create the window
-		window = glfwCreateWindow(500, 500, "Hello World!", NULL, NULL);
+		window = glfwCreateWindow(500, 500, "LWJGL", NULL, NULL);
 		if ( window == NULL )
 			throw new RuntimeException("Failed to create the GLFW window");
 
