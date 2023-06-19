@@ -1,0 +1,1 @@
+java -Xms64M -jar build/nine.jar
