@@ -21,6 +21,7 @@ public class CubeDrawing implements Drawing
             1f, 1f, 1f,
             0f, 1f, 1f
         };
+        for(int i = 0; i < positions.length; i++) positions[i] -= 0.5f; 
         float[] uvs =
         {
             1f, 0f,
