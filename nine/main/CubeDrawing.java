@@ -23,23 +23,23 @@ public class CubeDrawing implements Drawing
         };
         float[] uvs =
         {
-            0f, 0f,
             1f, 0f,
-            1f, 1f,
-            0f, 1f,
+            1f, 0f,
+            1f, 0f,
+            1f, 0f,
 
-            0f, 0f,
-            1f, 0f,
-            1f, 1f,
+            0f, 1f,
+            0f, 1f,
+            0f, 1f,
             0f, 1f
         };
         int[] indices =
         {
-            0, 2, 1, // bottom
-            3, 2, 0,
+            0, 1, 2, // bottom
+            2, 3, 0,
 
-            4, 5, 6, // top
-            6, 7, 4,
+            6, 5, 4, // top
+            7, 6, 4,
 
             0, 4, 5, // back
             5, 1, 0,
@@ -47,8 +47,8 @@ public class CubeDrawing implements Drawing
             2, 6, 7, // front
             7, 3, 2,
 
-            0, 7, 3, // left
-            0, 4, 7,
+            0, 3, 7, // left
+            7, 4, 0,
 
             1, 5, 6, // right
             6, 2, 1

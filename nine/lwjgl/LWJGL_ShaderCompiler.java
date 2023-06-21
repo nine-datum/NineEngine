@@ -94,7 +94,7 @@ public class LWJGL_ShaderCompiler implements ShaderCompiler
                         });
                     }
                 });
-                return drawing ->
+                return drawing -> () ->
                 {
                     GL20.glUseProgram(program);
                     uniform.load();

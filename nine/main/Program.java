@@ -11,11 +11,13 @@ import nine.math.Matrix4f;
 import nine.math.Matrix4fMul;
 import nine.math.Matrix4fMulChain;
 import nine.math.Matrix4fPerspective;
+import nine.math.Matrix4fRotationX;
 import nine.math.Matrix4fRotationY;
 import nine.math.Matrix4fScale;
 import nine.math.Matrix4fTranslation;
 import nine.math.ValueFloat;
 import nine.math.ValueFloatAdd;
+import nine.math.ValueFloatDegreesToRadians;
 import nine.math.ValueFloatMul;
 import nine.math.ValueFloatSin;
 import nine.math.Time;
@@ -148,7 +150,7 @@ public class Program {
 			new Matrix4fTranslation(
 				new Vector3fZ(
 					new ValueFloatAdd(
-						new ValueFloatStruct(10f),
+						new ValueFloatStruct(5f),
 						new ValueFloatMul(
 							lerp,
 							new ValueFloatStruct(10f))))));
@@ -158,18 +160,19 @@ public class Program {
 			new Matrix4fMulChain(
 				projection,
 				new Matrix4fRotationY(new Time()),
+				new Matrix4fRotationX(new ValueFloatDegreesToRadians(45f)),
 				new Matrix4fScale(
-					new Vector3fStruct(0.3f, 0.3f, 0.2f)))));
+					new Vector3fStruct(0.5f, 0.5f, 0.5f)))));
 
-		Drawing drawing = new CubeDrawing(gl);
+		Drawing drawing = player.play(new CubeDrawing(gl));
 		
 		
 		// Run the rendering loop until the user has attempted to close
 		// the window or has pressed the ESCAPE key.
 		while ( !glfwWindowShouldClose(window) ) {
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
-			
-			player.play(drawing);
+
+			drawing.draw();
 
 			glfwSwapBuffers(window); // swap the color buffers
 
