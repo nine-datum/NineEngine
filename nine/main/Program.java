@@ -13,7 +13,9 @@ import nine.math.Matrix4fMulChain;
 import nine.math.Matrix4fPerspective;
 import nine.math.Matrix4fRotationX;
 import nine.math.Matrix4fRotationY;
+import nine.math.Matrix4fRotationZ;
 import nine.math.Matrix4fScale;
+import nine.math.Matrix4fTransform;
 import nine.math.Matrix4fTranslation;
 import nine.math.ValueFloat;
 import nine.math.ValueFloatAdd;
@@ -155,17 +157,31 @@ public class Program {
 							lerp,
 							new ValueFloatStruct(10f))))));
 		
-		ShaderPlayer player = shader.player(uniform -> uniform.uniformMatrix(
-			"transform",
-			new Matrix4fMulChain(
-				projection,
-				new Matrix4fRotationY(new Time()),
-				new Matrix4fRotationX(new ValueFloatDegreesToRadians(45f)),
-				new Matrix4fScale(
-					new Vector3fStruct(0.5f, 0.5f, 0.5f)))));
+		Matrix4f world = new Matrix4fMulChain(
+			projection,
+			new Matrix4fRotationY(new Time()),
+			new Matrix4fRotationX(new ValueFloatDegreesToRadians(0f)),
+			new Matrix4fScale(
+				new Vector3fStruct(1f, 1f, 1f)));
 
-		Drawing drawing = player.play(new CubeDrawing(gl));
-		
+		Drawing cube = new CubeDrawing(gl);
+
+		BodyPart head = new BodyPart(new Matrix4fTransform(
+			new Vector3fStruct(0f, 0.5f, 0f),
+			new Vector3fStruct(0f, 0f, 0f),
+			new Vector3fStruct(0.3f, 0.3f, 0.2f)
+		),
+		new Matrix4fScale(new Vector3fStruct(0.3f, 0.3f, 0.2f)),
+		new HeadDrawing(gl));
+
+		BodyPart body = new BodyPart(new Matrix4fTransform(
+			new Vector3fStruct(0f, 0f, 0f),
+			new Vector3fStruct(0f, 0f, 0f)
+		),
+		new Matrix4fScale(new Vector3fStruct(0.5f, 1f, 0.3f)),
+		cube, head);
+
+		Drawing drawing = body.drawing(shader, world);
 		
 		// Run the rendering loop until the user has attempted to close
 		// the window or has pressed the ESCAPE key.

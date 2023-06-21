@@ -5,6 +5,7 @@ import nine.collection.Flow;
 import nine.collection.MapFlow;
 import nine.math.Matrix4f;
 import nine.math.Matrix4fMul;
+import nine.math.Matrix4fMulChain;
 import nine.opengl.CompositeDrawing;
 import nine.opengl.Drawing;
 import nine.opengl.Shader;
@@ -14,23 +15,24 @@ public class BodyPart
 {
     Flow<BodyPart> children;
     Matrix4f transform;
+    Matrix4f local;
     Drawing drawing;
 
-    public BodyPart(Matrix4f transform, Drawing drawing, BodyPart... children)
+    public BodyPart(Matrix4f transform, Matrix4f local, Drawing drawing, BodyPart... children)
     {
         this.transform = transform;
         this.children = new ArrayFlow<BodyPart>(children);
         this.drawing = drawing;
+        this.local = local;
     }
     public Drawing drawing(Shader shader, Matrix4f world)
     {
-        Matrix4f mul = new Matrix4fMul(transform, world);
-        ShaderPlayer player = shader.player(u -> u.uniformMatrix("transform", mul));
+        ShaderPlayer player = shader.player(u -> u.uniformMatrix("transform", new Matrix4fMulChain(world, transform, local)));
         return new CompositeDrawing(
             player.play(drawing),
             new CompositeDrawing(
                 new MapFlow<>(
                     children,
-                    c -> c.drawing(shader, mul))));
+                    c -> c.drawing(shader, new Matrix4fMul(world, transform)))));
     }
 }

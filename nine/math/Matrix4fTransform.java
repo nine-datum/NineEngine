@@ -12,6 +12,13 @@ public class Matrix4fTransform implements Matrix4f
             new Matrix4fScale(scale)
         );
     }
+    public Matrix4fTransform(Vector3f position, Vector3f rotation)
+    {
+        result = new Matrix4fMul(
+            new Matrix4fTranslation(position),
+            new Matrix4fRotation(rotation));
+    }
+
 
     @Override
     public void accept(ElementsAcceptor acceptor)
