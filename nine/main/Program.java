@@ -120,57 +120,9 @@ public class Program {
 		GL.createCapabilities();
 
 		// Set the clear color
-		glClearColor(1.0f, 0.0f, 0.0f, 0.0f);
+		glClearColor(0.5f, 0.5f, 0.5f, 0f);
 		
-		float[] positions =
-        {
-            -0.5f, 0f, -3f,
-            0.5f, 0f, -3f,
-            1.5f, 1f, 0f,
-            2.5f, 5f, -3f,
-            1.5f, 6f, 0f,
-            -1.5f, 6f, 0f,
-            -2.5f, 5f, -3f,
-            -1.5f, 1f, 0f,
-            -0.5f, 2f, 3f,
-            0.5f, 2f, 3f,
-            0.5f, 4f, 3f,
-            -0.5f, 5f, 3f
-        };
-
-		float[] uvs = new float[positions.length / 3 * 2];
-		for(int i = 0; i < uvs.length; i++) uvs[i] = (1f / uvs.length) * i;
-
-        int[] indices =
-        {
-            0,6,3,
-            3,1,0,
-
-            1,3,2,
-            0,7,6,
-
-            6,5,4,
-            4,3,6,
-
-            5,6,11,
-            3,4,10,
-
-            4,5,11,
-            11,10,4,
-
-            6,7,8,
-            8,11,6,
-            3,10,9,
-            9,2,3,
-
-            10,11,8,
-            8,9,10,
-
-            8,7,0,
-            1,2,9,
-            9,8,0,
-            0,1,9
-        };
+		
 
 		Storage storage = new FileStorage();
 
@@ -208,11 +160,10 @@ public class Program {
 				new Matrix4fRotationY(new Time()),
 				new Matrix4fScale(
 					new Vector3fStruct(0.3f, 0.3f, 0.2f)))));
-		
-		Drawing drawing = gl.vao(indices)
-			.attribute(3, positions)
-			.attribute(2, uvs).drawing();
 
+		Drawing drawing = new CubeDrawing(gl);
+		
+		
 		// Run the rendering loop until the user has attempted to close
 		// the window or has pressed the ESCAPE key.
 		while ( !glfwWindowShouldClose(window) ) {
