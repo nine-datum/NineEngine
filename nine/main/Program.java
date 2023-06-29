@@ -122,7 +122,7 @@ public class Program {
 		GL.createCapabilities();
 
 		// Set the clear color
-		glClearColor(0.5f, 0.5f, 0.5f, 0f);
+		glClearColor(0.5f, 0.5f, 0.7f, 0f);
 		
 		
 
@@ -130,11 +130,12 @@ public class Program {
 
 		OpenGL gl = new LWJGL_OpenGL();
 		Shader shader = gl.compiler().createProgram(
-			new FileShaderSource(storage.open("shaders/vertex.glsl"), new ShaderVersionMacro("400")),
-			new FileShaderSource(storage.open("shaders/fragment.glsl"), new ShaderVersionMacro("400")), acceptor ->
+			new FileShaderSource(storage.open("shaders/diffuse_vertex.glsl"), new ShaderVersionMacro("400")),
+			new FileShaderSource(storage.open("shaders/diffuse_fragment.glsl"), new ShaderVersionMacro("400")), acceptor ->
 		{
 			acceptor.call(0, "position");
 			acceptor.call(1, "texcoord");
+			acceptor.call(2, "normal");
 		});
 
 		ValueFloat lerp = new ValueFloatMul(
