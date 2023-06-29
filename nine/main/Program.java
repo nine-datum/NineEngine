@@ -13,7 +13,6 @@ import nine.math.Matrix4fMulChain;
 import nine.math.Matrix4fPerspective;
 import nine.math.Matrix4fRotationX;
 import nine.math.Matrix4fRotationY;
-import nine.math.Matrix4fRotationZ;
 import nine.math.Matrix4fScale;
 import nine.math.Matrix4fTransform;
 import nine.math.Matrix4fTranslation;
@@ -29,7 +28,6 @@ import nine.math.Vector3fZ;
 import nine.opengl.Drawing;
 import nine.opengl.OpenGL;
 import nine.opengl.Shader;
-import nine.opengl.ShaderPlayer;
 import nine.opengl.shader.FileShaderSource;
 import nine.opengl.shader.ShaderVersionMacro;
 
