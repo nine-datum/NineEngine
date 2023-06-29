@@ -8,5 +8,5 @@ uniform vec3 worldLight;
 
 void main (void)
 {	
-	out_Color = vec4(vec3(1,1,1) * (dot(worldLight, worldNormal) + 1) * 0.5, 1);
+	out_Color = vec4(vec3(1,1,1) * (dot(worldNormal, -worldLight) + 1) * 0.5, 1);
 }

@@ -23,9 +23,9 @@ public class NormalsFlow implements Flow<Float>
             new RangeFlow(vertices.length() / 3),
             i -> action ->
             {
-                Vector3f a = vertices.at(i);
-                Vector3f b = vertices.at(i + 1);
-                Vector3f c = vertices.at(i + 2);
+                Vector3f a = vertices.at(i * 3);
+                Vector3f b = vertices.at(i * 3 + 1);
+                Vector3f c = vertices.at(i * 3 + 2);
                 Vector3f normal = new Vector3fNormalized(new Vector3fCross(new Vector3fSub(b, a), new Vector3fSub(c, a)));
                 action.call(normal);
                 action.call(normal);

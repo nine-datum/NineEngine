@@ -27,9 +27,9 @@ public class LWJGL_OpenGL implements OpenGL
     {
         return () ->
         {
-            GL20.glEnable(GL20.GL_DEPTH);
+            GL20.glEnable(GL20.GL_DEPTH_TEST);
             drawing.draw();
-            GL20.glDisable(GL20.GL_DEPTH);
+            GL20.glDisable(GL20.GL_DEPTH_TEST);
         };
     }
     @Override
@@ -40,6 +40,16 @@ public class LWJGL_OpenGL implements OpenGL
             GL20.glShadeModel(GL20.GL_SMOOTH);
             drawing.draw();
             GL20.glShadeModel(GL20.GL_FLAT);
+        };
+    }
+    @Override
+    public Drawing clockwise(Drawing drawing)
+    {
+        return () ->
+        {
+            GL20.glFrontFace(GL20.GL_CW);
+            drawing.draw();
+            GL20.glFrontFace(GL20.GL_CCW);
         };
     }
 }

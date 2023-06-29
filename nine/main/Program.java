@@ -16,15 +16,13 @@ import nine.math.Matrix4fRotationY;
 import nine.math.Matrix4fScale;
 import nine.math.Matrix4fTransform;
 import nine.math.Matrix4fTranslation;
-import nine.math.ValueFloat;
-import nine.math.ValueFloatAdd;
 import nine.math.ValueFloatDegreesToRadians;
-import nine.math.ValueFloatMul;
-import nine.math.ValueFloatSin;
 import nine.math.Time;
 import nine.math.ValueFloatStruct;
+import nine.math.Vector3fNormalized;
 import nine.math.Vector3fStruct;
 import nine.math.Vector3fZ;
+import nine.opengl.CompositeUniform;
 import nine.opengl.Drawing;
 import nine.opengl.OpenGL;
 import nine.opengl.Shader;
@@ -139,33 +137,24 @@ public class Program {
 			acceptor.call(2, "normal");
 		});
 
-		ShaderPlayer shaderPlayer = shader.player().uniforms(u ->
-			u.uniformVector("worldLight", new Vector3fStruct(0f, 0f, 1f)));
-
-		ValueFloat lerp = new ValueFloatMul(
-			new ValueFloatStruct(0.5f),
-			new ValueFloatAdd(new ValueFloatStruct(1f), new ValueFloatSin(new ValueFloatStruct(0f))));
-
-
 		Matrix4f projection = new Matrix4fMul(new Matrix4fPerspective(
 			new ValueFloatStruct(1f),
-			new ValueFloatStruct(0.3f),
+			new ValueFloatDegreesToRadians(60f),
 			new ValueFloatStruct(0.1f),
 			new ValueFloatStruct(100f)),
 			new Matrix4fTranslation(
 				new Vector3fZ(
-					new ValueFloatAdd(
-						new ValueFloatStruct(5f),
-						new ValueFloatMul(
-							lerp,
-							new ValueFloatStruct(10f))))));
+						new ValueFloatStruct(2.5f))));
+
+		ShaderPlayer shaderPlayer = shader.player().uniforms(u ->
+			new CompositeUniform(
+				u.uniformVector("worldLight", new Vector3fNormalized(new Vector3fStruct(0f, 0f, 1f))),
+				u.uniformMatrix("projection", projection)));
 		
 		Matrix4f world = new Matrix4fMulChain(
-			projection,
 			new Matrix4fRotationY(new Time()),
-			new Matrix4fRotationX(new ValueFloatDegreesToRadians(0f)),
-			new Matrix4fScale(
-				new Vector3fStruct(1f, 1f, 1f)));
+			new Matrix4fRotationX(new ValueFloatDegreesToRadians(15f)),
+			new Matrix4fTranslation(new Vector3fStruct(0f, 0f, 0f)));
 
 		Drawing cube = new CubeDrawing(gl);
 
@@ -184,7 +173,7 @@ public class Program {
 		new Matrix4fScale(new Vector3fStruct(0.5f, 1f, 0.3f)),
 		cube, head);
 
-		Drawing drawing = gl.depthOn(gl.smooth(body.drawing(shaderPlayer, world)));
+		Drawing drawing = gl.clockwise(gl.depthOn(gl.smooth(body.drawing(shaderPlayer, world))));
 		
 		// Run the rendering loop until the user has attempted to close
 		// the window or has pressed the ESCAPE key.

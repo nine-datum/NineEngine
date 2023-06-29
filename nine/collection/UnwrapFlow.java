@@ -20,9 +20,7 @@ public class UnwrapFlow implements Flow<Float>
     {
         indices.read(i ->
         {
-            action.call(data.at(i * size));
-            action.call(data.at(i * size + 1));
-            action.call(data.at(i * size + 2));
+            for(int s = 0; s < size; s++) action.call(data.at(i * size + s));
         });
     }
 }
