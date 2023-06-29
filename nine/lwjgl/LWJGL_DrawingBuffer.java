@@ -3,6 +3,8 @@ package nine.lwjgl;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 
+import nine.buffer.Buffer;
+import nine.buffer.IntegerCollector;
 import nine.function.Action;
 import nine.opengl.Drawing;
 import nine.opengl.DrawingAttributeBuffer;
@@ -10,15 +12,15 @@ import nine.opengl.DrawingBuffer;
 
 public class LWJGL_DrawingBuffer implements DrawingBuffer
 {
-    int[] elements;
+    Buffer<Integer> elements;
 
-    LWJGL_DrawingBuffer(int[] elements)
+    LWJGL_DrawingBuffer(Buffer<Integer> elements)
     {
         this.elements = elements;
     }
 
     @Override
-    public DrawingAttributeBuffer attribute(int stride, float[] data)
+    public DrawingAttributeBuffer attribute(int stride, Buffer<Float> data)
     {
         LWJGL_Vao vao = new LWJGL_Vao()
         {
@@ -29,6 +31,7 @@ public class LWJGL_DrawingBuffer implements DrawingBuffer
                 GL30.glBindVertexArray(vao);
 
                 int[] buffers = new int[count + 1];
+                int[] elements = new IntegerCollector().collect(LWJGL_DrawingBuffer.this.elements);
                 GL20.glGenBuffers(buffers);
 
                 GL20.glBindBuffer(GL20.GL_ELEMENT_ARRAY_BUFFER, buffers[0]);

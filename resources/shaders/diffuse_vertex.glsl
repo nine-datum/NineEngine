@@ -9,6 +9,6 @@ uniform mat4 transform;
 void main (void)
 {
 	uv = texcoord;
-	worldNormal = (transform * vec4(normal, 0)).xyz;
+	worldNormal = normal;// (transform * vec4(normal, 0)).xyz;
 	gl_Position = transform * vec4(position, 1);
 }

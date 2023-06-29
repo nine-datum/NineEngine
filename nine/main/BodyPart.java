@@ -8,7 +8,6 @@ import nine.math.Matrix4fMul;
 import nine.math.Matrix4fMulChain;
 import nine.opengl.CompositeDrawing;
 import nine.opengl.Drawing;
-import nine.opengl.Shader;
 import nine.opengl.ShaderPlayer;
 
 public class BodyPart
@@ -25,9 +24,9 @@ public class BodyPart
         this.drawing = drawing;
         this.local = local;
     }
-    public Drawing drawing(Shader shader, Matrix4f world)
+    public Drawing drawing(ShaderPlayer shader, Matrix4f world)
     {
-        ShaderPlayer player = shader.player(u -> u.uniformMatrix("transform", new Matrix4fMulChain(world, transform, local)));
+        ShaderPlayer player = shader.uniforms(u -> u.uniformMatrix("transform", new Matrix4fMulChain(world, transform, local)));
         return new CompositeDrawing(
             player.play(drawing),
             new CompositeDrawing(

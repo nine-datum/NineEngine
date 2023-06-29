@@ -1,7 +1,8 @@
 package nine.buffer;
 
-public interface Buffer<T>
+import nine.function.IntegerMapping;
+
+public interface Buffer<T> extends IntegerMapping<T>
 {
-    T at(int index);    
     int length();
 }

@@ -28,6 +28,7 @@ import nine.math.Vector3fZ;
 import nine.opengl.Drawing;
 import nine.opengl.OpenGL;
 import nine.opengl.Shader;
+import nine.opengl.ShaderPlayer;
 import nine.opengl.shader.FileShaderSource;
 import nine.opengl.shader.ShaderVersionMacro;
 
@@ -138,6 +139,9 @@ public class Program {
 			acceptor.call(2, "normal");
 		});
 
+		ShaderPlayer shaderPlayer = shader.player().uniforms(u ->
+			u.uniformVector("worldLight", new Vector3fStruct(0f, 0f, 1f)));
+
 		ValueFloat lerp = new ValueFloatMul(
 			new ValueFloatStruct(0.5f),
 			new ValueFloatAdd(new ValueFloatStruct(1f), new ValueFloatSin(new ValueFloatStruct(0f))));
@@ -180,7 +184,7 @@ public class Program {
 		new Matrix4fScale(new Vector3fStruct(0.5f, 1f, 0.3f)),
 		cube, head);
 
-		Drawing drawing = body.drawing(shader, world);
+		Drawing drawing = gl.depthOn(gl.smooth(body.drawing(shaderPlayer, world)));
 		
 		// Run the rendering loop until the user has attempted to close
 		// the window or has pressed the ESCAPE key.

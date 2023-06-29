@@ -10,6 +10,7 @@ public class MapFlow<TIn, TOut> implements Flow<TOut>
         this.in = in;
         this.mapping = mapping;
     }
+
     @Override
     public void read(FlowAction<TOut> action)
     {

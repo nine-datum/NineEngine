@@ -11,6 +11,11 @@ public class RangeBuffer implements Buffer<Integer>
         this.length = length;
     }
 
+    public RangeBuffer(int length)
+    {
+        this.length = length;
+    }
+
     @Override
     public Integer at(int index)
     {

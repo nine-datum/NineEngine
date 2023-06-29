@@ -1,5 +1,12 @@
 package nine.main;
 
+import nine.buffer.Buffer;
+import nine.buffer.FloatArrayBuffer;
+import nine.buffer.FlowToBuffer;
+import nine.buffer.IntegerArrayBuffer;
+import nine.buffer.RangeBuffer;
+import nine.collection.NormalsFlow;
+import nine.collection.UnwrapFlow;
 import nine.opengl.Drawing;
 import nine.opengl.OpenGL;
 
@@ -24,9 +31,6 @@ public class HeadDrawing implements Drawing
             0.5f, 4f, 3f,
             -0.5f, 5f, 3f
         };
-
-		float[] uvs = new float[positions.length / 3 * 2];
-		for(int i = 0; i < uvs.length; i++) uvs[i] = (1f / uvs.length) * i;
 
         int[] indices =
         {
@@ -58,9 +62,19 @@ public class HeadDrawing implements Drawing
             9,8,0,
             0,1,9
         };
-		drawing = gl.vao(indices)
-			.attribute(3, positions)
-			.attribute(2, uvs).drawing();
+
+        Buffer<Float> unwrap = new FlowToBuffer<Float>(
+            new UnwrapFlow(
+                new FloatArrayBuffer(positions),
+                new IntegerArrayBuffer(indices),
+                3));
+
+        Buffer<Float> normals = new FlowToBuffer<Float>(new NormalsFlow(unwrap));
+
+		drawing = gl.vao(new RangeBuffer(indices.length))
+			.attribute(3, unwrap)
+			.attribute(2, unwrap)
+            .attribute(3, normals).drawing();
 	}
 
 	@Override

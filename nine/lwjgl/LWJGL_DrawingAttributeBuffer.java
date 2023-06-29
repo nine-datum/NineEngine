@@ -3,6 +3,8 @@ package nine.lwjgl;
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 
+import nine.buffer.Buffer;
+import nine.buffer.FloatCollector;
 import nine.function.Action;
 import nine.opengl.Drawing;
 import nine.opengl.DrawingAttributeBuffer;
@@ -11,11 +13,12 @@ public class LWJGL_DrawingAttributeBuffer implements DrawingAttributeBuffer
 {
     int index;
     int stride;
-    float[] data;
+    Buffer<Float> data;
     LWJGL_DrawingAttributeBuffer previous;
     LWJGL_Vao vao;
+    static final FloatCollector floatCollector = new FloatCollector();
     
-    private LWJGL_DrawingAttributeBuffer(LWJGL_Vao vao, int index, int stride, float[] data, LWJGL_DrawingAttributeBuffer previous)
+    private LWJGL_DrawingAttributeBuffer(LWJGL_Vao vao, int index, int stride, Buffer<Float> data, LWJGL_DrawingAttributeBuffer previous)
     {
         this.index = index;
         this.stride = stride;
@@ -24,7 +27,7 @@ public class LWJGL_DrawingAttributeBuffer implements DrawingAttributeBuffer
         this.vao = vao;
     }
 
-    LWJGL_DrawingAttributeBuffer(LWJGL_Vao vao, int index, int stride, float[] data)
+    LWJGL_DrawingAttributeBuffer(LWJGL_Vao vao, int index, int stride, Buffer<Float> data)
     {
         this.index = index;
         this.stride = stride;
@@ -33,7 +36,7 @@ public class LWJGL_DrawingAttributeBuffer implements DrawingAttributeBuffer
     }
 
     @Override
-    public DrawingAttributeBuffer attribute(int stride, float[] data)
+    public DrawingAttributeBuffer attribute(int stride, Buffer<Float> data)
     {
         return new LWJGL_DrawingAttributeBuffer(vao, index + 1, stride, data, this);
     }
@@ -44,7 +47,7 @@ public class LWJGL_DrawingAttributeBuffer implements DrawingAttributeBuffer
         Action last = previous == null ? () -> { } : previous.activation(vbos);
         vbo.bind(() ->
         {
-            GL15.glBufferData(GL15.GL_ARRAY_BUFFER, data, GL15.GL_STATIC_DRAW);
+            GL15.glBufferData(GL15.GL_ARRAY_BUFFER, floatCollector.collect(data), GL15.GL_STATIC_DRAW);
             GL20.glVertexAttribPointer(index, stride, GL20.GL_FLOAT, false, 0, 0);
         });
         return () ->
