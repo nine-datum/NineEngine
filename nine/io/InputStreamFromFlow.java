@@ -1,23 +1,25 @@
 package nine.io;
 
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 
 public class InputStreamFromFlow extends InputStream
 {
-    private List<Byte> buffer = new ArrayList<Byte>();
-    private int position;
+    private static Count one = new MinCount(1);
+    private static ThreadLocal<Integer> temp = new ThreadLocal<Integer>();
+    private static Output set = i -> temp.set(Byte.toUnsignedInt(i));
+
+    private InputFlow flow;
 
     public InputStreamFromFlow(InputFlow flow)
     {
-        flow.read(MaxCount.identity, buffer::add);
+        this.flow = flow;
     }
 
     @Override
     public int read()
     {
-        if (position < buffer.size()) return Byte.toUnsignedInt(buffer.get(position++));
-        else return -1;
+        temp.set(-1);
+        flow.read(one, set);
+        return temp.get();
     }
 }

@@ -1,6 +1,5 @@
 package nine.geometry.collada;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -22,6 +21,8 @@ import nine.collection.RangeFlow;
 import nine.function.ErrorHandler;
 import nine.function.IntegerMapping;
 import nine.geometry.Model;
+import nine.io.InputStreamFromFlow;
+import nine.io.StorageResource;
 import nine.opengl.CompositeDrawing;
 import nine.opengl.Drawing;
 import nine.opengl.OpenGL;
@@ -30,18 +31,21 @@ public class ColladaModel implements Model
 {
     ColladaNode node;
 
-    public ColladaModel(File source, ErrorHandler errorHandler)
+    public ColladaModel(StorageResource source, ErrorHandler errorHandler)
     {
-        try
+        source.read(flow ->
         {
-            Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(source);
-            node = new XML_ColladaNode(document);
-        }
-        catch(Throwable error)
-        {
-            errorHandler.call(error);
-            node = new EmptyColladaNode();
-        }
+            try
+            {
+                Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputStreamFromFlow(flow));
+                node = new XML_ColladaNode(document);
+            }
+            catch(Throwable error)
+            {
+                errorHandler.call(error);
+                node = new EmptyColladaNode();
+            }
+        }, errorHandler);
     }
 
     @Override
