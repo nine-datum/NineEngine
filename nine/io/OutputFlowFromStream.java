@@ -3,8 +3,6 @@ package nine.io;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import nine.function.ErrorPrinter;
-
 public class OutputFlowFromStream implements OutputFlow
 {
     OutputStream stream;
@@ -15,9 +13,12 @@ public class OutputFlowFromStream implements OutputFlow
     }
 
     @Override
-    public void write(byte b)
+    public void write(Input input)
     {
-        try { stream.write(b); }
-        catch(IOException error) { ErrorPrinter.instance.call(error); }
+        input.in(in ->
+        {
+            try { stream.write(in); }
+            catch(IOException error) {}
+        });
     }
 }

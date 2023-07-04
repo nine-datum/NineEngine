@@ -2,5 +2,5 @@ package nine.io;
 
 public interface OutputFlow
 {
-    void write(byte b);
+    void write(Input input);
 }

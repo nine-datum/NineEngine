@@ -3,8 +3,6 @@ package nine.io;
 import java.io.IOException;
 import java.io.InputStream;
 
-import nine.function.ErrorPrinter;
-
 public class InputFlowFromStream implements InputFlow
 {
     InputStream stream;
@@ -15,9 +13,14 @@ public class InputFlowFromStream implements InputFlow
     }
 
     @Override
-    public int read() {
-        try { return stream.read(); }
-        catch(IOException error) { ErrorPrinter.instance.call(error); }
-        return -1;
+    public void read(Count count, Output output) {
+        try
+        {
+            int index = 0;
+            int r;
+            int c = count.count(Integer.MAX_VALUE);
+            while(index++ < c && (r = stream.read()) != -1) output.out((byte)r);
+        }
+        catch(IOException error) {}
     }
 }

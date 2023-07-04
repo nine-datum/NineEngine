@@ -11,9 +11,10 @@ public class ByteArrayInputFlow implements InputFlow
     }
 
     @Override
-    public int read()
+    public void read(Count count, Output output)
     {
-        if(position < array.length) return array[position++];
-        return -1;
+        int c = count.count(array.length - position);
+        new ByteArrayInput(array, position, c).in(output);
+        position += c;
     }
 }

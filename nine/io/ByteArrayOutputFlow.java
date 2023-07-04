@@ -2,17 +2,17 @@ package nine.io;
 
 public class ByteArrayOutputFlow implements OutputFlow
 {
-    byte[] array;
+    private Output output;
     private int position;
 
     public ByteArrayOutputFlow(byte[] array)
     {
-        this.array = array;
+        output = in -> array[position++] = in;
     }
 
     @Override
-    public void write(byte b)
+    public void write(Input input)
     {
-        array[position++] = b;
+        input.in(output);
     }
 }

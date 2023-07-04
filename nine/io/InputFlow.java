@@ -2,5 +2,5 @@ package nine.io;
 
 public interface InputFlow
 {
-    int read();
+    void read(Count count, Output output);
 }
