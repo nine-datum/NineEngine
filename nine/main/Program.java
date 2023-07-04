@@ -4,6 +4,7 @@ import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
 import org.lwjgl.system.*;
 
+import nine.geometry.collada.ColladaModel;
 import nine.io.FileStorage;
 import nine.io.Storage;
 import nine.lwjgl.LWJGL_OpenGL;
@@ -21,7 +22,6 @@ import nine.math.Time;
 import nine.math.ValueFloatStruct;
 import nine.math.Vector3fNormalized;
 import nine.math.Vector3fStruct;
-import nine.math.Vector3fZ;
 import nine.opengl.CompositeUniform;
 import nine.opengl.Drawing;
 import nine.opengl.OpenGL;
@@ -30,6 +30,7 @@ import nine.opengl.ShaderPlayer;
 import nine.opengl.shader.FileShaderSource;
 import nine.opengl.shader.ShaderVersionMacro;
 
+import java.io.File;
 import java.nio.*;
 
 import static org.lwjgl.glfw.Callbacks.*;
@@ -137,14 +138,14 @@ public class Program {
 			acceptor.call(2, "normal");
 		});
 
+		Matrix4f cameraInversed = new Matrix4fTranslation(new Vector3fStruct(0f, -1f, 2.5f));
+
 		Matrix4f projection = new Matrix4fMul(new Matrix4fPerspective(
 			new ValueFloatStruct(1f),
 			new ValueFloatDegreesToRadians(60f),
 			new ValueFloatStruct(0.1f),
 			new ValueFloatStruct(100f)),
-			new Matrix4fTranslation(
-				new Vector3fZ(
-						new ValueFloatStruct(2.5f))));
+			cameraInversed);
 
 		ShaderPlayer shaderPlayer = shader.player().uniforms(u ->
 			new CompositeUniform(
@@ -153,25 +154,17 @@ public class Program {
 		
 		Matrix4f world = new Matrix4fMulChain(
 			new Matrix4fRotationY(new Time()),
-			new Matrix4fRotationX(new ValueFloatDegreesToRadians(15f)),
+			new Matrix4fRotationX(new ValueFloatDegreesToRadians(-90f)),
 			new Matrix4fTranslation(new Vector3fStruct(0f, 0f, 0f)));
 
-		Drawing cube = new CubeDrawing(gl);
-
-		BodyPart head = new BodyPart(new Matrix4fTransform(
-			new Vector3fStruct(0f, 0.5f, 0f),
-			new Vector3fStruct(0f, 0f, 0f),
-			new Vector3fStruct(0.3f, 0.3f, 0.2f)
-		),
-		new Matrix4fScale(new Vector3fStruct(0.3f, 0.3f, 0.2f)),
-		new HeadDrawing(gl));
+		Drawing cube = new ColladaModel(new File("resources/models/Character.dae"), System.out::println).load(gl);
 
 		BodyPart body = new BodyPart(new Matrix4fTransform(
 			new Vector3fStruct(0f, 0f, 0f),
 			new Vector3fStruct(0f, 0f, 0f)
 		),
-		new Matrix4fScale(new Vector3fStruct(0.5f, 1f, 0.3f)),
-		cube, head);
+		new Matrix4fScale(new Vector3fStruct(1f, 1f, 1f)),
+		cube);
 
 		Drawing drawing = gl.clockwise(gl.depthOn(gl.smooth(body.drawing(shaderPlayer, world))));
 		

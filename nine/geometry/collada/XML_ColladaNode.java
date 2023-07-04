@@ -1,7 +1,6 @@
 package nine.geometry.collada;
 
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 public class XML_ColladaNode implements ColladaNode
 {
@@ -21,16 +20,15 @@ public class XML_ColladaNode implements ColladaNode
     @Override
     public void children(String tag, NodeReader reader)
     {
-        NodeList children = node.getChildNodes();
-        int length = children.getLength();
-        for(int i = 0; i < length; i++)
+        Node child = node.getFirstChild();
+        do
         {
-            Node child = children.item(i);
             if(child.getNodeName().equals(tag))
             {
                 reader.read(new XML_ColladaNode(child));
             }
         }
+        while((child = child.getNextSibling()) != null);
     }
 
     @Override

@@ -50,16 +50,16 @@ public class ColladaModel implements Model
         List<Drawing> drawings = new ArrayList<Drawing>();
 
         node.children("COLLADA", root ->
-            root.children("library_geometries", geom ->
-                geom.children("mesh", mesh ->
+            root.children("library_geometries", lib ->
+            lib.children("geometry", geom ->
+            geom.children("mesh", mesh ->
         {
-            List<Buffer<Float>> buffers = List.of(
+            List<Buffer<Float>> buffers = new ArrayList<>(List.of(
                 new EmptyBuffer<Float>(), // positions
                 new EmptyBuffer<Float>(), // normals
                 new EmptyBuffer<Float>(), // uvs
                 new EmptyBuffer<Float>() // not used
-            );
-            Buffer<Integer> indices = new EmptyBuffer<Integer>();
+            ));
 
             Mapping<String, Integer> semanticIndex = s ->
             {
@@ -87,9 +87,7 @@ public class ColladaModel implements Model
                 sources.put(id, i -> a ->
                 {
                     int m = i * step;
-                    a.call(buffer.at(m));
-                    a.call(buffer.at(m + 1));
-                    a.call(buffer.at(m + 2));
+                    for(int c = 0; c < step; c++) a.call(buffer.at(m + c));
                 });
             })))))));
 
@@ -98,7 +96,9 @@ public class ColladaModel implements Model
                 vertices.children("input", input ->
                 input.attribute("source", source ->
             {
-                sources.put(id, sources.get(source));
+                String s = source.replaceFirst("#", "");
+                sources.put(id, sources.get(s));
+                sources.remove(s);
             }))));
 
             int elementsCount = sources.size();
@@ -120,7 +120,7 @@ public class ColladaModel implements Model
                             new FlowToBuffer<>(
                                 new FlatmapFlow<>(
                                     new RangeFlow(indicesCount / elementsCount),
-                                    i -> sourceBuffer.at(indices.at(i * elementsCount + step)))));
+                                    i -> sourceBuffer.at(rawIndices.at(i * elementsCount + step)))));
                     })));
                 });
 
@@ -130,7 +130,7 @@ public class ColladaModel implements Model
                     .attribute(3, buffers.get(semanticIndex.map("NORMAL")))
                     .drawing());
             })));
-        })));
+        }))));
 
         return new CompositeDrawing(new IterableFlow<Drawing>(drawings));
     }
