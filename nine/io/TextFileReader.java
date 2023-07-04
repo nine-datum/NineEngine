@@ -18,7 +18,7 @@ public class TextFileReader
     {
         file.read(flow ->
         {
-            Scanner scanner = new Scanner(new InputStreamFromFlow(flow));
+            Scanner scanner = new Scanner(flow);
             List<String> lines = new ArrayList<String>();
             while(scanner.hasNextLine())
             {

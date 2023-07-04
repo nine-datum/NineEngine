@@ -21,7 +21,6 @@ import nine.collection.RangeFlow;
 import nine.function.ErrorHandler;
 import nine.function.IntegerMapping;
 import nine.geometry.Model;
-import nine.io.InputStreamFromFlow;
 import nine.io.StorageResource;
 import nine.opengl.CompositeDrawing;
 import nine.opengl.Drawing;
@@ -37,7 +36,7 @@ public class ColladaModel implements Model
         {
             try
             {
-                Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputStreamFromFlow(flow));
+                Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(flow);
                 node = new XML_ColladaNode(document);
             }
             catch(Throwable error)

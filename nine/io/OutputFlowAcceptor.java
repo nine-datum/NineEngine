@@ -1,6 +1,8 @@
 package nine.io;
 
+import java.io.OutputStream;
+
 public interface OutputFlowAcceptor
 {
-    void call(OutputFlow outputFlow);
+    void call(OutputStream outputFlow);
 }

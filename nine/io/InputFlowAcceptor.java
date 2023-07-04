@@ -1,6 +1,8 @@
 package nine.io;
 
+import java.io.InputStream;
+
 public interface InputFlowAcceptor
 {
-    void call(InputFlow inputFlow);
+    void call(InputStream inputFlow);
 }
