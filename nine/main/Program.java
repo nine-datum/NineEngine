@@ -155,18 +155,18 @@ public class Program {
 		
 		Matrix4f world = new Matrix4fMulChain(
 			new Matrix4fRotationY(new Time()),
-			new Matrix4fRotationX(new ValueFloatDegreesToRadians(-90f)),
+			new Matrix4fRotationX(new ValueFloatDegreesToRadians(0f)),
 			new Matrix4fTranslation(new Vector3fStruct(0f, 0f, 0f)));
 
-		Texture texture = gl.texture(storage.open("models/Character.png"));
-		Drawing cube = new ColladaModel(storage.open("models/Character.dae"), ErrorPrinter.instance).load(gl);
+		Texture texture = gl.texture(storage.open("models/Knight.png"));
+		Drawing cube = new ColladaModel(storage.open("models/Knight.dae"), ErrorPrinter.instance).load(gl);
 		cube = texture.apply(cube);
 
 		BodyPart body = new BodyPart(new Matrix4fTransform(
 			new Vector3fStruct(0f, 0f, 0f),
 			new Vector3fStruct(0f, 0f, 0f)
 		),
-		new Matrix4fScale(new Vector3fStruct(1f, 1f, 1f)),
+		new Matrix4fScale(new Vector3fStruct(0.01f, 0.01f, 0.01f)),
 		cube);
 
 		Drawing drawing = gl.clockwise(gl.depthOn(gl.smooth(body.drawing(shaderPlayer, world))));
