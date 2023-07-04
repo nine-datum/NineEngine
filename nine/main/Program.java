@@ -154,16 +154,16 @@ public class Program {
 		
 		Matrix4f world = new Matrix4fMulChain(
 			new Matrix4fRotationY(new Time()),
-			new Matrix4fRotationX(new ValueFloatDegreesToRadians(-90f)),
+			new Matrix4fRotationX(new ValueFloatDegreesToRadians(0f)),
 			new Matrix4fTranslation(new Vector3fStruct(0f, 0f, 0f)));
 
-		Drawing cube = new ColladaModel(new File("resources/models/Character.dae"), System.out::println).load(gl);
+		Drawing cube = new ColladaModel(new File("resources/models/Knight.dae"), System.out::println).load(gl);
 
 		BodyPart body = new BodyPart(new Matrix4fTransform(
 			new Vector3fStruct(0f, 0f, 0f),
 			new Vector3fStruct(0f, 0f, 0f)
 		),
-		new Matrix4fScale(new Vector3fStruct(1f, 1f, 1f)),
+		new Matrix4fScale(new Vector3fStruct(0.01f, 0.01f, 0.01f)),
 		cube);
 
 		Drawing drawing = gl.clockwise(gl.depthOn(gl.smooth(body.drawing(shaderPlayer, world))));

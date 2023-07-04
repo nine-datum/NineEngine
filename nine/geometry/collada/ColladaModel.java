@@ -103,7 +103,7 @@ public class ColladaModel implements Model
 
             int elementsCount = sources.size();
 
-            mesh.children("triangles", triangles -> triangles.children("p", p -> p.content(pContent ->
+            NodeReader trianglesReader = triangles -> triangles.children("p", p -> p.content(pContent ->
             {
                 Buffer<Integer> rawIndices = new TextValueBuffer<Integer>(pContent, Integer::parseInt);
                 int indicesCount = rawIndices.length();
@@ -129,7 +129,9 @@ public class ColladaModel implements Model
                     .attribute(2, buffers.get(semanticIndex.map("TEXCOORD")))
                     .attribute(3, buffers.get(semanticIndex.map("NORMAL")))
                     .drawing());
-            })));
+            }));
+            mesh.children("triangles", trianglesReader);
+            mesh.children("polylist", trianglesReader);
         }))));
 
         return new CompositeDrawing(new IterableFlow<Drawing>(drawings));
