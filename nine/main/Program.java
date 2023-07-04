@@ -153,10 +153,12 @@ public class Program {
 				u.uniformVector("worldLight", new Vector3fNormalized(new Vector3fStruct(0f, 0f, 1f))),
 				u.uniformMatrix("projection", projection)));
 		
+		Vector3fStruct position = new Vector3fStruct();
+
 		Matrix4f world = new Matrix4fMulChain(
+			new Matrix4fTranslation(position),
 			new Matrix4fRotationY(new Time()),
-			new Matrix4fRotationX(new ValueFloatDegreesToRadians(0f)),
-			new Matrix4fTranslation(new Vector3fStruct(0f, 0f, 0f)));
+			new Matrix4fRotationX(new ValueFloatDegreesToRadians(0f)));
 
 		Texture texture = gl.texture(storage.open("models/Knight.png"));
 		Drawing cube = new ColladaModel(storage.open("models/Knight.dae"), ErrorPrinter.instance).load(gl);
@@ -176,7 +178,13 @@ public class Program {
 		while ( !glfwWindowShouldClose(window) ) {
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
 
-			drawing.draw();
+			for(int i = 0; i < 9; i++)
+			{
+				position.x = (i / 3) * 2f - 2;
+				position.y = (i % 3) * 2f - 2;
+				position.z = 3f;
+				drawing.draw();
+			}
 
 			glfwSwapBuffers(window); // swap the color buffers
 
