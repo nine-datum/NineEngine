@@ -16,7 +16,11 @@ public class Matrix4fPrinter
         matrix.accept(elements ->
         {
             printer.call("[");
-            for(int i = 0; i < 16; i++) printer.call(String.valueOf(elements.at(i))); 
+            for(int i = 0; i < 16; i++)
+            {
+                if(i != 0) printer.call(", ");
+                printer.call(String.valueOf(elements.at(i)));
+            } 
             printer.call("]");
         });
     }
