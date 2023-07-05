@@ -20,6 +20,10 @@ public class ColladaModel implements Model
         this.node = node;
         this.parser = parser;
     }
+    public ColladaModel(ColladaNode node)
+    {
+        this(node, new ColladaBasicGeometryParser());
+    }
 
     @Override
     public Drawing load(OpenGL gl, ShaderPlayer shader)

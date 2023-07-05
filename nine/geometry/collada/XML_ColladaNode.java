@@ -21,6 +21,7 @@ public class XML_ColladaNode implements ColladaNode
     public void children(String tag, NodeReader reader)
     {
         Node child = node.getFirstChild();
+        if(child == null) return;
         do
         {
             if(child.getNodeName().equals(tag))

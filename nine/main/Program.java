@@ -169,11 +169,11 @@ public class Program {
 		Matrix4f world = new Matrix4fMulChain(
 			new Matrix4fTranslation(position),
 			new Matrix4fRotationY(new Time()),
-			new Matrix4fRotationX(new ValueFloatDegreesToRadians(0f)));
+			new Matrix4fRotationX(new ValueFloatDegreesToRadians(-90)));
 
-		Texture texture = gl.texture(storage.open("models/Archer.png"));
+		Texture texture = gl.texture(storage.open("models/Character.png"));
 		Drawing cube =
-			new ColladaSkinnedModel(new FileColladaNode(storage.open("models/Archer.dae"), ErrorPrinter.instance))
+			new ColladaSkinnedModel(new FileColladaNode(storage.open("models/Character.dae"), ErrorPrinter.instance))
 			.load(gl, shaderPlayer);
 
 		cube = texture.apply(cube);
@@ -182,7 +182,7 @@ public class Program {
 			new Vector3fStruct(0f, 0f, 0f),
 			new Vector3fStruct(0f, 0f, 0f)
 		),
-		new Matrix4fScale(new Vector3fStruct(0.01f, 0.01f, 0.01f)),
+		new Matrix4fScale(new Vector3fStruct(1f, 1f, 1f)),
 		cube);
 
 		Drawing drawing = gl.clockwise(gl.depthOn(gl.smooth(body.drawing(shader.player(), world))));
@@ -195,12 +195,12 @@ public class Program {
 
 			time.accept(t ->
 			{
-				int l = ((int)t % 9 + 1);
+				int l = ((int)(t * 10) % 90 + 1);
 				for(int i = 0; i < l; i++)
 				{
-					position.x = (i / 3) * 2f - 2;
-					position.y = (i % 3) * 2f - 2;
-					position.z = 3f;
+					position.x = (i % 3) * 2f - 2;
+					position.y = ((i / 3) % 3) * 2f - 2;
+					position.z = (i / 9 + 1) * 3f;
 					drawing.draw();
 				
 				}

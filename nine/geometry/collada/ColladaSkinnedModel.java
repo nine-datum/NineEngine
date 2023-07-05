@@ -93,6 +93,7 @@ public class ColladaSkinnedModel implements Model
             map.put("#" + skinId, map.get(sourceId)
                 .attribute(weightPerIndex, ordered_joints)
                 .attribute(weightPerIndex, ordered_weights));
+            map.remove(sourceId);
 
             new RangeFlow(names.length()).read(i -> boneIndices.put(names.at(i), i));
             invBindPoses.put("#" + skinId, invBind);
@@ -103,6 +104,7 @@ public class ColladaSkinnedModel implements Model
         skeletonParser.read(node, animations::get, matrixUpdateStatus, (skinId, skeleton) ->
         {
             DrawingAttributeBuffer skin = map.get(skinId);
+
             Matrix4f[] bones = new Collector<>(Matrix4f[]::new)
                 .collect(new MapBuffer<>(new RangeBuffer(100), i -> Matrix4fIdentity.identity));
 
@@ -126,10 +128,10 @@ public class ColladaSkinnedModel implements Model
             })));
         });
 
-        return shader.play(new CompositeDrawing(
+        return new CompositeDrawing(
             new CachedFlow<>(
                 new MapFlow<>(
                     new IterableFlow<>(map.values()),
-                    m -> m.drawing()))));
+                    m -> m.drawing())));
     }
 }

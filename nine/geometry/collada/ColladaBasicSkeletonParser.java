@@ -1,6 +1,8 @@
 package nine.geometry.collada;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import nine.function.RefreshStatus;
 import nine.math.Matrix4f;
@@ -15,12 +17,16 @@ public class ColladaBasicSkeletonParser implements ColladaSkeletonParser
         root.children("library_visual_scenes", scenes ->
         scenes.children("visual_scene", scene ->
         {
+            List<ColladaNode> controllers = new ArrayList<>();
             HashMap<String, Matrix4f> bones = new HashMap<>();
-            scene.children("node", new ColladaBoneNodeReader(Matrix4fIdentity.identity, animator, refresh, bones::put, controller ->
-            controller.attribute("url", skinId ->
+            scene.children("node", new ColladaBoneNodeReader(Matrix4fIdentity.identity, animator, refresh, bones::put, controllers::add));
+            for(ColladaNode controller : controllers)
             {
-                reader.read(skinId, bones::get);
-            })));
+                controller.attribute("url", skinId ->
+                {
+                    reader.read(skinId, bones::get);
+                });
+            }
         })));
     }
 }
