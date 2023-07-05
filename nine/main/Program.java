@@ -5,6 +5,7 @@ import org.lwjgl.opengl.*;
 import org.lwjgl.system.*;
 
 import nine.function.ErrorPrinter;
+import nine.geometry.collada.ColladaGeometryParser;
 import nine.geometry.collada.ColladaModel;
 import nine.io.FileStorage;
 import nine.io.Storage;
@@ -44,6 +45,8 @@ public class Program {
 
 	// The window handle
 	private long window;
+	int width = 1000;
+	int height = 1000;
 
 	public void run() {
 
@@ -76,7 +79,7 @@ public class Program {
 		glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE); // the window will be resizable
 
 		// Create the window
-		window = glfwCreateWindow(500, 500, "LWJGL", NULL, NULL);
+		window = glfwCreateWindow(width, height, "LWJGL", NULL, NULL);
 		if ( window == NULL )
 			throw new RuntimeException("Failed to create the GLFW window");
 
@@ -109,6 +112,12 @@ public class Program {
 		glfwMakeContextCurrent(window);
 		// Enable v-sync
 		glfwSwapInterval(1);
+		glfwSetFramebufferSizeCallback(window, (d, w, h) ->
+		{
+			width = w;
+			height = h;
+			GL11.glViewport(0, 0, w, h);
+		});
 
 		// Make the window visible
 		glfwShowWindow(window);
@@ -142,7 +151,7 @@ public class Program {
 		Matrix4f cameraInversed = new Matrix4fTranslation(new Vector3fStruct(0f, -1f, 2.5f));
 
 		Matrix4f projection = new Matrix4fMul(new Matrix4fPerspective(
-			new ValueFloatStruct(1f),
+			a -> a.call(width / (float)height),
 			new ValueFloatDegreesToRadians(60f),
 			new ValueFloatStruct(0.1f),
 			new ValueFloatStruct(100f)),
@@ -161,7 +170,10 @@ public class Program {
 			new Matrix4fRotationX(new ValueFloatDegreesToRadians(0f)));
 
 		Texture texture = gl.texture(storage.open("models/Knight.png"));
-		Drawing cube = new ColladaModel(storage.open("models/Knight.dae"), ErrorPrinter.instance).load(gl);
+		Drawing cube = new ColladaModel(
+			storage.open("models/Knight.dae"),
+			new ColladaGeometryParser(),
+			ErrorPrinter.instance).load(gl);
 		cube = texture.apply(cube);
 
 		BodyPart body = new BodyPart(new Matrix4fTransform(
