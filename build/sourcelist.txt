@@ -20,6 +20,8 @@ D:\JavaProjects\NineEngine\nine\function\IntegerMapping.java
 D:\JavaProjects\NineEngine\nine\function\Condition.java
 D:\JavaProjects\NineEngine\nine\function\ErrorPrinter.java
 D:\JavaProjects\NineEngine\nine\function\ActionDouble.java
+D:\JavaProjects\NineEngine\nine\function\Refreshable.java
+D:\JavaProjects\NineEngine\nine\function\RefreshStatus.java
 D:\JavaProjects\NineEngine\nine\opengl\Drawing.java
 D:\JavaProjects\NineEngine\nine\opengl\DrawingBuffer.java
 D:\JavaProjects\NineEngine\nine\opengl\OpenGL.java
@@ -153,6 +155,7 @@ D:\JavaProjects\NineEngine\nine\math\Matrix4fInversed.java
 D:\JavaProjects\NineEngine\nine\math\Matrix4fDet.java
 D:\JavaProjects\NineEngine\nine\math\Matrix4fDelayed.java
 D:\JavaProjects\NineEngine\nine\math\Vector3fMatrixRotation.java
+D:\JavaProjects\NineEngine\nine\math\Matrix4fRefreshable.java
 D:\JavaProjects\NineEngine\nine\drawing\ColorFloat.java
 D:\JavaProjects\NineEngine\nine\drawing\ColorFloatsAcceptor.java
 D:\JavaProjects\NineEngine\nine\drawing\ColorFloatStruct.java
@@ -263,4 +266,4 @@ D:\JavaProjects\NineEngine\nine\geometry\collada\KeyFrameAnimation.java
 D:\JavaProjects\NineEngine\nine\geometry\collada\ColladaBasicAnimationParser.java
 D:\JavaProjects\NineEngine\nine\geometry\collada\ShadedDrawingAttributeBuffer.java
 D:\JavaProjects\NineEngine\nine\geometry\collada\Animator.java
-D:\JavaProjects\NineEngine\nine\geometry\collada\RefreshStatus.java
+D:\JavaProjects\NineEngine\nine\geometry\collada\UpdateRefreshStatus.java
