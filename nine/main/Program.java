@@ -10,6 +10,7 @@ import nine.geometry.collada.FileColladaNode;
 import nine.io.FileStorage;
 import nine.io.Storage;
 import nine.lwjgl.LWJGL_OpenGL;
+import nine.math.LocalTime;
 import nine.math.Matrix4f;
 import nine.math.Matrix4fMul;
 import nine.math.Matrix4fMulChain;
@@ -21,6 +22,7 @@ import nine.math.Matrix4fTransform;
 import nine.math.Matrix4fTranslation;
 import nine.math.ValueFloatDegreesToRadians;
 import nine.math.Time;
+import nine.math.ValueFloat;
 import nine.math.ValueFloatStruct;
 import nine.math.Vector3fNormalized;
 import nine.math.Vector3fStruct;
@@ -184,19 +186,25 @@ public class Program {
 		cube);
 
 		Drawing drawing = gl.clockwise(gl.depthOn(gl.smooth(body.drawing(shader.player(), world))));
+		ValueFloat time = new LocalTime();
 		
 		// Run the rendering loop until the user has attempted to close
 		// the window or has pressed the ESCAPE key.
 		while ( !glfwWindowShouldClose(window) ) {
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
 
-			for(int i = 0; i < 9; i++)
+			time.accept(t ->
 			{
-				position.x = (i / 3) * 2f - 2;
-				position.y = (i % 3) * 2f - 2;
-				position.z = 3f;
-				drawing.draw();
-			}
+				int l = ((int)t % 9 + 1);
+				for(int i = 0; i < l; i++)
+				{
+					position.x = (i / 3) * 2f - 2;
+					position.y = (i % 3) * 2f - 2;
+					position.z = 3f;
+					drawing.draw();
+				
+				}
+			});
 
 			glfwSwapBuffers(window); // swap the color buffers
 

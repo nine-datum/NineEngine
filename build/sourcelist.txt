@@ -156,6 +156,7 @@ D:\JavaProjects\NineEngine\nine\math\Matrix4fDet.java
 D:\JavaProjects\NineEngine\nine\math\Matrix4fDelayed.java
 D:\JavaProjects\NineEngine\nine\math\Vector3fMatrixRotation.java
 D:\JavaProjects\NineEngine\nine\math\Matrix4fRefreshable.java
+D:\JavaProjects\NineEngine\nine\math\LocalTime.java
 D:\JavaProjects\NineEngine\nine\drawing\ColorFloat.java
 D:\JavaProjects\NineEngine\nine\drawing\ColorFloatsAcceptor.java
 D:\JavaProjects\NineEngine\nine\drawing\ColorFloatStruct.java
