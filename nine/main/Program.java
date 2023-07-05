@@ -5,8 +5,10 @@ import org.lwjgl.opengl.*;
 import org.lwjgl.system.*;
 
 import nine.function.ErrorPrinter;
-import nine.geometry.collada.ColladaGeometryParser;
-import nine.geometry.collada.ColladaModel;
+import nine.geometry.collada.ColladaBasicGeometryParser;
+import nine.geometry.collada.ColladaBasicSkinParser;
+import nine.geometry.collada.ColladaSkinnedModel;
+import nine.geometry.collada.FileColladaNode;
 import nine.io.FileStorage;
 import nine.io.Storage;
 import nine.lwjgl.LWJGL_OpenGL;
@@ -140,7 +142,7 @@ public class Program {
 
 		OpenGL gl = new LWJGL_OpenGL();
 		Shader shader = gl.compiler().createProgram(
-			new FileShaderSource(storage.open("shaders/diffuse_vertex.glsl"), new ShaderVersionMacro("400")),
+			new FileShaderSource(storage.open("shaders/diffuse_skin_vertex.glsl"), new ShaderVersionMacro("400")),
 			new FileShaderSource(storage.open("shaders/diffuse_fragment.glsl"), new ShaderVersionMacro("400")), acceptor ->
 		{
 			acceptor.call(0, "position");
@@ -170,10 +172,13 @@ public class Program {
 			new Matrix4fRotationX(new ValueFloatDegreesToRadians(0f)));
 
 		Texture texture = gl.texture(storage.open("models/Knight.png"));
-		Drawing cube = new ColladaModel(
-			storage.open("models/Knight.dae"),
-			new ColladaGeometryParser(),
-			ErrorPrinter.instance).load(gl);
+		Drawing cube =
+			new ColladaSkinnedModel(
+				new FileColladaNode(storage.open("models/Knight.dae"), ErrorPrinter.instance),
+				new ColladaBasicGeometryParser(),
+				new ColladaBasicSkinParser())
+			.load(gl);
+
 		cube = texture.apply(cube);
 
 		BodyPart body = new BodyPart(new Matrix4fTransform(
