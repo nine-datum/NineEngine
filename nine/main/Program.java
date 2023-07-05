@@ -5,9 +5,6 @@ import org.lwjgl.opengl.*;
 import org.lwjgl.system.*;
 
 import nine.function.ErrorPrinter;
-import nine.geometry.collada.ColladaBasicGeometryParser;
-import nine.geometry.collada.ColladaBasicSkeletonParser;
-import nine.geometry.collada.ColladaBasicSkinParser;
 import nine.geometry.collada.ColladaSkinnedModel;
 import nine.geometry.collada.FileColladaNode;
 import nine.io.FileStorage;
@@ -174,12 +171,8 @@ public class Program {
 
 		Texture texture = gl.texture(storage.open("models/Knight.png"));
 		Drawing cube =
-			new ColladaSkinnedModel(
-				new FileColladaNode(storage.open("models/Knight.dae"), ErrorPrinter.instance),
-				new ColladaBasicGeometryParser(),
-				new ColladaBasicSkinParser(),
-				new ColladaBasicSkeletonParser())
-			.load(gl);
+			new ColladaSkinnedModel(new FileColladaNode(storage.open("models/Knight.dae"), ErrorPrinter.instance))
+			.load(gl, shaderPlayer);
 
 		cube = texture.apply(cube);
 
@@ -190,7 +183,7 @@ public class Program {
 		new Matrix4fScale(new Vector3fStruct(0.01f, 0.01f, 0.01f)),
 		cube);
 
-		Drawing drawing = gl.clockwise(gl.depthOn(gl.smooth(body.drawing(shaderPlayer, world))));
+		Drawing drawing = gl.clockwise(gl.depthOn(gl.smooth(body.drawing(shader.player(), world))));
 		
 		// Run the rendering loop until the user has attempted to close
 		// the window or has pressed the ESCAPE key.

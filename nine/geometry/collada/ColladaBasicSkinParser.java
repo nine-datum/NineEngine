@@ -1,6 +1,7 @@
 package nine.geometry.collada;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import nine.buffer.Buffer;
@@ -9,8 +10,11 @@ import nine.buffer.EmptyBuffer;
 import nine.buffer.FloatArrayBuffer;
 import nine.buffer.IntegerArrayBuffer;
 import nine.buffer.MapBuffer;
+import nine.buffer.MatrixBuffer;
 import nine.buffer.TextElementsBuffer;
 import nine.buffer.TextValueBuffer;
+import nine.collection.RangeFlow;
+import nine.math.Matrix4f;
 import nine.math.Matrix4fRowBuffer;
 
 public class ColladaBasicSkinParser implements ColladaSkinParser
@@ -104,11 +108,22 @@ public class ColladaBasicSkinParser implements ColladaSkinParser
                     }
 
                     Buffer<Float> matrixBuffer = new MapBuffer<>(buffers.map("BIND_MATRIX"), Float::parseFloat);
+                    Buffer<Matrix4f> invPoses = new MatrixBuffer(
+                        new MapBuffer<>(
+                            buffers.map("INV_BIND_MATRIX"),
+                            Float::parseFloat));
+                    
+                    HashMap<String, Matrix4f> inv_bind_poses = new HashMap<>();
+                    new RangeFlow(names.get(0).length()).read(i ->
+                    {
+                        inv_bind_poses.put(names.get(0).at(i), invPoses.at(i));
+                    });
 
                     reader.read(
                         skinId,
                         skinSource,
                         names.get(0),
+                        inv_bind_poses::get,
                         new Matrix4fRowBuffer(matrixBuffer),
                         new FloatArrayBuffer(weightArray),
                         new IntegerArrayBuffer(jointArray),

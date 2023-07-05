@@ -8,6 +8,7 @@ import nine.geometry.Model;
 import nine.opengl.CompositeDrawing;
 import nine.opengl.Drawing;
 import nine.opengl.OpenGL;
+import nine.opengl.ShaderPlayer;
 
 public class ColladaModel implements Model
 {
@@ -21,7 +22,7 @@ public class ColladaModel implements Model
     }
 
     @Override
-    public Drawing load(OpenGL gl)
+    public Drawing load(OpenGL gl, ShaderPlayer shader)
     {
         List<Drawing> drawings = new ArrayList<Drawing>();
 
@@ -34,6 +35,6 @@ public class ColladaModel implements Model
                     .drawing());
         });
 
-        return new CompositeDrawing(new IterableFlow<Drawing>(drawings));
+        return shader.play(new CompositeDrawing(new IterableFlow<Drawing>(drawings)));
     }
 }

@@ -2,6 +2,7 @@ package nine.lwjgl;
 
 import org.lwjgl.opengl.GL20;
 
+import nine.buffer.Buffer;
 import nine.drawing.Color;
 import nine.drawing.ColorFloatStruct;
 import nine.math.Matrix4f;
@@ -28,6 +29,27 @@ public class LWJGL_Uniforms implements Uniforms
             for(int i = 0; i < 16; i++) buffer[i] = elements.at(i);
             GL20.glUniformMatrix4fv(location, false, buffer);
         });
+    }
+
+    @Override
+    public Uniform uniformMatrixArray(String name, Buffer<Matrix4f> matrices)
+    {
+        int location = GL20.glGetUniformLocation(program, name);
+        int length = matrices.length();
+        float[] buffer = new float[16 * length];
+        
+        return () ->
+        {
+            for(int m = 0; m < length; m++)
+            {
+                int mat = m;
+                matrices.at(m).accept(elements ->
+                {
+                    for(int i = 0; i < 16; i++) buffer[mat * 16 + i] = elements.at(i);
+                });
+            }
+            GL20.glUniformMatrix4fv(location, false, buffer);
+        };
     }
 
     @Override
