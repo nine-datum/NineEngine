@@ -44,7 +44,7 @@ public class ColladaBoneNodeReader implements NodeReader
                             new TextValueBuffer<>(content, Float::parseFloat));
                 }
 
-                Matrix4f transform = new Matrix4fDelayed(new Matrix4fMul(parent, local), 0.01f);
+                Matrix4f transform = new Matrix4fDelayed(new Matrix4fMul(parent, local), 0.033f);
 
                 reader.read(name, transform);
                 child.children("node", new ColladaBoneNodeReader(transform, animator, reader, controllerReader));
