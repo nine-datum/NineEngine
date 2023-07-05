@@ -12,6 +12,6 @@ uniform mat4 projection;
 void main (void)
 {
 	uv = texcoord;
-	worldNormal = weights.xyz + (joints.xyz + normal) * texcoord.x * 0.0;//normalize((transform * vec4(normal, 0)).xyz);
+	worldNormal = joints.xyz * 0.1 + (weights.xyz + normal) * texcoord.x * 0.0;//normalize((transform * vec4(normal, 0)).xyz);
 	gl_Position = (projection * transform) * vec4(position, 1);
 }

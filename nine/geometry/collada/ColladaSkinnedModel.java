@@ -1,16 +1,11 @@
 package nine.geometry.collada;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 import nine.buffer.Buffer;
-import nine.buffer.EmptyBuffer;
-import nine.buffer.FlowToBuffer;
 import nine.buffer.MapBuffer;
-import nine.collection.BufferToFlow;
+import nine.buffer.RangeBuffer;
 import nine.collection.CachedFlow;
-import nine.collection.FlatmapFlow;
 import nine.collection.IterableFlow;
 import nine.collection.MapFlow;
 import nine.collection.Mapping;
@@ -37,12 +32,13 @@ public class ColladaSkinnedModel implements Model
     public Drawing load(OpenGL gl)
     {
         HashMap<String, DrawingAttributeBuffer> map = new HashMap<>();
-        List<Buffer<Integer>> raw_indices = new ArrayList<>(List.of(new EmptyBuffer<>()));
+        MutableBufferMapping<Integer> raw_indices = new MutableBufferMapping<>();
 
         geometryParser.read(node, (source, floatBuffers, intBuffers) ->
         {
-            raw_indices.set(0, intBuffers.map("INDEX_VERTEX"));
-            map.put("#" + source, gl.vao(intBuffers.map("INDEX"))
+            String sourceId = "#" + source;
+            raw_indices.write(sourceId, intBuffers.map("INDEX_VERTEX"));
+            map.put(sourceId, gl.vao(intBuffers.map("INDEX"))
                     .attribute(3, floatBuffers.map("VERTEX"))
                     .attribute(2, floatBuffers.map("TEXCOORD"))
                     .attribute(3, floatBuffers.map("NORMAL")));
@@ -50,16 +46,15 @@ public class ColladaSkinnedModel implements Model
 
         skinParser.read(node, (source, names, matrix, weights, joints, weightPerIndex) ->
         {
-            Buffer<Integer> indices = raw_indices.get(0);
+            Buffer<Integer> indices = raw_indices.map(source);
             Mapping<Buffer<Float>, Buffer<Float>> mapBuffer = buffer ->
-                new FlowToBuffer<>(new FlatmapFlow<>(new BufferToFlow<>(indices), i -> action ->
+                new MapBuffer<>(new RangeBuffer(indices.length() * weightPerIndex), i ->
                 {
-                    int w = i * weightPerIndex;
-                    for(int c = 0; c < weightPerIndex; c++)
-                    {
-                        action.call(buffer.at(w + c));
-                    }
-                }));
+                    int pos = i / weightPerIndex;
+                    int add = i % weightPerIndex;
+                    int index = indices.at(pos);
+                    return buffer.at(index * weightPerIndex + add);
+                });
             Buffer<Float> ordered_joints = mapBuffer.map(new MapBuffer<>(joints, j -> (float)j));
             Buffer<Float> ordered_weights = mapBuffer.map(weights);
 
