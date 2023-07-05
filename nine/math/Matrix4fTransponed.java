@@ -12,6 +12,6 @@ public class Matrix4fTransponed implements Matrix4f
     @Override
     public void accept(ElementsAcceptor acceptor) 
     {
-        source.accept(e -> acceptor.call(i -> e.at((i >> 2) + (i & 3) * 4)));
+        source.accept(e -> acceptor.call(i -> e.at((i >> 2) + ((i & 3) << 2))));
     }
 }

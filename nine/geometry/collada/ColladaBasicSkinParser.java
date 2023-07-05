@@ -11,7 +11,7 @@ import nine.buffer.IntegerArrayBuffer;
 import nine.buffer.MapBuffer;
 import nine.buffer.TextElementsBuffer;
 import nine.buffer.TextValueBuffer;
-import nine.math.BufferMatrix4f;
+import nine.math.Matrix4fRowBuffer;
 
 public class ColladaBasicSkinParser implements ColladaSkinParser
 {
@@ -20,6 +20,7 @@ public class ColladaBasicSkinParser implements ColladaSkinParser
         node.children("COLLADA", root ->
         root.children("library_controllers", lib ->
         lib.children("controller", controller ->
+        controller.attribute("id", skinId ->
         controller.children("skin", skin ->
         skin.attribute("source", skinSource ->
         {
@@ -105,14 +106,15 @@ public class ColladaBasicSkinParser implements ColladaSkinParser
                     Buffer<Float> matrixBuffer = new MapBuffer<>(buffers.map("BIND_MATRIX"), Float::parseFloat);
 
                     reader.read(
+                        skinId,
                         skinSource,
                         names.get(0),
-                        new BufferMatrix4f(matrixBuffer),
+                        new Matrix4fRowBuffer(matrixBuffer),
                         new FloatArrayBuffer(weightArray),
                         new IntegerArrayBuffer(jointArray),
                         weightsPerVertex);
                 }))));
             }));
-        })))));
+        }))))));
     }
 }

@@ -20,12 +20,14 @@ public class ColladaSkinnedModel implements Model
     ColladaNode node;
     ColladaGeometryParser geometryParser;
     ColladaSkinParser skinParser;
+    ColladaSkeletonParser skeletonParser;
 
-    public ColladaSkinnedModel(ColladaNode node, ColladaGeometryParser geometryParser, ColladaSkinParser skinParser)
+    public ColladaSkinnedModel(ColladaNode node, ColladaGeometryParser geometryParser, ColladaSkinParser skinParser, ColladaSkeletonParser skeletonParser)
     {
         this.node = node;
         this.geometryParser = geometryParser;
         this.skinParser = skinParser;
+        this.skeletonParser = skeletonParser;
     }
 
     @Override
@@ -44,9 +46,9 @@ public class ColladaSkinnedModel implements Model
                     .attribute(3, floatBuffers.map("NORMAL")));
         });
 
-        skinParser.read(node, (source, names, matrix, weights, joints, weightPerIndex) ->
+        skinParser.read(node, (skinId, sourceId, names, matrix, weights, joints, weightPerIndex) ->
         {
-            Buffer<Integer> indices = raw_indices.map(source);
+            Buffer<Integer> indices = raw_indices.map(sourceId);
             Mapping<Buffer<Float>, Buffer<Float>> mapBuffer = buffer ->
                 new MapBuffer<>(new RangeBuffer(indices.length() * weightPerIndex), i ->
                 {
@@ -58,9 +60,13 @@ public class ColladaSkinnedModel implements Model
             Buffer<Float> ordered_joints = mapBuffer.map(new MapBuffer<>(joints, j -> (float)j));
             Buffer<Float> ordered_weights = mapBuffer.map(weights);
 
-            map.put(source, map.get(source)
+            map.put(skinId, map.get(sourceId)
                 .attribute(weightPerIndex, ordered_joints)
                 .attribute(weightPerIndex, ordered_weights));
+        });
+
+        skeletonParser.read(node, (skinId, skeleton) ->
+        {
         });
 
         return new CompositeDrawing(

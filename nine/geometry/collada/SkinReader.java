@@ -5,5 +5,5 @@ import nine.math.Matrix4f;
 
 public interface SkinReader
 {
-    void read(String source, Buffer<String> names, Matrix4f matrix, Buffer<Float> weights, Buffer<Integer> joints, int weightPerIndex);
+    void read(String skinId, String geomId, Buffer<String> names, Matrix4f matrix, Buffer<Float> weights, Buffer<Integer> joints, int weightPerIndex);
 }

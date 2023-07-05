@@ -6,6 +6,7 @@ import org.lwjgl.system.*;
 
 import nine.function.ErrorPrinter;
 import nine.geometry.collada.ColladaBasicGeometryParser;
+import nine.geometry.collada.ColladaBasicSkeletonParser;
 import nine.geometry.collada.ColladaBasicSkinParser;
 import nine.geometry.collada.ColladaSkinnedModel;
 import nine.geometry.collada.FileColladaNode;
@@ -176,7 +177,8 @@ public class Program {
 			new ColladaSkinnedModel(
 				new FileColladaNode(storage.open("models/Knight.dae"), ErrorPrinter.instance),
 				new ColladaBasicGeometryParser(),
-				new ColladaBasicSkinParser())
+				new ColladaBasicSkinParser(),
+				new ColladaBasicSkeletonParser())
 			.load(gl);
 
 		cube = texture.apply(cube);
