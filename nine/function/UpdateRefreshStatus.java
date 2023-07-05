@@ -1,11 +1,8 @@
-package nine.geometry.collada;
-
-import nine.function.RefreshStatus;
-import nine.function.Refreshable;
+package nine.function;
 
 public class UpdateRefreshStatus implements RefreshStatus
 {
-    int index;
+    int index = -1;
 
     @Override
     public Refreshable make()

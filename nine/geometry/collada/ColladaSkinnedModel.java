@@ -13,11 +13,12 @@ import nine.collection.IterableFlow;
 import nine.collection.MapFlow;
 import nine.collection.Mapping;
 import nine.collection.RangeFlow;
+import nine.function.UpdateRefreshStatus;
 import nine.geometry.Model;
 import nine.math.Matrix4f;
 import nine.math.Matrix4fIdentity;
 import nine.math.Matrix4fMul;
-import nine.math.Matrix4fRefreshable;
+import nine.math.Matrix4fStruct;
 import nine.opengl.CompositeDrawing;
 import nine.opengl.CompositeUniform;
 import nine.opengl.Drawing;
@@ -111,9 +112,8 @@ public class ColladaSkinnedModel implements Model
             {
                 String key = bone.getKey();
                 int index = bone.getValue();
-                Matrix4f matrix = new Matrix4fRefreshable(
-                    new Matrix4fMul(skeleton.transform(key), invBind.transform(key)),
-                    matrixUpdateStatus);
+                Matrix4f matrix = new Matrix4fStruct(
+                    new Matrix4fMul(skeleton.transform(key), invBind.transform(key)));
                 bones[index] = matrix;
             });
 
