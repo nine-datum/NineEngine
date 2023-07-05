@@ -11,10 +11,7 @@ public class Matrix4fStruct implements Matrix4f
     }
     public Matrix4fStruct(Matrix4f matrix)
     {
-        matrix.accept(e ->
-        {
-            for(int i = 0; i < 16; i++) array[i] = e.at(i);
-        });
+        apply(matrix);
     }
 
     @Override
@@ -29,5 +26,13 @@ public class Matrix4fStruct implements Matrix4f
         StringBuilder sb = new StringBuilder();
         new Matrix4fPrinter(sb::append).print(this);
         return sb.toString();
+    }
+
+    public void apply(Matrix4f matrix)
+    {
+        matrix.accept(e ->
+        {
+            for(int i = 0; i < 16; i++) array[i] = e.at(i);
+        });
     }
 }

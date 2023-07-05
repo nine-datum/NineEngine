@@ -9,7 +9,6 @@ import nine.buffer.Collector;
 import nine.buffer.MapBuffer;
 import nine.buffer.RangeBuffer;
 import nine.collection.CachedFlow;
-import nine.collection.Flow;
 import nine.collection.IterableFlow;
 import nine.collection.MapFlow;
 import nine.collection.Mapping;
@@ -18,15 +17,11 @@ import nine.geometry.Model;
 import nine.math.Matrix4f;
 import nine.math.Matrix4fIdentity;
 import nine.math.Matrix4fMul;
-import nine.math.Matrix4fMulChain;
-import nine.math.Time;
 import nine.opengl.CompositeDrawing;
-import nine.opengl.CompositeUniform;
 import nine.opengl.Drawing;
 import nine.opengl.DrawingAttributeBuffer;
 import nine.opengl.OpenGL;
 import nine.opengl.ShaderPlayer;
-import nine.opengl.Uniform;
 
 public class ColladaSkinnedModel implements Model
 {
@@ -101,45 +96,25 @@ public class ColladaSkinnedModel implements Model
 
         animationParser.read(node, animations::put);
 
-        skeletonParser.read(node, (skinId, skeleton) ->
+        skeletonParser.read(node, animations::get, (skinId, skeleton) ->
         {
             DrawingAttributeBuffer skin = map.get(skinId);
             Matrix4f[] bones = new Collector<>(Matrix4f[]::new)
                 .collect(new MapBuffer<>(new RangeBuffer(100), i -> Matrix4fIdentity.identity));
 
             Skeleton invBind = invBindPoses.get(skinId);
-            
-            Flow<Uniform> uniforms = new CachedFlow<Uniform>(new MapFlow<>(
-                new IterableFlow<Map.Entry<String, Integer>>(boneIndices.entrySet()),
-                bone ->
-                {
-                    String key = bone.getKey();
-                    Animation animation = animations.get(key);
-                    Matrix4f matrix;
-                    if(animation == null)
-                    {
-                        matrix = new Matrix4fMul(skeleton.transform(key), invBind.transform(key));
-                    }
-                    else
-                    {
-                         matrix = new Matrix4fMulChain(
-                            animation.animate(new Time()),
-                            skeleton.transform(key),
-                            invBind.transform(key));
-                    }
-                    int index = bone.getValue();
-                    return () ->
-                    {
-                        bones[index] = matrix;
-                    };
-                }
-            ));
+
+            new IterableFlow<Map.Entry<String, Integer>>(boneIndices.entrySet()).read(bone ->
+            {
+                String key = bone.getKey();
+                int index = bone.getValue();
+                Matrix4f matrix = new Matrix4fMul(skeleton.transform(key), invBind.transform(key));
+                bones[index] = matrix;
+            });
 
             map.put(skinId, new ShadedDrawingAttributeBuffer(skin, shader.uniforms(u ->
             {
-                return new CompositeUniform(
-                    new CompositeUniform(uniforms),
-                    u.uniformMatrixArray("jointTransforms", new ArrayBuffer<>(bones)));
+                return u.uniformMatrixArray("jointTransforms", new ArrayBuffer<>(bones));
             })));
         });
 

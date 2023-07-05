@@ -169,9 +169,9 @@ public class Program {
 			new Matrix4fRotationY(new Time()),
 			new Matrix4fRotationX(new ValueFloatDegreesToRadians(0f)));
 
-		Texture texture = gl.texture(storage.open("models/Knight.png"));
+		Texture texture = gl.texture(storage.open("models/Archer.png"));
 		Drawing cube =
-			new ColladaSkinnedModel(new FileColladaNode(storage.open("models/Knight.dae"), ErrorPrinter.instance))
+			new ColladaSkinnedModel(new FileColladaNode(storage.open("models/Archer.dae"), ErrorPrinter.instance))
 			.load(gl, shaderPlayer);
 
 		cube = texture.apply(cube);
