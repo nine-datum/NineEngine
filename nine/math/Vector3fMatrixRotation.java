@@ -12,7 +12,7 @@ public class Vector3fMatrixRotation implements Vector3f
     @Override
     public void accept(Vector3fAcceptor acceptor)
     {
-        double x, y, z;
+        /*double x, y, z;
 			Matrix4x4 rotation = WithoutScale();
 			double sy = Math.Sqrt(rotation[0, 0] * rotation[0, 0] + rotation[1, 0] * rotation[1, 0]);
 
@@ -35,6 +35,6 @@ public class Vector3fMatrixRotation implements Vector3f
 
 				z = 0;
 			}
-			return new Vector3((float)x, (float)y, (float)z) * Mathf.Rad2Deg;
+			return new Vector3((float)x, (float)y, (float)z) * Mathf.Rad2Deg;*/
     }
 }

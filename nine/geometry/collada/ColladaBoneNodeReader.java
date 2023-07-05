@@ -1,9 +1,10 @@
 package nine.geometry.collada;
 
 import nine.buffer.TextValueBuffer;
+import nine.function.RefreshStatus;
 import nine.math.Matrix4f;
-import nine.math.Matrix4fDelayed;
 import nine.math.Matrix4fMul;
+import nine.math.Matrix4fRefreshable;
 import nine.math.Matrix4fRowBuffer;
 import nine.math.Time;
 
@@ -13,13 +14,15 @@ public class ColladaBoneNodeReader implements NodeReader
     ColladaBoneReader reader;
     Animator animator;
     NodeReader controllerReader;
+    RefreshStatus refresh;
 
-    public ColladaBoneNodeReader(Matrix4f parent, Animator animator, ColladaBoneReader boneReader, NodeReader controllerReader)
+    public ColladaBoneNodeReader(Matrix4f parent, Animator animator, RefreshStatus refresh, ColladaBoneReader boneReader, NodeReader controllerReader)
     {
         this.parent = parent;
         this.reader = boneReader;
         this.animator = animator;
         this.controllerReader = controllerReader;
+        this.refresh = refresh;
     }
 
     @Override
@@ -44,10 +47,10 @@ public class ColladaBoneNodeReader implements NodeReader
                             new TextValueBuffer<>(content, Float::parseFloat));
                 }
 
-                Matrix4f transform = new Matrix4fDelayed(new Matrix4fMul(parent, local), 0.033f);
+                Matrix4f transform = new Matrix4fRefreshable(new Matrix4fMul(parent, local), refresh);
 
                 reader.read(name, transform);
-                child.children("node", new ColladaBoneNodeReader(transform, animator, reader, controllerReader));
+                child.children("node", new ColladaBoneNodeReader(transform, animator, refresh, reader, controllerReader));
             }));
             child.children("instance_controller", controllerReader);
         });

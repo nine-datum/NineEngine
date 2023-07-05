@@ -17,7 +17,9 @@ import nine.geometry.Model;
 import nine.math.Matrix4f;
 import nine.math.Matrix4fIdentity;
 import nine.math.Matrix4fMul;
+import nine.math.Matrix4fRefreshable;
 import nine.opengl.CompositeDrawing;
+import nine.opengl.CompositeUniform;
 import nine.opengl.Drawing;
 import nine.opengl.DrawingAttributeBuffer;
 import nine.opengl.OpenGL;
@@ -61,6 +63,7 @@ public class ColladaSkinnedModel implements Model
         HashMap<String, Animation> animations = new HashMap<>();
         HashMap<String, Skeleton> invBindPoses = new HashMap<>();
         HashMap<String, Integer> boneIndices = new HashMap<>();
+        UpdateRefreshStatus matrixUpdateStatus = new UpdateRefreshStatus();
 
         geometryParser.read(node, (source, floatBuffers, intBuffers) ->
         {
@@ -96,7 +99,7 @@ public class ColladaSkinnedModel implements Model
 
         animationParser.read(node, animations::put);
 
-        skeletonParser.read(node, animations::get, (skinId, skeleton) ->
+        skeletonParser.read(node, animations::get, matrixUpdateStatus, (skinId, skeleton) ->
         {
             DrawingAttributeBuffer skin = map.get(skinId);
             Matrix4f[] bones = new Collector<>(Matrix4f[]::new)
@@ -108,13 +111,17 @@ public class ColladaSkinnedModel implements Model
             {
                 String key = bone.getKey();
                 int index = bone.getValue();
-                Matrix4f matrix = new Matrix4fMul(skeleton.transform(key), invBind.transform(key));
+                Matrix4f matrix = new Matrix4fRefreshable(
+                    new Matrix4fMul(skeleton.transform(key), invBind.transform(key)),
+                    matrixUpdateStatus);
                 bones[index] = matrix;
             });
 
             map.put(skinId, new ShadedDrawingAttributeBuffer(skin, shader.uniforms(u ->
             {
-                return u.uniformMatrixArray("jointTransforms", new ArrayBuffer<>(bones));
+                return new CompositeUniform(
+                    matrixUpdateStatus::update,
+                    u.uniformMatrixArray("jointTransforms", new ArrayBuffer<>(bones)));
             })));
         });
 
