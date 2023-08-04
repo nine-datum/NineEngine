@@ -5,12 +5,12 @@ import java.util.List;
 
 import nine.collection.IterableFlow;
 import nine.geometry.Model;
+import nine.geometry.ModelAsset;
 import nine.opengl.CompositeDrawing;
 import nine.opengl.Drawing;
 import nine.opengl.OpenGL;
-import nine.opengl.ShaderPlayer;
 
-public class ColladaModel implements Model
+public class ColladaModel implements ModelAsset
 {
     ColladaNode node;
     ColladaGeometryParser parser;
@@ -26,7 +26,7 @@ public class ColladaModel implements Model
     }
 
     @Override
-    public Drawing load(OpenGL gl, ShaderPlayer shader)
+    public Model load(OpenGL gl)
     {
         List<Drawing> drawings = new ArrayList<Drawing>();
 
@@ -39,6 +39,6 @@ public class ColladaModel implements Model
                     .drawing());
         });
 
-        return shader.play(new CompositeDrawing(new IterableFlow<Drawing>(drawings)));
+        return (shader, refreshStatus) -> shader.play(new CompositeDrawing(new IterableFlow<Drawing>(drawings)));
     }
 }

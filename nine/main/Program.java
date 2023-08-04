@@ -5,6 +5,7 @@ import org.lwjgl.opengl.*;
 import org.lwjgl.system.*;
 
 import nine.function.ErrorPrinter;
+import nine.function.UpdateRefreshStatus;
 import nine.geometry.collada.ColladaSkinnedModel;
 import nine.geometry.collada.FileColladaNode;
 import nine.io.FileStorage;
@@ -12,6 +13,7 @@ import nine.io.Storage;
 import nine.lwjgl.LWJGL_OpenGL;
 import nine.math.LocalTime;
 import nine.math.Matrix4f;
+import nine.math.Matrix4fIdentity;
 import nine.math.Matrix4fMul;
 import nine.math.Matrix4fMulChain;
 import nine.math.Matrix4fPerspective;
@@ -169,12 +171,16 @@ public class Program {
 		Matrix4f world = new Matrix4fMulChain(
 			new Matrix4fTranslation(position),
 			new Matrix4fRotationY(new Time()),
-			new Matrix4fRotationX(new ValueFloatDegreesToRadians(-90)));
+			new Matrix4fRotationX(new ValueFloatDegreesToRadians(0f)));
 
-		Texture texture = gl.texture(storage.open("models/Character.png"));
+		UpdateRefreshStatus updateStatus = new UpdateRefreshStatus();
+
+		Texture texture = gl.texture(storage.open("models/Archer.png"));
 		Drawing cube =
-			new ColladaSkinnedModel(new FileColladaNode(storage.open("models/Character.dae"), ErrorPrinter.instance))
-			.load(gl, shaderPlayer);
+			new ColladaSkinnedModel(new FileColladaNode(storage.open("models/Archer.dae"), ErrorPrinter.instance))
+			.load(gl)
+			.load(key -> Matrix4fIdentity.identity)
+			.instance(shaderPlayer, updateStatus);
 
 		cube = texture.apply(cube);
 
@@ -182,27 +188,32 @@ public class Program {
 			new Vector3fStruct(0f, 0f, 0f),
 			new Vector3fStruct(0f, 0f, 0f)
 		),
-		new Matrix4fScale(new Vector3fStruct(1f, 1f, 1f)),
+		new Matrix4fScale(new Vector3fStruct(0.01f, 0.01f, 0.01f)),
 		cube);
 
-		Drawing drawing = gl.clockwise(gl.depthOn(gl.smooth(body.drawing(shader.player(), world))));
+		Drawing drawing = gl.clockwise(gl.depthOn(
+			gl.smooth(
+				body.drawing(
+					shader.player(),
+					world))));
+
 		ValueFloat time = new LocalTime();
 		
 		// Run the rendering loop until the user has attempted to close
 		// the window or has pressed the ESCAPE key.
 		while ( !glfwWindowShouldClose(window) ) {
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
+			updateStatus.update();
 
 			time.accept(t ->
 			{
-				int l = ((int)(t * 10) % 90 + 1);
+				int l = 9;
 				for(int i = 0; i < l; i++)
 				{
 					position.x = (i % 3) * 2f - 2;
 					position.y = ((i / 3) % 3) * 2f - 2;
 					position.z = (i / 9 + 1) * 3f;
 					drawing.draw();
-				
 				}
 			});
 

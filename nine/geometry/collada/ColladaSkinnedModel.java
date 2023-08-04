@@ -13,20 +13,17 @@ import nine.collection.IterableFlow;
 import nine.collection.MapFlow;
 import nine.collection.Mapping;
 import nine.collection.RangeFlow;
-import nine.function.UpdateRefreshStatus;
-import nine.geometry.Model;
+import nine.geometry.SkinnedModel;
+import nine.geometry.SkinnedModelAsset;
 import nine.math.Matrix4f;
 import nine.math.Matrix4fIdentity;
 import nine.math.Matrix4fMul;
 import nine.math.Matrix4fRefreshable;
 import nine.opengl.CompositeDrawing;
-import nine.opengl.CompositeUniform;
-import nine.opengl.Drawing;
 import nine.opengl.DrawingAttributeBuffer;
 import nine.opengl.OpenGL;
-import nine.opengl.ShaderPlayer;
 
-public class ColladaSkinnedModel implements Model
+public class ColladaSkinnedModel implements SkinnedModelAsset
 {
     ColladaNode node;
     ColladaGeometryParser geometryParser;
@@ -57,14 +54,13 @@ public class ColladaSkinnedModel implements Model
     }
 
     @Override
-    public Drawing load(OpenGL gl, ShaderPlayer shader)
+    public SkinnedModel load(OpenGL gl)
     {
         HashMap<String, DrawingAttributeBuffer> map = new HashMap<>();
         MutableBufferMapping<Integer> raw_indices = new MutableBufferMapping<>();
         HashMap<String, Animation> animations = new HashMap<>();
         HashMap<String, Skeleton> invBindPoses = new HashMap<>();
         HashMap<String, Integer> boneIndices = new HashMap<>();
-        UpdateRefreshStatus matrixUpdateStatus = new UpdateRefreshStatus();
 
         geometryParser.read(node, (source, floatBuffers, intBuffers) ->
         {
@@ -100,38 +96,38 @@ public class ColladaSkinnedModel implements Model
         });
 
         animationParser.read(node, animations::put);
-
-        skeletonParser.read(node, animations::get, matrixUpdateStatus, (skinId, skeleton) ->
+        
+        return skeletonTransform -> (shader, refreshStatus) ->
         {
-            DrawingAttributeBuffer skin = map.get(skinId);
-
-            Matrix4f[] bones = new Collector<>(Matrix4f[]::new)
-                .collect(new MapBuffer<>(new RangeBuffer(100), i -> Matrix4fIdentity.identity));
-
-            Skeleton invBind = invBindPoses.get(skinId);
-
-            new IterableFlow<Map.Entry<String, Integer>>(boneIndices.entrySet()).read(bone ->
+            skeletonParser.read(node, animations::get, refreshStatus, (skinId, skeleton) ->
             {
-                String key = bone.getKey();
-                int index = bone.getValue();
-                Matrix4f matrix = new Matrix4fRefreshable(
-                    new Matrix4fMul(skeleton.transform(key), invBind.transform(key)),
-                    matrixUpdateStatus);
-                bones[index] = matrix;
+                DrawingAttributeBuffer skin = map.get(skinId);
+                Skeleton mulSkeleton = key -> new Matrix4fMul(skeletonTransform.transform(key), skeleton.transform(key));
+
+                Matrix4f[] bones = new Collector<>(Matrix4f[]::new)
+                    .collect(new MapBuffer<>(new RangeBuffer(100), i -> Matrix4fIdentity.identity));
+
+                Skeleton invBind = invBindPoses.get(skinId);
+
+                new IterableFlow<Map.Entry<String, Integer>>(boneIndices.entrySet()).read(bone ->
+                {
+                    String key = bone.getKey();
+                    int index = bone.getValue();
+                    Matrix4f matrix = new Matrix4fRefreshable(
+                        new Matrix4fMul(mulSkeleton.transform(key), invBind.transform(key)),
+                        refreshStatus);
+                    bones[index] = matrix;
+                });
+
+                map.put(skinId, new ShadedDrawingAttributeBuffer(skin, shader.uniforms(u ->
+                    u.uniformMatrixArray("jointTransforms", new ArrayBuffer<>(bones)))));
             });
 
-            map.put(skinId, new ShadedDrawingAttributeBuffer(skin, shader.uniforms(u ->
-            {
-                return new CompositeUniform(
-                    matrixUpdateStatus::update,
-                    u.uniformMatrixArray("jointTransforms", new ArrayBuffer<>(bones)));
-            })));
-        });
-
-        return new CompositeDrawing(
-            new CachedFlow<>(
-                new MapFlow<>(
-                    new IterableFlow<>(map.values()),
-                    m -> m.drawing())));
+            return new CompositeDrawing(
+                new CachedFlow<>(
+                    new MapFlow<>(
+                        new IterableFlow<>(map.values()),
+                        m -> m.drawing())));
+        };
     }
 }
