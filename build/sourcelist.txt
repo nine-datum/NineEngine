@@ -235,7 +235,10 @@ D:\JavaProjects\NineEngine\nine\buffer\TextElementsBuffer.java
 D:\JavaProjects\NineEngine\nine\buffer\CachedBuffer.java
 D:\JavaProjects\NineEngine\nine\buffer\MatrixBuffer.java
 D:\JavaProjects\NineEngine\nine\buffer\TranslateBuffer.java
+D:\JavaProjects\NineEngine\nine\geometry\ModelAsset.java
 D:\JavaProjects\NineEngine\nine\geometry\Model.java
+D:\JavaProjects\NineEngine\nine\geometry\SkinnedModelAsset.java
+D:\JavaProjects\NineEngine\nine\geometry\SkinnedModel.java
 D:\JavaProjects\NineEngine\nine\geometry\collada\ColladaModel.java
 D:\JavaProjects\NineEngine\nine\geometry\collada\ColladaNode.java
 D:\JavaProjects\NineEngine\nine\geometry\collada\StringReader.java
