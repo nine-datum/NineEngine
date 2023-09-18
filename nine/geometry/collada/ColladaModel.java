@@ -30,7 +30,7 @@ public class ColladaModel implements ModelAsset
     {
         List<Drawing> drawings = new ArrayList<Drawing>();
 
-        parser.read(node, (source, floatBuffers, intBuffers) ->
+        parser.read(node, (source, material, floatBuffers, intBuffers) ->
         {
             drawings.add(gl.vao(intBuffers.map("INDEX"))
                     .attribute(3, floatBuffers.map("VERTEX"))

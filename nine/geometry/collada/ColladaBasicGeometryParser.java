@@ -58,6 +58,7 @@ public class ColladaBasicGeometryParser implements ColladaGeometryParser
             int elementsCount = sources.size();
 
             NodeReader trianglesReader = triangles -> triangles.children("p", p -> p.content(pContent ->
+            triangles.attribute("material", material ->
             {
                 Buffer<Integer> rawIndices = new TextValueBuffer<Integer>(pContent, Integer::parseInt);
                 int indicesCount = rawIndices.length();
@@ -83,8 +84,8 @@ public class ColladaBasicGeometryParser implements ColladaGeometryParser
                     })));
                 });
 
-                reader.read(geomId, floatBuffers, intBuffers);
-            }));
+                reader.read(geomId, material, floatBuffers, intBuffers);
+            })));
             mesh.children("triangles", trianglesReader);
             mesh.children("polylist", trianglesReader);
         })))));

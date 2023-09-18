@@ -33,7 +33,6 @@ import nine.opengl.Drawing;
 import nine.opengl.OpenGL;
 import nine.opengl.Shader;
 import nine.opengl.ShaderPlayer;
-import nine.opengl.Texture;
 import nine.opengl.shader.FileShaderSource;
 import nine.opengl.shader.ShaderVersionMacro;
 
@@ -171,24 +170,21 @@ public class Program {
 		Matrix4f world = new Matrix4fMulChain(
 			new Matrix4fTranslation(position),
 			new Matrix4fRotationY(new Time()),
-			new Matrix4fRotationX(new ValueFloatDegreesToRadians(0f)));
+			new Matrix4fRotationX(new ValueFloatDegreesToRadians(-90f)));
 
 		UpdateRefreshStatus updateStatus = new UpdateRefreshStatus();
 
-		Texture texture = gl.texture(storage.open("models/Archer.png"));
 		Drawing cube =
-			new ColladaSkinnedModel(new FileColladaNode(storage.open("models/Archer.dae"), ErrorPrinter.instance))
-			.load(gl)
+			new ColladaSkinnedModel(new FileColladaNode(storage.open("models/Human_Body_Animated_V_0_1.dae"), ErrorPrinter.instance))
+			.load(gl, storage)
 			.load(key -> Matrix4fIdentity.identity)
 			.instance(shaderPlayer, updateStatus);
-
-		cube = texture.apply(cube);
 
 		BodyPart body = new BodyPart(new Matrix4fTransform(
 			new Vector3fStruct(0f, 0f, 0f),
 			new Vector3fStruct(0f, 0f, 0f)
 		),
-		new Matrix4fScale(new Vector3fStruct(0.01f, 0.01f, 0.01f)),
+		new Matrix4fScale(new Vector3fStruct(1f, 1f, 1f)),
 		cube);
 
 		Drawing drawing = gl.clockwise(gl.depthOn(
