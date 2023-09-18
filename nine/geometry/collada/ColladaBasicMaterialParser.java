@@ -19,10 +19,17 @@ public class ColladaBasicMaterialParser implements ColladaMaterialParser
             lib.children("image", image ->
             image.attribute("id", id ->
             image.children("init_from", init ->
-            init.content(file ->
             {
-                imageToFile.put(id, file);
-            })))));
+                init.content(file ->
+                {
+                    imageToFile.put(id, file);
+                });
+                init.children("ref", ref ->
+                ref.content(file ->
+                {
+                    imageToFile.put(id, file);
+                }));
+            }))));
 
             root.children("library_effects", lib ->
             lib.children("effect", effect ->
