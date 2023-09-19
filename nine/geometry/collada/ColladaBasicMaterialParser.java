@@ -12,6 +12,7 @@ public class ColladaBasicMaterialParser implements ColladaMaterialParser
         HashMap<String, String> surfaceToImage = new HashMap<>();
         HashMap<String, String> imageToFile = new HashMap<>();
         HashMap<String, String> materialToEffect = new HashMap<>();
+        HashMap<String, String> sceneToMaterial = new HashMap<>();
 
         node.children("COLLADA", root ->
         {
@@ -40,11 +41,19 @@ public class ColladaBasicMaterialParser implements ColladaMaterialParser
                 newparam.attribute("sid", paramId ->
                 {
                     newparam.children("sampler2D", sampler ->
-                    sampler.children("source", source ->
-                    source.content(content ->
                     {
-                        paramToSurface.put(paramId, content);
-                    })));
+                        sampler.children("source", source ->
+                        source.content(content ->
+                        {
+                            paramToSurface.put(paramId, content);
+                        }));
+                        sampler.children("instance_image", instance_image ->
+                        instance_image.attribute("url", image ->
+                        {
+                            paramToSurface.put(paramId, paramId);
+                            surfaceToImage.put(paramId, image.replace("#", ""));
+                        }));
+                    });
                     newparam.children("surface", surface ->
                     surface.children("init_from", init ->
                     init.content(content ->
@@ -54,8 +63,12 @@ public class ColladaBasicMaterialParser implements ColladaMaterialParser
                 }));
 
                 profile.children("technique", tech ->
-                tech.children("lambert", lambert ->
-                lambert.children("diffuse", diffuse ->
+                tech.manyChildren(tags ->
+                {
+                    tags.read("lambert");
+                    tags.read("blinn");
+                }, specific_tech ->
+                specific_tech.children("diffuse", diffuse ->
                 diffuse.children("texture", texture ->
                 texture.attribute("texture", image ->
                 {
@@ -69,8 +82,30 @@ public class ColladaBasicMaterialParser implements ColladaMaterialParser
             material.children("instance_effect", effect ->
             effect.attribute("url", url ->
             {
-                materialToEffect.put(id, url);
+                materialToEffect.put("#" + id, url);
             })))));
+            root.children("library_visual_scenes", lib ->
+            lib.children("visual_scene", scene ->
+            {
+                class RecursiveReader implements NodeReader
+                {
+                    @Override
+                    public void read(ColladaNode child)
+                    {
+                        child.children("node", this);
+                        child.children("instance_controller", controller ->
+                        controller.children("bind_material", material ->
+                        material.children("technique_common", tech ->
+                        tech.children("instance_material", instance ->
+                        instance.attribute("symbol", symbol ->
+                        instance.attribute("target", target ->
+                        {
+                            sceneToMaterial.put(symbol, target);
+                        }))))));
+                    }
+                }
+                scene.children("node", new RecursiveReader());
+            }));
         });
 
         reader.call(name ->
@@ -79,7 +114,8 @@ public class ColladaBasicMaterialParser implements ColladaMaterialParser
                 surfaceToImage.get(
                     paramToSurface.get(
                         effectToParam.get(
-                            materialToEffect.get(name)))));
+                            materialToEffect.get(
+                                sceneToMaterial.get(name))))));
         });
     }
 }
