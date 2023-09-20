@@ -23,9 +23,6 @@ public class ColladaBasicGeometryParser implements ColladaGeometryParser
             geom.attribute("id", geomId ->
             geom.children("mesh", mesh ->
         {
-            MutableBufferMapping<Float> floatBuffers = new MutableBufferMapping<Float>();
-            MutableBufferMapping<Integer> intBuffers = new MutableBufferMapping<Integer>();
-
             HashMap<String, IntegerMapping<Flow<Float>>> sources = new HashMap<String, IntegerMapping<Flow<Float>>>();
 
             mesh.children("source", source ->
@@ -60,6 +57,8 @@ public class ColladaBasicGeometryParser implements ColladaGeometryParser
             NodeReader trianglesReader = triangles -> triangles.children("p", p -> p.content(pContent ->
             triangles.attribute("material", material ->
             {
+                MutableBufferMapping<Integer> intBuffers = new MutableBufferMapping<Integer>();
+                MutableBufferMapping<Float> floatBuffers = new MutableBufferMapping<Float>();
                 Buffer<Integer> rawIndices = new TextValueBuffer<Integer>(pContent, Integer::parseInt);
                 int indicesCount = rawIndices.length();
                 intBuffers.write("INDEX", new RangeBuffer(indicesCount));
