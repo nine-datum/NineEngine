@@ -24,7 +24,7 @@ public class ColladaBasicSkeletonParser implements ColladaSkeletonParser
             {
                 controller.attribute("url", skinId ->
                 {
-                    reader.read(skinId, bones::get);
+                    reader.read(skinId, new MapSkeleton(bones));
                 });
             }
         })));

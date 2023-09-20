@@ -14,7 +14,12 @@ public class XML_ColladaNode implements ColladaNode
     @Override
     public void attribute(String name, StringReader reader)
     {
-        reader.read(node.getAttributes().getNamedItem(name).getNodeValue());
+        Node item = node.getAttributes().getNamedItem(name);
+        if(item != null)
+        {
+            String value = item.getNodeValue();
+            if(value != null) reader.read(value);
+        }
     }
 
     @Override
