@@ -175,7 +175,7 @@ public class Program {
 		UpdateRefreshStatus updateStatus = new UpdateRefreshStatus();
 
 		Drawing cube =
-			new ColladaSkinnedModel(new FileColladaNode(storage.open("models/Human_SET_Cotton.dae"), ErrorPrinter.instance))
+			new ColladaSkinnedModel(new FileColladaNode(storage.open("models/Soldier.dae"), ErrorPrinter.instance))
 			.load(gl, storage)
 			.load(key -> Matrix4fIdentity.identity)
 			.instance(shaderPlayer, updateStatus);

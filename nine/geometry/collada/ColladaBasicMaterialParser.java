@@ -93,7 +93,11 @@ public class ColladaBasicMaterialParser implements ColladaMaterialParser
                     public void read(ColladaNode child)
                     {
                         child.children("node", this);
-                        child.children("instance_controller", controller ->
+                        child.manyChildren(selector ->
+                        {
+                            selector.read("instance_controller");
+                            selector.read("instance_geometry");
+                        }, controller ->
                         controller.children("bind_material", material ->
                         material.children("technique_common", tech ->
                         tech.children("instance_material", instance ->
@@ -110,12 +114,14 @@ public class ColladaBasicMaterialParser implements ColladaMaterialParser
 
         reader.call(name ->
         {
-            return imageToFile.get(
+            String tex = imageToFile.get(
                 surfaceToImage.get(
                     paramToSurface.get(
                         effectToParam.get(
                             materialToEffect.get(
                                 sceneToMaterial.get(name))))));
+            if(tex == null) return "default.png";
+            return tex;
         });
     }
 }
