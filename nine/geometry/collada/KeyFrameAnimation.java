@@ -38,19 +38,18 @@ public class KeyFrameAnimation implements Animation
             int current = 0;
             float k = 0f;
             
-            for(int i = 0; i < keysLength; i++)
+            for(int i = keysLength - 1; i >= 0; i--)
             {
                 k = keys.at(i);
-                if(k > frac)
+                if(frac > k)
                 {
                     current = i;
-                    next = (i - 1);
-                    if(next < 0) next = keysLength + next;
+                    next = (i + 1) % keysLength;
                     break;
                 }
             }
 
-            lerp.value = (k - frac) / (k - keys.at(next));
+            lerp.value = (frac - k) / (keys.at(1) - keys.at(0));
             ab[0] = frames.at(current);
             ab[1] = frames.at(next);
             matrix.accept(a);
