@@ -30,7 +30,7 @@ public class KeyFrameAnimation implements Animation
         Matrix4f matrix = new Matrix4fLerp(a -> ab[0].accept(a), a -> ab[1].accept(a), lerp);
         return a -> time.accept(t ->
         {
-            int keysLength = keys.length();
+            int keysLength = keys.length() - 1;
             float last = keys.at(keysLength - 1);
             float frac = t - (last * (int)(t / last));
             

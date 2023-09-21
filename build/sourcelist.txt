@@ -263,7 +263,6 @@ D:\JavaProjects\NineEngine\nine\geometry\collada\ColladaBoneReader.java
 D:\JavaProjects\NineEngine\nine\geometry\collada\ColladaAnimationParser.java
 D:\JavaProjects\NineEngine\nine\geometry\collada\ColladaAnimationReader.java
 D:\JavaProjects\NineEngine\nine\geometry\collada\Animation.java
-D:\JavaProjects\NineEngine\nine\geometry\collada\KeyFrameAnimation.java
 D:\JavaProjects\NineEngine\nine\geometry\collada\ShadedDrawingAttributeBuffer.java
 D:\JavaProjects\NineEngine\nine\geometry\collada\Animator.java
 D:\JavaProjects\NineEngine\nine\geometry\collada\BuffersReader.java
@@ -280,3 +279,4 @@ D:\JavaProjects\NineEngine\nine\geometry\collada\MapSkeleton.java
 D:\JavaProjects\NineEngine\nine\geometry\collada\MaterialProvider.java
 D:\JavaProjects\NineEngine\nine\geometry\collada\MaterialReader.java
 D:\JavaProjects\NineEngine\nine\geometry\collada\XML_ColladaNode.java
+D:\JavaProjects\NineEngine\nine\geometry\collada\KeyFrameAnimation.java
