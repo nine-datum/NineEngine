@@ -1,1 +1,1 @@
-java -Xms64M -jar build/nine.jar
+java -Xms64M -jar build/nine.jar "models/Character.dae"

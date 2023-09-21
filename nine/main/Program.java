@@ -51,10 +51,10 @@ public class Program {
 	int width = 1000;
 	int height = 1000;
 
-	public void run() {
+	public void run(String[] args) {
 
 		init();
-		loop();
+		loop(args);
 
 		// Free the window callbacks and destroy the window
 		glfwFreeCallbacks(window);
@@ -126,7 +126,7 @@ public class Program {
 		glfwShowWindow(window);
 	}
 
-	private void loop() {
+	private void loop(String[] args) {
 		// This line is critical for LWJGL's interoperation with GLFW's
 		// OpenGL context, or any context that is managed externally.
 		// LWJGL detects the context that is current in the current thread,
@@ -175,7 +175,7 @@ public class Program {
 		UpdateRefreshStatus updateStatus = new UpdateRefreshStatus();
 
 		Drawing cube =
-			new ColladaSkinnedModel(new FileColladaNode(storage.open("models/Character.dae"), ErrorPrinter.instance))
+			new ColladaSkinnedModel(new FileColladaNode(storage.open(args[0]), ErrorPrinter.instance))
 			.load(gl, storage)
 			.load(key -> Matrix4fIdentity.identity)
 			.instance(shaderPlayer, updateStatus);
@@ -194,12 +194,14 @@ public class Program {
 					world))));
 
 		ValueFloat time = new LocalTime();
+		FPSCounter fps = new FPSCounter(time, System.out::println);
 		
 		// Run the rendering loop until the user has attempted to close
 		// the window or has pressed the ESCAPE key.
 		while ( !glfwWindowShouldClose(window) ) {
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
 			updateStatus.update();
+			fps.frame();
 
 			time.accept(t ->
 			{
@@ -223,6 +225,7 @@ public class Program {
 
 	public static void main(String[] args)
 	{
-		new Program().run();
+		if(args.length == 0) args = new String[] { "models/Soldier.dae" };
+		new Program().run(args);
 	}
 }

@@ -63,6 +63,15 @@ public class ColladaSkinnedModel implements SkinnedModelAsset
             new ColladaBasicMaterialParser());
     }
 
+    interface RawMeshAction
+    {
+        void call(String id, DrawingAttributeBuffer buffer, Buffer<Integer> rawIndices);
+    }
+    interface RawMesh
+    {
+        void accept(RawMeshAction action);
+    }
+
     @Override
     public SkinnedModel load(OpenGL gl, Storage storage)
     {
@@ -87,14 +96,6 @@ public class ColladaSkinnedModel implements SkinnedModelAsset
             {
                 return texture.apply(source.drawing());
             }
-        }
-        interface RawMeshAction
-        {
-            void call(String id, DrawingAttributeBuffer buffer, Buffer<Integer> rawIndices);
-        }
-        interface RawMesh
-        {
-            void accept(RawMeshAction action);
         }
 
         ArrayList<RawMesh> meshes = new ArrayList<RawMesh>();
@@ -166,25 +167,25 @@ public class ColladaSkinnedModel implements SkinnedModelAsset
         {
             skeletonParser.read(node, animations::get, refreshStatus, (skinId, skeleton) ->
             {
+                Skeleton mulSkeleton = key -> new Matrix4fMul(skeletonTransform.transform(key), skeleton.transform(key));
+
+                Matrix4f[] bones = new Collector<>(Matrix4f[]::new)
+                    .collect(new MapBuffer<>(new RangeBuffer(100), i -> Matrix4fIdentity.identity));
+
+                Skeleton invBind = invBindPoses.get(skinId);
+
+                new IterableFlow<Map.Entry<String, Integer>>(boneIndices.entrySet()).read(bone ->
+                {
+                    String key = bone.getKey();
+                    int index = bone.getValue();
+                    Matrix4f matrix = new Matrix4fRefreshable(
+                        new Matrix4fMul(mulSkeleton.transform(key), invBind.transform(key)),
+                        refreshStatus);
+                    bones[index] = matrix;
+                });
+
                 addRawMeshAction.call(skinId, (mesh, indices, meshAction) ->
                 {
-                    Skeleton mulSkeleton = key -> new Matrix4fMul(skeletonTransform.transform(key), skeleton.transform(key));
-
-                    Matrix4f[] bones = new Collector<>(Matrix4f[]::new)
-                        .collect(new MapBuffer<>(new RangeBuffer(100), i -> Matrix4fIdentity.identity));
-
-                    Skeleton invBind = invBindPoses.get(skinId);
-
-                    new IterableFlow<Map.Entry<String, Integer>>(boneIndices.entrySet()).read(bone ->
-                    {
-                        String key = bone.getKey();
-                        int index = bone.getValue();
-                        Matrix4f matrix = new Matrix4fRefreshable(
-                            new Matrix4fMul(mulSkeleton.transform(key), invBind.transform(key)),
-                            refreshStatus);
-                        bones[index] = matrix;
-                    });
-
                     meshAction.call(action -> action.call(skinId, new ShadedDrawingAttributeBuffer(mesh, shader.uniforms(u ->
                         u.uniformMatrixArray("jointTransforms", new ArrayBuffer<>(bones)))), indices));
                 });
