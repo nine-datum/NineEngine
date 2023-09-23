@@ -67,6 +67,7 @@ public class ColladaBasicMaterialParser implements ColladaMaterialParser
                 {
                     tags.read("lambert");
                     tags.read("blinn");
+                    tags.read("phong");
                 }, specific_tech ->
                 specific_tech.children("diffuse", diffuse ->
                 diffuse.children("texture", texture ->

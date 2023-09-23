@@ -1,1 +1,1 @@
-java -Xms64M -jar build/nine.jar "models/Archer.dae"
+java -Xms64M -jar build/nine.jar "models/Hip Hop Dancing.dae"
