@@ -35,7 +35,7 @@ public class FileStorageResource implements StorageResource
         {
             try
             {
-                acceptor.call(stream);
+                acceptor.call(new InputFlowFromStream(stream));
             }
             finally
             {
@@ -55,7 +55,7 @@ public class FileStorageResource implements StorageResource
         try
         {
             output = new FileOutputStream(new File(fileName));
-            acceptor.call(output);
+            acceptor.call(new OutputFlowFromStream(output));
         }
         catch (Throwable exception)
         {

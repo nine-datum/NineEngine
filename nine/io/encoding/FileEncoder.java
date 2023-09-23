@@ -1,6 +1,7 @@
 package nine.io.encoding;
 
 import nine.function.ErrorHandler;
+import nine.io.ByteArrayInput;
 import nine.io.StorageResource;
 
 public class FileEncoder
@@ -16,8 +17,7 @@ public class FileEncoder
     {
         output.write(flow -> encodable.encode(bytes ->
         {
-            try { flow.write(bytes); }
-            catch (Throwable th) { errorHandler.call(th); }
+            flow.write(new ByteArrayInput(bytes));
         }), errorHandler);
     }
 }

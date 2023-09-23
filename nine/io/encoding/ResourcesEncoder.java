@@ -1,12 +1,14 @@
 package nine.io.encoding;
 
 import java.io.File;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import nine.io.FileStorageResource;
+import nine.io.InputStreamFromFlow;
 import nine.io.StorageResource;
 
 public class ResourcesEncoder implements Encodable
@@ -35,10 +37,9 @@ public class ResourcesEncoder implements Encodable
             System.out.println("Resource encoded : " + name);
             resource.read(input ->
             {
-                try
+                try(InputStream inputStream = new InputStreamFromFlow(input))
                 {
-                    byte[] bytes = input.readAllBytes();
-                    input.close();
+                    byte[] bytes = inputStream.readAllBytes();
                     
                     stream.writeText(name);
                     stream.writeByteArray(bytes);

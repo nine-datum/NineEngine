@@ -12,6 +12,7 @@ import org.lwjgl.opengl.GL20;
 
 import nine.buffer.Buffer;
 import nine.function.ErrorPrinter;
+import nine.io.InputStreamFromFlow;
 import nine.io.StorageResource;
 import nine.opengl.Drawing;
 import nine.opengl.DrawingBuffer;
@@ -106,7 +107,7 @@ public class LWJGL_OpenGL implements OpenGL
             BufferedImage image;
             try
             {
-                image = ImageIO.read(flow);
+                image = ImageIO.read(new InputStreamFromFlow(flow));
             }
             catch(Throwable th)
             {

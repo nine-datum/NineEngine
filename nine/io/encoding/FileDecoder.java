@@ -1,6 +1,8 @@
 package nine.io.encoding;
 
 import nine.function.ErrorHandler;
+import nine.io.ByteArrayOutput;
+import nine.io.MinCount;
 import nine.io.StorageResource;
 
 public class FileDecoder
@@ -17,8 +19,7 @@ public class FileDecoder
         input.read(flow -> decodable.decode(length ->
         {
             byte[] buffer = new byte[length];
-            try { flow.read(buffer); }
-            catch (Throwable error) { errorHandler.call(error); }
+            flow.read(new MinCount(length), new ByteArrayOutput(buffer));
             return buffer;
         }),
         errorHandler);

@@ -12,6 +12,11 @@ public class ByteArrayInput implements Input
         this.start = start;
         this.end = start + count;
     }
+    public ByteArrayInput(byte[] array)
+    {
+        this.array = array;
+        this.end = array.length;
+    }
 
     @Override
     public void in(Output out)

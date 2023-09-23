@@ -5,6 +5,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.Document;
 
 import nine.function.ErrorHandler;
+import nine.io.InputStreamFromFlow;
 import nine.io.StorageResource;
 
 public class FileColladaNode implements ColladaNode
@@ -17,7 +18,7 @@ public class FileColladaNode implements ColladaNode
         {
             try
             {
-                Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(flow);
+                Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputStreamFromFlow(flow));
                 node = new XML_ColladaNode(document);
             }
             catch(Throwable error)

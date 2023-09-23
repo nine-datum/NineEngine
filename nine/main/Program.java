@@ -170,7 +170,7 @@ public class Program {
 		Matrix4f world = new Matrix4fMulChain(
 			new Matrix4fTranslation(position),
 			new Matrix4fRotationY(new Time()),
-			new Matrix4fRotationX(new ValueFloatDegreesToRadians(-90f)));
+			new Matrix4fRotationX(new ValueFloatDegreesToRadians(0f)));
 
 		UpdateRefreshStatus updateStatus = new UpdateRefreshStatus();
 
@@ -184,7 +184,7 @@ public class Program {
 			new Vector3fStruct(0f, 0f, 0f),
 			new Vector3fStruct(0f, 0f, 0f)
 		),
-		new Matrix4fScale(new Vector3fStruct(1f, 1f, 1f)),
+		new Matrix4fScale(new Vector3fStruct(0.01f, 0.01f, 0.01f)),
 		cube);
 
 		Drawing drawing = gl.clockwise(gl.depthOn(
@@ -225,7 +225,7 @@ public class Program {
 
 	public static void main(String[] args)
 	{
-		if(args.length == 0) args = new String[] { "models/Soldier.dae" };
+		if(args.length == 0) args = new String[] { "models/Archer.dae" };
 		new Program().run(args);
 	}
 }

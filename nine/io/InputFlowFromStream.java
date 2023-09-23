@@ -16,10 +16,11 @@ public class InputFlowFromStream implements InputFlow
     public void read(Count count, Output output) {
         try
         {
-            int index = 0;
             int r;
             int c = count.count(Integer.MAX_VALUE);
-            while(index++ < c && (r = stream.read()) != -1) output.out((byte)r);
+            byte[] buffer = new byte[c];
+            r = stream.read(buffer);
+            for(int i = 0; i < r; i++) output.out(buffer[i]);
         }
         catch(IOException error) {}
     }

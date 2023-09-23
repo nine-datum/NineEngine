@@ -1,8 +1,7 @@
 package nine.io.encoding;
 
-import java.io.ByteArrayInputStream;
-
 import nine.function.ErrorHandler;
+import nine.io.ByteArrayInputFlow;
 import nine.io.InputFlowAcceptor;
 import nine.io.OutputFlowAcceptor;
 import nine.io.StorageResource;
@@ -19,7 +18,7 @@ public class VirtualStorageResource implements StorageResource
     @Override
     public void read(InputFlowAcceptor acceptor, ErrorHandler errorHandler)
     {
-        acceptor.call(new ByteArrayInputStream(bytes));
+        acceptor.call(new ByteArrayInputFlow(bytes));
     }
 
     @Override
