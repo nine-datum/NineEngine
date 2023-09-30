@@ -197,6 +197,9 @@ public class Program {
 		Drawing drawing = gl.clockwise(gl.depthOn(gl.smooth(
 			new TransformedDrawing(world, shader.player(), model))));
 
+		int instancesNumber = Integer.valueOf(args[1]);
+		int instancesRow = Integer.valueOf(args[2]);
+
 		// Run the rendering loop until the user has attempted to close
 		// the window or has pressed the ESCAPE key.
 		while ( !glfwWindowShouldClose(window) ) {
@@ -206,8 +209,8 @@ public class Program {
 
 			time.accept(t ->
 			{
-				int l = 400;
-				int r = 20;
+				int l = instancesNumber;
+				int r = instancesRow;
 				for(int i = 0; i < l; i++)
 				{
 					position.x = (i % r) * 2f - 2 * (r / 2);
@@ -226,7 +229,7 @@ public class Program {
 
 	public static void main(String[] args)
 	{
-		if(args.length == 0) args = new String[] { "models/Human_Anim_Walk_Test.dae" };
+		if(args.length == 0) args = new String[] { "models/Human_Anim_Walk_Test.dae", "100", "10" };
 		new Program().run(args);
 	}
 }
