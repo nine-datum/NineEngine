@@ -8,9 +8,13 @@ import nine.function.ErrorPrinter;
 import nine.function.UpdateRefreshStatus;
 import nine.geometry.collada.ColladaSkinnedModel;
 import nine.geometry.collada.FileColladaNode;
+import nine.input.Mouse;
 import nine.io.FileStorage;
 import nine.io.Storage;
+import nine.lwjgl.LWJGL_Mouse;
 import nine.lwjgl.LWJGL_OpenGL;
+import nine.math.CameraClampVector3fFunction;
+import nine.math.Delta;
 import nine.math.LocalTime;
 import nine.math.Matrix4f;
 import nine.math.Matrix4fIdentity;
@@ -18,15 +22,19 @@ import nine.math.Matrix4fMul;
 import nine.math.Matrix4fMulChain;
 import nine.math.Matrix4fPerspective;
 import nine.math.Matrix4fRotationX;
-import nine.math.Matrix4fRotationY;
 import nine.math.Matrix4fScale;
 import nine.math.Matrix4fTransform;
 import nine.math.Matrix4fTranslation;
+import nine.math.OrbitalCameraMatrix4f;
 import nine.math.ValueFloatDegreesToRadians;
-import nine.math.Time;
+import nine.math.ValueFloatMul;
 import nine.math.ValueFloat;
 import nine.math.ValueFloatStruct;
+import nine.math.Vector3fAccumulated;
+import nine.math.Vector3fYX;
+import nine.math.Vector3fMul;
 import nine.math.Vector3fNormalized;
+import nine.math.Vector3fPrint;
 import nine.math.Vector3fStruct;
 import nine.opengl.CompositeUniform;
 import nine.opengl.Drawing;
@@ -137,7 +145,7 @@ public class Program {
 		// Set the clear color
 		glClearColor(0.5f, 0.5f, 0.7f, 0f);
 		
-		
+		UpdateRefreshStatus updateStatus = new UpdateRefreshStatus();		
 
 		Storage storage = new FileStorage();
 
@@ -151,14 +159,25 @@ public class Program {
 			acceptor.call(2, "normal");
 		});
 
-		Matrix4f cameraInversed = new Matrix4fTranslation(new Vector3fStruct(0f, -1f, 2.5f));
+		ValueFloat time = new LocalTime();
+		FPSCounter fps = new FPSCounter(time, System.out::println);
+		Mouse mouse = new LWJGL_Mouse(window, updateStatus);
+
+		Matrix4f camera = new OrbitalCameraMatrix4f(
+			new Vector3fStruct(0f, 1f, 0f),
+			new Vector3fPrint(new Vector3fAccumulated(
+				new Vector3fMul(
+					new Vector3fYX(mouse.delta()),
+					new ValueFloatMul(new Delta(time, updateStatus), new ValueFloatStruct(0.1f))),
+					new CameraClampVector3fFunction(), updateStatus), updateStatus),
+			new ValueFloatStruct(5f));
 
 		Matrix4f projection = new Matrix4fMul(new Matrix4fPerspective(
 			a -> a.call(width / (float)height),
 			new ValueFloatDegreesToRadians(60f),
 			new ValueFloatStruct(0.1f),
 			new ValueFloatStruct(100f)),
-			cameraInversed);
+			camera);
 
 		ShaderPlayer shaderPlayer = shader.player().uniforms(u ->
 			new CompositeUniform(
@@ -169,10 +188,8 @@ public class Program {
 
 		Matrix4f world = new Matrix4fMulChain(
 			new Matrix4fTranslation(position),
-			new Matrix4fRotationY(new Time()),
-			new Matrix4fRotationX(new ValueFloatDegreesToRadians(0f)));
-
-		UpdateRefreshStatus updateStatus = new UpdateRefreshStatus();
+			//new Matrix4fRotationY(time),
+			new Matrix4fRotationX(new ValueFloatDegreesToRadians(-90f)));
 
 		Drawing cube =
 			new ColladaSkinnedModel(new FileColladaNode(storage.open(args[0]), ErrorPrinter.instance))
@@ -184,7 +201,7 @@ public class Program {
 			new Vector3fStruct(0f, 0f, 0f),
 			new Vector3fStruct(0f, 0f, 0f)
 		),
-		new Matrix4fScale(new Vector3fStruct(0.01f, 0.01f, 0.01f)),
+		new Matrix4fScale(new Vector3fStruct(1f, 1f, 1f)),
 		cube);
 
 		Drawing drawing = gl.clockwise(gl.depthOn(
@@ -193,9 +210,6 @@ public class Program {
 					shader.player(),
 					world))));
 
-		ValueFloat time = new LocalTime();
-		FPSCounter fps = new FPSCounter(time, System.out::println);
-		
 		// Run the rendering loop until the user has attempted to close
 		// the window or has pressed the ESCAPE key.
 		while ( !glfwWindowShouldClose(window) ) {
@@ -210,7 +224,6 @@ public class Program {
 				{
 					position.x = (i % 3) * 2f - 2;
 					position.y = ((i / 3) % 3) * 2f - 2;
-					position.z = (i / 9 + 1) * 3f;
 					drawing.draw();
 				}
 			});
@@ -225,7 +238,7 @@ public class Program {
 
 	public static void main(String[] args)
 	{
-		if(args.length == 0) args = new String[] { "models/Archer.dae" };
+		if(args.length == 0) args = new String[] { "models/Character.dae" };
 		new Program().run(args);
 	}
 }
