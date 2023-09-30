@@ -167,7 +167,7 @@ public class ColladaSkinnedModel implements SkinnedModelAsset
         {
             skeletonParser.read(node, animations::get, refreshStatus, (skinId, skeleton) ->
             {
-                Skeleton mulSkeleton = key -> new Matrix4fMul(skeletonTransform.transform(key), skeleton.transform(key));
+                Skeleton mulSkeleton = key -> skeletonTransform.bone(key, skeleton.transform(key));
 
                 Matrix4f[] bones = new Collector<>(Matrix4f[]::new)
                     .collect(new MapBuffer<>(new RangeBuffer(100), i -> Matrix4fIdentity.identity));

@@ -4,6 +4,7 @@ import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
 import org.lwjgl.system.*;
 
+import nine.drawing.TransformedDrawing;
 import nine.function.ErrorPrinter;
 import nine.function.UpdateRefreshStatus;
 import nine.geometry.collada.ColladaSkinnedModel;
@@ -17,13 +18,11 @@ import nine.math.CameraClampVector3fFunction;
 import nine.math.Delta;
 import nine.math.LocalTime;
 import nine.math.Matrix4f;
-import nine.math.Matrix4fIdentity;
 import nine.math.Matrix4fMul;
 import nine.math.Matrix4fMulChain;
 import nine.math.Matrix4fPerspective;
+import nine.math.Matrix4fRefreshable;
 import nine.math.Matrix4fRotationX;
-import nine.math.Matrix4fScale;
-import nine.math.Matrix4fTransform;
 import nine.math.Matrix4fTranslation;
 import nine.math.OrbitalCameraMatrix4f;
 import nine.math.ValueFloatDegreesToRadians;
@@ -34,7 +33,6 @@ import nine.math.Vector3fAccumulated;
 import nine.math.Vector3fYX;
 import nine.math.Vector3fMul;
 import nine.math.Vector3fNormalized;
-import nine.math.Vector3fPrint;
 import nine.math.Vector3fStruct;
 import nine.opengl.CompositeUniform;
 import nine.opengl.Drawing;
@@ -56,8 +54,8 @@ public class Program {
 
 	// The window handle
 	private long window;
-	int width = 1000;
-	int height = 1000;
+	int width = 1024;
+	int height = 800;
 
 	public void run(String[] args) {
 
@@ -164,20 +162,20 @@ public class Program {
 		Mouse mouse = new LWJGL_Mouse(window, updateStatus);
 
 		Matrix4f camera = new OrbitalCameraMatrix4f(
-			new Vector3fStruct(0f, 1f, 0f),
-			new Vector3fPrint(new Vector3fAccumulated(
+			new Vector3fStruct(0f, 2f, 0f),
+			new Vector3fAccumulated(
 				new Vector3fMul(
 					new Vector3fYX(mouse.delta()),
 					new ValueFloatMul(new Delta(time, updateStatus), new ValueFloatStruct(0.1f))),
-					new CameraClampVector3fFunction(), updateStatus), updateStatus),
+					new CameraClampVector3fFunction(), updateStatus),
 			new ValueFloatStruct(5f));
 
-		Matrix4f projection = new Matrix4fMul(new Matrix4fPerspective(
+		Matrix4f projection = new Matrix4fRefreshable(new Matrix4fMul(new Matrix4fPerspective(
 			a -> a.call(width / (float)height),
 			new ValueFloatDegreesToRadians(60f),
 			new ValueFloatStruct(0.1f),
 			new ValueFloatStruct(100f)),
-			camera);
+			camera), updateStatus);
 
 		ShaderPlayer shaderPlayer = shader.player().uniforms(u ->
 			new CompositeUniform(
@@ -188,27 +186,16 @@ public class Program {
 
 		Matrix4f world = new Matrix4fMulChain(
 			new Matrix4fTranslation(position),
-			//new Matrix4fRotationY(time),
 			new Matrix4fRotationX(new ValueFloatDegreesToRadians(-90f)));
 
-		Drawing cube =
+		Drawing model =
 			new ColladaSkinnedModel(new FileColladaNode(storage.open(args[0]), ErrorPrinter.instance))
 			.load(gl, storage)
-			.load(key -> Matrix4fIdentity.identity)
+			.load((key, bone) -> bone)
 			.instance(shaderPlayer, updateStatus);
 
-		BodyPart body = new BodyPart(new Matrix4fTransform(
-			new Vector3fStruct(0f, 0f, 0f),
-			new Vector3fStruct(0f, 0f, 0f)
-		),
-		new Matrix4fScale(new Vector3fStruct(1f, 1f, 1f)),
-		cube);
-
-		Drawing drawing = gl.clockwise(gl.depthOn(
-			gl.smooth(
-				body.drawing(
-					shader.player(),
-					world))));
+		Drawing drawing = gl.clockwise(gl.depthOn(gl.smooth(
+			new TransformedDrawing(world, shader.player(), model))));
 
 		// Run the rendering loop until the user has attempted to close
 		// the window or has pressed the ESCAPE key.
@@ -219,11 +206,12 @@ public class Program {
 
 			time.accept(t ->
 			{
-				int l = 9;
+				int l = 400;
+				int r = 20;
 				for(int i = 0; i < l; i++)
 				{
-					position.x = (i % 3) * 2f - 2;
-					position.y = ((i / 3) % 3) * 2f - 2;
+					position.x = (i % r) * 2f - 2 * (r / 2);
+					position.z = ((i / r) % r) * 2f - 2 * (r / 2);
 					drawing.draw();
 				}
 			});
@@ -238,7 +226,7 @@ public class Program {
 
 	public static void main(String[] args)
 	{
-		if(args.length == 0) args = new String[] { "models/Character.dae" };
+		if(args.length == 0) args = new String[] { "models/Human_Anim_Walk_Test.dae" };
 		new Program().run(args);
 	}
 }
