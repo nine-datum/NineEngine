@@ -62,6 +62,15 @@ public class ColladaSkinnedModel implements SkinnedModelAsset
             new ColladaBasicAnimationParser(),
             new ColladaBasicMaterialParser());
     }
+    public ColladaSkinnedModel(ColladaNode node, ColladaAnimationParser animationParser)
+    {
+        this(node,
+            new ColladaBasicGeometryParser(),
+            new ColladaBasicSkinParser(),
+            new ColladaBasicSkeletonParser(),
+            animationParser,
+            new ColladaBasicMaterialParser());
+    }
 
     interface RawMeshAction
     {

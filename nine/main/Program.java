@@ -6,12 +6,20 @@ import org.lwjgl.system.*;
 
 import nine.drawing.TransformedDrawing;
 import nine.function.ErrorPrinter;
+import nine.function.Function;
+import nine.function.FunctionSingle;
 import nine.function.UpdateRefreshStatus;
+import nine.geometry.SkinnedModel;
+import nine.geometry.collada.AnimationFromColladaNode;
 import nine.geometry.collada.ColladaSkinnedModel;
 import nine.geometry.collada.FileColladaNode;
+import nine.geometry.collada.Skeleton;
+import nine.input.Keyboard;
 import nine.input.Mouse;
+import nine.input.WASD_Vector2f;
 import nine.io.FileStorage;
 import nine.io.Storage;
+import nine.lwjgl.LWJGL_Keyboard;
 import nine.lwjgl.LWJGL_Mouse;
 import nine.lwjgl.LWJGL_OpenGL;
 import nine.math.CameraClampVector3fFunction;
@@ -23,17 +31,25 @@ import nine.math.Matrix4fMulChain;
 import nine.math.Matrix4fPerspective;
 import nine.math.Matrix4fRefreshable;
 import nine.math.Matrix4fRotationX;
+import nine.math.Matrix4fScale;
 import nine.math.Matrix4fTranslation;
 import nine.math.OrbitalCameraMatrix4f;
 import nine.math.ValueFloatDegreesToRadians;
 import nine.math.ValueFloatMul;
 import nine.math.ValueFloat;
 import nine.math.ValueFloatStruct;
+import nine.math.Vector2f;
+import nine.math.Vector2fAccumulated;
+import nine.math.Vector2fFunction;
+import nine.math.Vector2fMul;
+import nine.math.Vector2fPrint;
+import nine.math.Vector2fRefreshable;
 import nine.math.Vector3fAccumulated;
+import nine.math.Vector3fAdd;
 import nine.math.Vector3fYX;
 import nine.math.Vector3fMul;
-import nine.math.Vector3fNormalized;
 import nine.math.Vector3fStruct;
+import nine.math.Vector3fXZ;
 import nine.opengl.CompositeUniform;
 import nine.opengl.Drawing;
 import nine.opengl.OpenGL;
@@ -158,15 +174,25 @@ public class Program {
 		});
 
 		ValueFloat time = new LocalTime();
+		ValueFloat timeDelta = new Delta(time, updateStatus);
 		FPSCounter fps = new FPSCounter(time, System.out::println);
 		Mouse mouse = new LWJGL_Mouse(window, updateStatus);
+		Keyboard keyboard = new LWJGL_Keyboard(window, updateStatus);
 
+		Vector2f playerMovement = new Vector2fRefreshable(
+			new Vector2fPrint(new WASD_Vector2f(keyboard).normalized().mul(new ValueFloatStruct(3f))),
+			updateStatus);
+			
+		Vector2f playerPosition = new Vector2fAccumulated(
+			new Vector2fMul(playerMovement, timeDelta),
+			Vector2fFunction.identity, updateStatus);
+		
 		Matrix4f camera = new OrbitalCameraMatrix4f(
-			new Vector3fStruct(0f, 2f, 0f),
+			new Vector3fAdd(new Vector3fStruct(0f, 2f, 0f), new Vector3fXZ(playerPosition)),
 			new Vector3fAccumulated(
 				new Vector3fMul(
 					new Vector3fYX(mouse.delta()),
-					new ValueFloatMul(new Delta(time, updateStatus), new ValueFloatStruct(0.1f))),
+					new ValueFloatMul(timeDelta, new ValueFloatStruct(0.1f))),
 					new CameraClampVector3fFunction(), updateStatus),
 			new ValueFloatStruct(5f));
 
@@ -179,23 +205,39 @@ public class Program {
 
 		ShaderPlayer shaderPlayer = shader.player().uniforms(u ->
 			new CompositeUniform(
-				u.uniformVector("worldLight", new Vector3fNormalized(new Vector3fStruct(0f, 0f, 1f))),
+				u.uniformVector("worldLight", new Vector3fStruct(0f, 0f, 1f)),
 				u.uniformMatrix("projection", projection)));
 		
 		Vector3fStruct position = new Vector3fStruct();
 
 		Matrix4f world = new Matrix4fMulChain(
 			new Matrix4fTranslation(position),
-			new Matrix4fRotationX(new ValueFloatDegreesToRadians(-90f)));
+			new Matrix4fRotationX(new ValueFloatDegreesToRadians(-90f)),
+			new Matrix4fScale(new Vector3fStruct(1f, 1f, 1f)));
 
-		Drawing model =
+		Skeleton idle = new AnimationFromColladaNode(new FileColladaNode(storage.open("models/Human_Anim_Idle_Test.dae"), ErrorPrinter.instance), updateStatus);
+		Skeleton walk = new AnimationFromColladaNode(new FileColladaNode(storage.open("models/Human_Anim_Walk_Test.dae"), ErrorPrinter.instance), updateStatus);
+
+		Function<SkinnedModel> model = () ->
 			new ColladaSkinnedModel(new FileColladaNode(storage.open(args[0]), ErrorPrinter.instance))
-			.load(gl, storage)
-			.load((key, bone) -> bone)
+			.load(gl, storage);
+
+		FunctionSingle<Skeleton, Drawing> animatedDrawing = a -> model.call().load((key, bone) -> a.transform(key))
 			.instance(shaderPlayer, updateStatus);
 
-		Drawing drawing = gl.clockwise(gl.depthOn(gl.smooth(
-			new TransformedDrawing(world, shader.player(), model))));
+		FunctionSingle<Drawing, Drawing> finalDrawing = d -> gl.clockwise(gl.depthOn(gl.smooth(d)));
+
+		Drawing player = new PlayerDrawing(
+			playerMovement,
+			playerPosition,
+			finalDrawing.call(animatedDrawing.call(idle)),
+			finalDrawing.call(animatedDrawing.call(walk)),
+			(transform, drawing) -> new TransformedDrawing(
+				new Matrix4fMul(transform, new Matrix4fRotationX(new ValueFloatDegreesToRadians(-90f))),
+				shader.player(), drawing));
+
+
+		Drawing idleDrawing = new TransformedDrawing(world, shader.player(), finalDrawing.call(animatedDrawing.call(idle)));
 
 		int instancesNumber = Integer.valueOf(args[1]);
 		int instancesRow = Integer.valueOf(args[2]);
@@ -207,17 +249,17 @@ public class Program {
 			updateStatus.update();
 			fps.frame();
 
-			time.accept(t ->
+			player.draw();
+			int l = instancesNumber;
+			int r = instancesRow;
+			for(int i = 0; i < l; i++)
 			{
-				int l = instancesNumber;
-				int r = instancesRow;
-				for(int i = 0; i < l; i++)
-				{
-					position.x = (i % r) * 2f - 2 * (r / 2);
-					position.z = ((i / r) % r) * 2f - 2 * (r / 2);
-					drawing.draw();
-				}
-			});
+				int px = (i % r) * 2 - 2 * (r / 2);
+				int py = ((i / r) % r) * 2 - 2 * (r / 2);
+				position.x = px;
+				position.z = py;
+				if(px != 0 || py != 0) idleDrawing.draw();
+			}
 
 			glfwSwapBuffers(window); // swap the color buffers
 
@@ -229,7 +271,7 @@ public class Program {
 
 	public static void main(String[] args)
 	{
-		if(args.length == 0) args = new String[] { "models/Human_Anim_Walk_Test.dae", "100", "10" };
+		if(args.length == 0) args = new String[] { "models/Human_Anim_Idle_Test.dae", "100", "10" };
 		new Program().run(args);
 	}
 }

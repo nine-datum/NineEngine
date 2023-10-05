@@ -21,4 +21,9 @@ public final class Vector2fNormalized implements Vector2f
                 acceptor.call(0f, 0f);
         }));
     }
+    @Override
+    public Vector2f normalized()
+    {
+        return this;
+    }
 }

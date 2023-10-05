@@ -22,4 +22,9 @@ public final class Vector3fNormalized implements Vector3f
                 acceptor.call(0f, 0f, 0f);
         }));
     }
+    @Override
+    public Vector3f normalized()
+    {
+        return this;
+    }
 }
