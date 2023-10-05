@@ -6,7 +6,6 @@ import org.lwjgl.system.*;
 
 import nine.drawing.TransformedDrawing;
 import nine.function.ErrorPrinter;
-import nine.function.Function;
 import nine.function.FunctionSingle;
 import nine.function.UpdateRefreshStatus;
 import nine.geometry.SkinnedModel;
@@ -42,7 +41,6 @@ import nine.math.Vector2f;
 import nine.math.Vector2fAccumulated;
 import nine.math.Vector2fFunction;
 import nine.math.Vector2fMul;
-import nine.math.Vector2fPrint;
 import nine.math.Vector2fRefreshable;
 import nine.math.Vector3fAccumulated;
 import nine.math.Vector3fAdd;
@@ -180,7 +178,7 @@ public class Program {
 		Keyboard keyboard = new LWJGL_Keyboard(window, updateStatus);
 
 		Vector2f playerMovement = new Vector2fRefreshable(
-			new Vector2fPrint(new WASD_Vector2f(keyboard).normalized().mul(new ValueFloatStruct(3f))),
+			new WASD_Vector2f(keyboard).normalized().mul(new ValueFloatStruct(3f)),
 			updateStatus);
 			
 		Vector2f playerPosition = new Vector2fAccumulated(
@@ -218,11 +216,10 @@ public class Program {
 		Skeleton idle = new AnimationFromColladaNode(new FileColladaNode(storage.open("models/Human_Anim_Idle_Test.dae"), ErrorPrinter.instance), updateStatus);
 		Skeleton walk = new AnimationFromColladaNode(new FileColladaNode(storage.open("models/Human_Anim_Walk_Test.dae"), ErrorPrinter.instance), updateStatus);
 
-		Function<SkinnedModel> model = () ->
-			new ColladaSkinnedModel(new FileColladaNode(storage.open(args[0]), ErrorPrinter.instance))
+		SkinnedModel model = new ColladaSkinnedModel(new FileColladaNode(storage.open(args[0]), ErrorPrinter.instance))
 			.load(gl, storage);
 
-		FunctionSingle<Skeleton, Drawing> animatedDrawing = a -> model.call().load((key, bone) -> a.transform(key))
+		FunctionSingle<Skeleton, Drawing> animatedDrawing = a -> model.load((key, bone) -> a.transform(key))
 			.instance(shaderPlayer, updateStatus);
 
 		FunctionSingle<Drawing, Drawing> finalDrawing = d -> gl.clockwise(gl.depthOn(gl.smooth(d)));

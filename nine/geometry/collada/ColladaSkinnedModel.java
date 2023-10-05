@@ -2,6 +2,7 @@ package nine.geometry.collada;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import nine.buffer.ArrayBuffer;
@@ -111,6 +112,13 @@ public class ColladaSkinnedModel implements SkinnedModelAsset
 
         class AddRawMeshAction
         {
+            List<RawMesh> meshes;
+
+            public AddRawMeshAction(List<RawMesh> meshes)
+            {
+                this.meshes = meshes;
+            }
+
             void call(String id, ActionTrio<DrawingAttributeBuffer, Buffer<Integer>, ActionSingle<RawMesh>> action)
             {
                 ArrayList<RawMesh> append = new ArrayList<>();
@@ -127,7 +135,7 @@ public class ColladaSkinnedModel implements SkinnedModelAsset
                 meshes.addAll(append);
             }
         }
-        AddRawMeshAction addRawMeshAction = new AddRawMeshAction();
+        AddRawMeshAction addRawMeshAction = new AddRawMeshAction(meshes);
 
         HashMap<String, Animation> animations = new HashMap<>();
         HashMap<String, Skeleton> invBindPoses = new HashMap<>();
@@ -174,6 +182,8 @@ public class ColladaSkinnedModel implements SkinnedModelAsset
         
         return skeletonTransform -> (shader, refreshStatus) ->
         {
+            List<RawMesh> mixedMeshes = new ArrayList<>(meshes);
+            AddRawMeshAction addMixedMeshAction = new AddRawMeshAction(mixedMeshes);
             skeletonParser.read(node, animations::get, refreshStatus, (skinId, skeleton) ->
             {
                 Skeleton mulSkeleton = key -> skeletonTransform.bone(key, skeleton.transform(key));
@@ -193,7 +203,7 @@ public class ColladaSkinnedModel implements SkinnedModelAsset
                     bones[index] = matrix;
                 });
 
-                addRawMeshAction.call(skinId, (mesh, indices, meshAction) ->
+                addMixedMeshAction.call(skinId, (mesh, indices, meshAction) ->
                 {
                     meshAction.call(action -> action.call(skinId, new ShadedDrawingAttributeBuffer(mesh, shader.uniforms(u ->
                         u.uniformMatrixArray("jointTransforms", new ArrayBuffer<>(bones)))), indices));
@@ -201,7 +211,7 @@ public class ColladaSkinnedModel implements SkinnedModelAsset
             });
 
             ArrayList<DrawingAttributeBuffer> drawings = new ArrayList<>();
-            meshes.forEach(a -> a.accept((id, mesh, indices) -> drawings.add(mesh)));
+            mixedMeshes.forEach(a -> a.accept((id, mesh, indices) -> drawings.add(mesh)));
 
             return new CompositeDrawing(
                 new CachedFlow<>(
