@@ -2,29 +2,105 @@ package nine.math;
 
 public interface Vector2f
 {
-    void accept(Vector2fAcceptor acceptor);
-
-    default Vector2f mul(ValueFloat f)
+    public interface XYAction
     {
-        return new Vector2fMul(this, f);
+        void call(float x, float y);
+    }
+
+    void accept(XYAction acceptor);
+
+    default Vector2f print()
+    {
+        return action -> accept((x, y) ->
+        {
+            System.out.printf("%f, %f\n", x, y);
+            action.call(x, y);
+        });
+    }
+    default Vector2f clampLength(ValueFloat limit)
+    {
+        ValueFloat length = length();
+        Vector2f clamped = normalized().mul(limit);
+        return a -> limit.accept(lim -> length.accept(len ->
+        {
+            if (len > lim) clamped.accept(a);
+            else accept(a);
+        }));
+    }
+    default Vector2f clampRect(Rectf rect)
+    {
+        return a -> accept((sx, sy) -> rect.accept((x, y, w, h) ->
+        {
+            float rx = sx;
+            float ry = sy;
+            if (rx < x) rx = x;
+            else if (rx > (x + w)) rx = x + w;
+            if (ry < y) ry = y;
+            else if (ry > (y + h)) ry = y + h;
+            a.call(rx, ry);
+        }));
+    }
+    default ValueFloat length()
+    {
+        return action -> accept((x, y) -> action.call((float)Math.sqrt(x * x + y * y)));
     }
     default Vector2f normalized()
     {
         return new Vector2fNormalized(this);
     }
-    default Vector2f sub(Vector2f v)
+    default ValueFloat dot(Vector2f b)
     {
-        return new Vector2fSub(this, v);
+        return action -> accept((ax, ay) -> b.accept((bx, by) -> action.call(ax * bx + ay * by)));
+    }
+    default Vector2f negative()
+    {
+        return action -> accept((x, y) -> action.call(-x, -y));
+    }
+    default Vector2f mul(Vector2f b)
+    {
+        return action -> accept((ax, ay) -> b.accept((bx, by) -> action.call(ax * bx, ay * by)));
+    }
+    default Vector2f div(Vector2f b)
+    {
+        return action -> accept((ax, ay) -> b.accept((bx, by) -> action.call(ax / bx, ay / by)));
+    }
+    default Vector2f mul(ValueFloat f)
+    {
+        return action -> accept((x, y) -> f.accept(m -> action.call(x * m, y * m)));
+    }
+    default Vector2f div(ValueFloat f)
+    {
+        return action -> accept((x, y) -> f.accept(m -> action.call(x / m, y / m)));
+    }
+    default Vector2f sub(Vector2f b)
+    {
+        return action -> accept((ax, ay) -> b.accept((bx, by) -> action.call(ax - bx, ay - by)));
     }
     default Vector2f add(Vector2f v)
     {
-        return new Vector2fAdd(this, v);
+        return action -> accept((ax, ay) -> v.accept((bx, by) -> action.call(ax + bx, ay + by)));
+    }
+    default ValueFloat x()
+    {
+        return action -> accept((x, y) -> action.call(x));
+    }
+    default ValueFloat y()
+    {
+        return action -> accept((x, y) -> action.call(y));
     }
     default int compareLength(Vector2f v)
     {
         float[] buffer = new float[2];
-        new Vector2fLength(this).accept(l -> buffer[0] = l);
-        new Vector2fLength(v).accept(l -> buffer[1] = l);
+        length().accept(l -> buffer[0] = l);
+        v.length().accept(l -> buffer[1] = l);
         return Float.compare(buffer[0], buffer[1]);
+    }
+    public static Vector2f newXY(ValueFloat x, ValueFloat y)
+    {
+        return action -> x.accept(vx -> y.accept(vy -> action.call(vx, vy)));
+    }
+    public static Vector2f newXY(float x, float y)
+    {
+        return new Vector2fStruct(x, y);
     }
 }

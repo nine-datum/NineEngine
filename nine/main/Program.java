@@ -34,20 +34,15 @@ import nine.math.Matrix4fScale;
 import nine.math.Matrix4fTranslation;
 import nine.math.OrbitalCameraMatrix4f;
 import nine.math.ValueFloatDegreesToRadians;
-import nine.math.ValueFloatMul;
 import nine.math.ValueFloat;
 import nine.math.ValueFloatStruct;
 import nine.math.Vector2f;
 import nine.math.Vector2fAccumulated;
 import nine.math.Vector2fFunction;
-import nine.math.Vector2fMul;
 import nine.math.Vector2fRefreshable;
+import nine.math.Vector3f;
 import nine.math.Vector3fAccumulated;
-import nine.math.Vector3fAdd;
-import nine.math.Vector3fYX;
-import nine.math.Vector3fMul;
 import nine.math.Vector3fStruct;
-import nine.math.Vector3fXZ;
 import nine.opengl.CompositeUniform;
 import nine.opengl.Drawing;
 import nine.opengl.OpenGL;
@@ -178,27 +173,26 @@ public class Program {
 		Keyboard keyboard = new LWJGL_Keyboard(window, updateStatus);
 
 		Vector2f playerMovement = new Vector2fRefreshable(
-			new WASD_Vector2f(keyboard).normalized().mul(new ValueFloatStruct(3f)),
+			new WASD_Vector2f(keyboard).normalized(),
 			updateStatus);
 			
 		Vector2f playerPosition = new Vector2fAccumulated(
-			new Vector2fMul(playerMovement, timeDelta),
+			playerMovement.mul(timeDelta.mul(ValueFloat.newFloat(3f))),
 			Vector2fFunction.identity, updateStatus);
 		
 		Matrix4f camera = new OrbitalCameraMatrix4f(
-			new Vector3fAdd(new Vector3fStruct(0f, 2f, 0f), new Vector3fXZ(playerPosition)),
+			Vector3f.newXYZ(0f, 2f, 0f).add(Vector3f.newXZ(playerPosition)),
 			new Vector3fAccumulated(
-				new Vector3fMul(
-					new Vector3fYX(mouse.delta()),
-					new ValueFloatMul(timeDelta, new ValueFloatStruct(0.1f))),
-					new CameraClampVector3fFunction(), updateStatus),
-			new ValueFloatStruct(5f));
+				Vector3f.newYX(mouse.delta()).mul(
+				timeDelta.mul(ValueFloat.newFloat(0.1f))),
+				new CameraClampVector3fFunction(), updateStatus),
+			ValueFloat.newFloat(5f));
 
 		Matrix4f projection = new Matrix4fRefreshable(new Matrix4fMul(new Matrix4fPerspective(
 			a -> a.call(width / (float)height),
-			new ValueFloatDegreesToRadians(60f),
-			new ValueFloatStruct(0.1f),
-			new ValueFloatStruct(100f)),
+			ValueFloat.newFloat(60f).degreesToRadians(),
+			ValueFloat.newFloat(0.1f),
+			ValueFloat.newFloat(100f)),
 			camera), updateStatus);
 
 		ShaderPlayer shaderPlayer = shader.player().uniforms(u ->

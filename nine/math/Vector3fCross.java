@@ -12,7 +12,7 @@ public class Vector3fCross implements Vector3f
     }
 
     @Override
-    public void accept(Vector3fAcceptor acceptor)
+    public void accept(XYZAction acceptor)
     {
         a.accept((ax, ay, az) -> b.accept((bx, by, bz) ->
         {

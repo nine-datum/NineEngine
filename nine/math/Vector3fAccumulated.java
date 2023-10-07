@@ -18,7 +18,7 @@ public class Vector3fAccumulated implements Vector3f
     }
 
     @Override
-    public void accept(Vector3fAcceptor acceptor)
+    public void accept(XYZAction acceptor)
     {
         if(refresh.mark())
         {

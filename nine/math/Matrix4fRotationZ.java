@@ -7,8 +7,8 @@ public class Matrix4fRotationZ implements Matrix4f
     
     public Matrix4fRotationZ(ValueFloat rotation)
     {
-        this.sin = new ValueFloatSin(rotation);
-        this.cos = new ValueFloatCos(rotation);
+        this.sin = rotation.sin();
+        this.cos = rotation.cos();
     }
     
     @Override

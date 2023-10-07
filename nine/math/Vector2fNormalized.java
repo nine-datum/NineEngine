@@ -8,10 +8,10 @@ public final class Vector2fNormalized implements Vector2f
     public Vector2fNormalized(Vector2f source)
     {
         this.source = source;
-        length = new Vector2fLength(source);
+        length = source.length();
     }
     @Override
-    public void accept(Vector2fAcceptor acceptor)
+    public void accept(XYAction acceptor)
     {
         length.accept(len -> source.accept((x, y) ->
         {

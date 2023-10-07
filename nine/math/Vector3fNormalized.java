@@ -8,11 +8,11 @@ public final class Vector3fNormalized implements Vector3f
     public Vector3fNormalized(Vector3f source)
     {
         this.source = source;
-        length = new Vector3fLength(source);
+        length = source.length();
     }
 
     @Override
-    public void accept(Vector3fAcceptor acceptor)
+    public void accept(XYZAction acceptor)
     {
         length.accept(len -> source.accept((x, y, z) ->
         {

@@ -7,9 +7,9 @@ public class OrbitalCameraMatrix4f implements Matrix4f
     public OrbitalCameraMatrix4f(Vector3f position, Vector3f rotation, ValueFloat distance)
     {
         result = new Matrix4fMulChain(
-            new Matrix4fTranslation(new Vector3fZ(distance)),
-            new Matrix4fRotation(new Vector3fNegative(rotation)),
-            new Matrix4fTranslation(new Vector3fNegative(position))
+            new Matrix4fTranslation(Vector3f.newZ(distance)),
+            new Matrix4fRotation(rotation.negative()),
+            new Matrix4fTranslation(position.negative())
         );
     }
 

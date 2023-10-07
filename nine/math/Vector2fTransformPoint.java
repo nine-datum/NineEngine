@@ -12,7 +12,7 @@ public class Vector2fTransformPoint implements Vector2f
     }
 
     @Override
-    public void accept(Vector2fAcceptor acceptor)
+    public void accept(XYAction acceptor)
     {
         point.accept((px, py) -> transform.accept(e ->
         {

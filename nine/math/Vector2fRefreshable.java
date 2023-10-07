@@ -17,7 +17,7 @@ public class Vector2fRefreshable implements Vector2f
     }
 
     @Override
-    public void accept(Vector2fAcceptor acceptor)
+    public void accept(XYAction acceptor)
     {
         if(refresh.mark())
         {

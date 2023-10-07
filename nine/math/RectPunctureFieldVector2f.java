@@ -17,7 +17,7 @@ public class RectPunctureFieldVector2f implements FieldVector2f
         return acceptor ->
         {
             RectfStruct s = new RectfStruct(rect);
-            if (s.contains(source))
+            if (s.containsPoint(source))
             {
                 source.accept((x, y) -> Stream.<Vector2f>of(
                     a -> a.call(s.x, y),

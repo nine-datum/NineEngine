@@ -1,7 +1,6 @@
 package nine.main;
 
 import nine.math.Vector2f;
-import nine.math.Vector2fAcceptor;
 
 public class LastNotZeroVector2f implements Vector2f
 {
@@ -15,7 +14,7 @@ public class LastNotZeroVector2f implements Vector2f
     }
 
     @Override
-    public void accept(Vector2fAcceptor acceptor)
+    public void accept(XYAction acceptor)
     {
         source.accept((x, y) ->
         {

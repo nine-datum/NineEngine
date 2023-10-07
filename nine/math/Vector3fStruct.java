@@ -25,7 +25,7 @@ public final class Vector3fStruct implements Vector3f
     }
 
     @Override
-    public void accept(Vector3fAcceptor acceptor)
+    public void accept(XYZAction acceptor)
     {
         acceptor.call(x, y, z);
     }

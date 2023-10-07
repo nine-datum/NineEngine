@@ -8,7 +8,7 @@ public final class CircleContainsPoint implements ValueBoolean
     public CircleContainsPoint(Vector2f center, ValueFloat radius, Vector2f point)
     {
         this.radius = radius;
-        this.delta = new Vector2fLength(point.sub(center));
+        this.delta = point.sub(center).length();
     }
 
     @Override

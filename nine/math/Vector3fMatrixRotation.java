@@ -10,7 +10,7 @@ public class Vector3fMatrixRotation implements Vector3f
     }
 
     @Override
-    public void accept(Vector3fAcceptor acceptor)
+    public void accept(XYZAction acceptor)
     {
         /*double x, y, z;
 			Matrix4x4 rotation = WithoutScale();

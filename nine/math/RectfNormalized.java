@@ -27,4 +27,10 @@ public class RectfNormalized implements Rectf
             acceptor.call(x, y, w, h);
         });
     }
+
+    @Override
+    public Rectf normalized()
+    {
+        return this;
+    }
 }

@@ -4,10 +4,8 @@ import nine.buffer.Buffer;
 import nine.buffer.MapBuffer;
 import nine.buffer.RangeBuffer;
 import nine.math.Vector3f;
-import nine.math.Vector3fBufferElement;
 import nine.math.Vector3fCross;
 import nine.math.Vector3fNormalized;
-import nine.math.Vector3fSub;
 
 public class NormalsFlow implements Flow<Float>
 {
@@ -17,7 +15,7 @@ public class NormalsFlow implements Flow<Float>
     {
         Buffer<Vector3f> vertices = new MapBuffer<Integer, Vector3f>(
             new RangeBuffer(positions.length() / 3),
-            i -> new Vector3fBufferElement(positions, i * 3));
+            i -> Vector3f.newBuffer(positions, i * 3));
 
         normals = new FlatmapFlow<Integer, Vector3f>(
             new RangeFlow(vertices.length() / 3),
@@ -26,7 +24,7 @@ public class NormalsFlow implements Flow<Float>
                 Vector3f a = vertices.at(i * 3);
                 Vector3f b = vertices.at(i * 3 + 1);
                 Vector3f c = vertices.at(i * 3 + 2);
-                Vector3f normal = new Vector3fNormalized(new Vector3fCross(new Vector3fSub(b, a), new Vector3fSub(c, a)));
+                Vector3f normal = new Vector3fNormalized(new Vector3fCross(b.sub(a), c.sub(a)));
                 action.call(normal);
                 action.call(normal);
                 action.call(normal);

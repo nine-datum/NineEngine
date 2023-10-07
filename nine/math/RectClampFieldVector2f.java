@@ -12,6 +12,6 @@ public class RectClampFieldVector2f implements FieldVector2f
     @Override
     public Vector2f project(Vector2f source)
     {
-        return new Vector2fClampRect(source, rect);
+        return source.clampRect(rect);
     }
 }

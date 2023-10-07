@@ -26,7 +26,7 @@ public final class Vector2fStruct implements Vector2f
     }
 
     @Override
-    public void accept(Vector2fAcceptor acceptor) 
+    public void accept(XYAction acceptor) 
     {
         acceptor.call(x, y);
     }
