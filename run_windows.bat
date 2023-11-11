@@ -1,1 +1,1 @@
-java -Xms64M -jar build/nine.jar "models/Human_Anim_Walk_Test.dae" 400 20
+java -Xms64M -jar build/nine.jar

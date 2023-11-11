@@ -35,7 +35,6 @@ import nine.math.Matrix4fTranslation;
 import nine.math.OrbitalCameraMatrix4f;
 import nine.math.ValueFloatDegreesToRadians;
 import nine.math.ValueFloat;
-import nine.math.ValueFloatStruct;
 import nine.math.Vector2f;
 import nine.math.Vector2fAccumulated;
 import nine.math.Vector2fFunction;
