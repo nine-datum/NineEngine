@@ -1,0 +1,9 @@
+jc = (javaClass) ->
+{
+    int:(jc "java.lang.Integer"),
+    long:(jc "java.lang.Long"),
+    string:(jc "java.lang.String"),
+    float:(jc "java.lang.Float"),
+    bool:(jc "java.lang.Boolean"),
+    updateStatus:(jc "nine.function.RefreshStatus")
+}

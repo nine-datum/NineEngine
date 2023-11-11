@@ -18,9 +18,6 @@ import nine.input.Mouse;
 import nine.input.WASD_Vector2f;
 import nine.io.FileStorage;
 import nine.io.Storage;
-import nine.lwjgl.LWJGL_Keyboard;
-import nine.lwjgl.LWJGL_Mouse;
-import nine.lwjgl.LWJGL_OpenGL;
 import nine.math.CameraClampVector3fFunction;
 import nine.math.Delta;
 import nine.math.LocalTime;
@@ -155,7 +152,10 @@ public class Program {
 
 		Storage storage = new FileStorage();
 
-		OpenGL gl = new LWJGL_OpenGL();
+		OpenGL gl = (OpenGL)storage.loadScript("scripts/opengl.jena").toObject(OpenGL.class);
+		Mouse mouse = (Mouse)storage.loadScript("scripts/mouse.jena").managedCall(window, updateStatus).toObject(Mouse.class);
+		Keyboard keyboard = (Keyboard)storage.loadScript("scripts/keyboard.jena").managedCall(window, updateStatus).toObject(Keyboard.class);
+
 		Shader shader = gl.compiler().createProgram(
 			new FileShaderSource(storage.open("shaders/diffuse_skin_vertex.glsl"), new ShaderVersionMacro("400")),
 			new FileShaderSource(storage.open("shaders/diffuse_fragment.glsl"), new ShaderVersionMacro("400")), acceptor ->
@@ -168,8 +168,6 @@ public class Program {
 		ValueFloat time = new LocalTime();
 		ValueFloat timeDelta = new Delta(time, updateStatus);
 		FPSCounter fps = new FPSCounter(time, System.out::println);
-		Mouse mouse = new LWJGL_Mouse(window, updateStatus);
-		Keyboard keyboard = new LWJGL_Keyboard(window, updateStatus);
 
 		Vector2f playerMovement = new Vector2fRefreshable(
 			new WASD_Vector2f(keyboard).normalized(),
