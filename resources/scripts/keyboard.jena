@@ -1,2 +1,2 @@
-import = source "resources/scripts/import.jena" ->
+import = source "resources/scripts/import.jena" =>
 javaClass "nine.lwjgl.LWJGL_Keyboard" .new [import.long, import.updateStatus]

@@ -1,4 +1,4 @@
-jc = (javaClass) ->
+jc = javaClass =>
 {
     int:(jc "java.lang.Integer"),
     long:(jc "java.lang.Long"),
