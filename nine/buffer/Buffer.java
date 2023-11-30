@@ -20,9 +20,14 @@ public interface Buffer<T> extends IntegerMapping<T>
     {
         return new RangeBuffer(length);
     }
-    static<T> Buffer<T> of(T[] array)
+    static Buffer<Integer> range(int start, int length)
     {
-        return new ArrayBuffer<T>(array);
+        return new RangeBuffer(start, length);
+    }
+    @SafeVarargs
+    static<T> Buffer<T> of(T... items)
+    {
+        return new ArrayBuffer<T>(items);
     }
     static<T> Buffer<T> of(List<T> list)
     {

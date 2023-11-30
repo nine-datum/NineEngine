@@ -16,7 +16,7 @@ public class PlayerDrawing implements Drawing
     public PlayerDrawing(Vector2f movement, Vector2f position, Drawing idle, Drawing walk, FunctionDouble<Matrix4f, Drawing, Drawing> transformedDrawing)
     {
         ValueFloat yAngle = 
-            ValueFloat.newFloat((float)Math.PI * -0.5f).sub(
+            ValueFloat.of((float)Math.PI * -0.5f).sub(
             ValueFloat.vector2fAngle(new LastNotZeroVector2f(movement)));
         ValueBoolean moved = action -> movement.accept((x, y) -> action.call(x != 0 || y != 0));
         Matrix4f transform = new Matrix4fTransform(

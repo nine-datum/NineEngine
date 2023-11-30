@@ -47,7 +47,7 @@ public interface ValueFloat
             }
         });
     }
-    public static ValueFloat newFloat(float v)
+    public static ValueFloat of(float v)
     {
         return new ValueFloatStruct(v);
     }

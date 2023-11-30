@@ -3,6 +3,8 @@ package nine.geometry.procedural;
 import java.util.ArrayList;
 
 import nine.buffer.Buffer;
+import nine.math.ValueFloat;
+import nine.math.Vector2f;
 import nine.math.Vector3f;
 import nine.opengl.Drawing;
 import nine.opengl.OpenGL;
@@ -41,23 +43,41 @@ public class Geometry
             .attribute(3, Buffer.of(normals)).drawing();
     }
 
-    public static Drawing lineString(OpenGL gl, Buffer<MaterialPoint> points)
+    public static Drawing lineString(OpenGL gl, Vector2f tiling, Buffer<MaterialPoint> points)
     {
         if(points.length() == 1) return Drawing.empty();
         
         ArrayList<Vertex> vertices = new ArrayList<>();
-        int length = points.length();
-
-        for(int i = 1; i < length; i++)
+        Buffer.range(1, points.length() - 1).flow().read(
+        i -> points.at(i).accept(
+        (width, point, normal) -> points.at(i - 1).accept(
+        (lw, lp, ln) ->
         {
-            points.at(i).accept((width, point, normal) ->
-            {
-                if(i == 1) points.at(i - 1).accept((lw, lp, ln) ->
-                {
-                    Vector3f dir = lp.sub(point);
-                    Vector3f left = dir.normalized().cross(normal).mul(width);
-                });
-            });
-        }
+            Vector3f dir = lp.sub(point);
+            Vector3f left = dir.normalized().cross(normal).mul(width.mul(ValueFloat.of(0.5f)));
+            float uvY = i;
+            var leftBottom = Vertex.of(lp.add(left), Vector2f.newXY(0f, uvY).mul(tiling), normal);
+            var rightBottom = Vertex.of(lp.add(left.negative()), Vector2f.newXY(1f, uvY).mul(tiling), normal);
+
+            var leftTop = Vertex.of(point.add(left), Vector2f.newXY(0f, uvY + 1f).mul(tiling), normal);
+            var rightTop = Vertex.of(point.add(left.negative()), Vector2f.newXY(1f, uvY + 1f).mul(tiling), normal);
+            
+            vertices.add(rightTop);
+            vertices.add(leftTop);
+            vertices.add(leftBottom);
+
+            vertices.add(leftBottom);
+            vertices.add(rightBottom);
+            vertices.add(rightTop);
+        })));
+
+        for(var v : vertices) v.accept((p, u, n) ->
+        {
+            p.accept((x, y, z) -> System.out.printf("position:%f, %f, %f\n", x, y, z));
+            //u.accept((x, y) -> System.out.printf("uv:%f, %f\n", x, y));
+            //n.accept((x, y, z) -> System.out.printf("normal:%f, %f, %f\n", x, y, z));
+        });
+
+        return of(gl, Buffer.of(vertices));
     }
 }

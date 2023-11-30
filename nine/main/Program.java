@@ -4,6 +4,7 @@ import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
 import org.lwjgl.system.*;
 
+import nine.buffer.Buffer;
 import nine.drawing.TransformedDrawing;
 import nine.function.ErrorPrinter;
 import nine.function.FunctionSingle;
@@ -13,6 +14,8 @@ import nine.geometry.collada.AnimationFromColladaNode;
 import nine.geometry.collada.ColladaSkinnedModel;
 import nine.geometry.collada.FileColladaNode;
 import nine.geometry.collada.Skeleton;
+import nine.geometry.procedural.Geometry;
+import nine.geometry.procedural.MaterialPoint;
 import nine.input.Keyboard;
 import nine.input.Mouse;
 import nine.input.WASD_Vector2f;
@@ -22,12 +25,11 @@ import nine.math.CameraClampVector3fFunction;
 import nine.math.Delta;
 import nine.math.LocalTime;
 import nine.math.Matrix4f;
+import nine.math.Matrix4fIdentity;
 import nine.math.Matrix4fMul;
-import nine.math.Matrix4fMulChain;
 import nine.math.Matrix4fPerspective;
 import nine.math.Matrix4fRefreshable;
 import nine.math.Matrix4fRotationX;
-import nine.math.Matrix4fScale;
 import nine.math.Matrix4fTranslation;
 import nine.math.OrbitalCameraMatrix4f;
 import nine.math.ValueFloatDegreesToRadians;
@@ -47,7 +49,7 @@ import nine.opengl.ShaderPlayer;
 import nine.opengl.shader.FileShaderSource;
 import nine.opengl.shader.ShaderVersionMacro;
 
-import java.nio.*;
+import java.nio.IntBuffer;
 
 import static org.lwjgl.glfw.Callbacks.*;
 import static org.lwjgl.glfw.GLFW.*;
@@ -156,8 +158,17 @@ public class Program {
 		Mouse mouse = (Mouse)storage.loadScript("scripts/mouse.jena").managedCall(window, updateStatus).toObject(Mouse.class);
 		Keyboard keyboard = (Keyboard)storage.loadScript("scripts/keyboard.jena").managedCall(window, updateStatus).toObject(Keyboard.class);
 
-		Shader shader = gl.compiler().createProgram(
+		Shader skinShader = gl.compiler().createProgram(
 			new FileShaderSource(storage.open("shaders/diffuse_skin_vertex.glsl"), new ShaderVersionMacro("400")),
+			new FileShaderSource(storage.open("shaders/diffuse_fragment.glsl"), new ShaderVersionMacro("400")), acceptor ->
+		{
+			acceptor.call(0, "position");
+			acceptor.call(1, "texcoord");
+			acceptor.call(2, "normal");
+		});
+
+		Shader diffuseShader = gl.compiler().createProgram(
+			new FileShaderSource(storage.open("shaders/diffuse_vertex.glsl"), new ShaderVersionMacro("400")),
 			new FileShaderSource(storage.open("shaders/diffuse_fragment.glsl"), new ShaderVersionMacro("400")), acceptor ->
 		{
 			acceptor.call(0, "position");
@@ -174,35 +185,40 @@ public class Program {
 			updateStatus);
 			
 		Vector2f playerPosition = new Vector2fAccumulated(
-			playerMovement.mul(timeDelta.mul(ValueFloat.newFloat(3f))),
+			playerMovement.mul(timeDelta.mul(ValueFloat.of(3f))),
 			Vector2fFunction.identity, updateStatus);
 		
 		Matrix4f camera = new OrbitalCameraMatrix4f(
 			Vector3f.newXYZ(0f, 2f, 0f).add(Vector3f.newXZ(playerPosition)),
 			new Vector3fAccumulated(
 				Vector3f.newYX(mouse.delta()).mul(
-				timeDelta.mul(ValueFloat.newFloat(0.1f))),
+				timeDelta.mul(ValueFloat.of(0.1f))),
 				new CameraClampVector3fFunction(), updateStatus),
-			ValueFloat.newFloat(5f));
+			ValueFloat.of(5f));
 
 		Matrix4f projection = new Matrix4fRefreshable(new Matrix4fMul(new Matrix4fPerspective(
 			a -> a.call(width / (float)height),
-			ValueFloat.newFloat(60f).degreesToRadians(),
-			ValueFloat.newFloat(0.1f),
-			ValueFloat.newFloat(100f)),
+			ValueFloat.of(60f).degreesToRadians(),
+			ValueFloat.of(0.1f),
+			ValueFloat.of(100f)),
 			camera), updateStatus);
 
-		ShaderPlayer shaderPlayer = shader.player().uniforms(u ->
+		Vector3f worldLight = Vector3f.newXYZ(0f, -1f, 1f).normalized();
+
+		ShaderPlayer skinShaderPlayer = skinShader.player().uniforms(u ->
 			new CompositeUniform(
-				u.uniformVector("worldLight", new Vector3fStruct(0f, 0f, 1f)),
+				u.uniformVector("worldLight", worldLight),
+				u.uniformMatrix("projection", projection)));
+
+		ShaderPlayer diffuseShaderPlayer = diffuseShader.player().uniforms(u ->
+			new CompositeUniform(
+				u.uniformVector("worldLight", worldLight),
 				u.uniformMatrix("projection", projection)));
 		
 		Vector3fStruct position = new Vector3fStruct();
-
-		Matrix4f world = new Matrix4fMulChain(
+		Matrix4f humanWorld = new Matrix4fMul(
 			new Matrix4fTranslation(position),
-			new Matrix4fRotationX(new ValueFloatDegreesToRadians(-90f)),
-			new Matrix4fScale(new Vector3fStruct(1f, 1f, 1f)));
+			new Matrix4fRotationX(new ValueFloatDegreesToRadians(-90f)));
 
 		Skeleton idle = new AnimationFromColladaNode(new FileColladaNode(storage.open("models/Human_Anim_Idle_Test.dae"), ErrorPrinter.instance), updateStatus);
 		Skeleton walk = new AnimationFromColladaNode(new FileColladaNode(storage.open("models/Human_Anim_Walk_Test.dae"), ErrorPrinter.instance), updateStatus);
@@ -211,9 +227,20 @@ public class Program {
 			.load(gl, storage);
 
 		FunctionSingle<Skeleton, Drawing> animatedDrawing = a -> model.load((key, bone) -> a.transform(key))
-			.instance(shaderPlayer, updateStatus);
+			.instance(skinShaderPlayer, updateStatus);
 
 		FunctionSingle<Drawing, Drawing> finalDrawing = d -> gl.clockwise(gl.depthOn(gl.smooth(d)));
+
+		var groundTexture = gl.texture(storage.open("textures/ground.jpg"));
+		var groundDrawing = finalDrawing.call(groundTexture.apply(Geometry.lineString(
+			gl,
+			Vector2f.newXY(10f, 10f),
+			Buffer.of(
+				MaterialPoint.of(ValueFloat.of(200f), Vector3f.newXYZ(0f, 0f, -100f), Vector3f.newY(1f)),
+				MaterialPoint.of(ValueFloat.of(200f), Vector3f.newXYZ(0f, 0f, 100f), Vector3f.newY(1f))
+		)))
+		.transform(Matrix4fIdentity.identity, diffuseShaderPlayer));
+
 
 		Drawing player = new PlayerDrawing(
 			playerMovement,
@@ -222,10 +249,10 @@ public class Program {
 			finalDrawing.call(animatedDrawing.call(walk)),
 			(transform, drawing) -> new TransformedDrawing(
 				new Matrix4fMul(transform, new Matrix4fRotationX(new ValueFloatDegreesToRadians(-90f))),
-				shader.player(), drawing));
+				skinShader.player(), drawing));
 
 
-		Drawing idleDrawing = new TransformedDrawing(world, shader.player(), finalDrawing.call(animatedDrawing.call(idle)));
+		Drawing idleDrawing = new TransformedDrawing(humanWorld, skinShader.player(), finalDrawing.call(animatedDrawing.call(idle)));
 
 		int instancesNumber = Integer.valueOf(args[1]);
 		int instancesRow = Integer.valueOf(args[2]);
@@ -238,6 +265,7 @@ public class Program {
 			fps.frame();
 
 			player.draw();
+			groundDrawing.draw();
 			int l = instancesNumber;
 			int r = instancesRow;
 			for(int i = 0; i < l; i++)

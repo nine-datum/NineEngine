@@ -105,6 +105,18 @@ public interface Vector3f
     {
         return action -> z.accept(zv -> action.call(0f, 0f, zv));
     }
+    public static Vector3f newX(float x)
+    {
+        return action -> action.call(x, 0f, 0f);
+    }
+    public static Vector3f newY(float y)
+    {
+        return action -> action.call(0f, y, 0f);
+    }
+    public static Vector3f newZ(float z)
+    {
+        return action -> action.call(0f, 0f, z);
+    }
     public static Vector3f newXY(ValueFloat x, ValueFloat y)
     {
         return action -> x.accept(xv -> y.accept(yv -> action.call(xv, yv, 0f)));
