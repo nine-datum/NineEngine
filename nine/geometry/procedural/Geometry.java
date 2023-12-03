@@ -3,6 +3,8 @@ package nine.geometry.procedural;
 import java.util.ArrayList;
 
 import nine.buffer.Buffer;
+import nine.collection.Flow;
+import nine.math.Matrix4f;
 import nine.math.ValueFloat;
 import nine.math.Vector2f;
 import nine.math.Vector3f;
@@ -41,6 +43,43 @@ public class Geometry
 			.attribute(3, Buffer.of(positions))
 			.attribute(2, Buffer.of(uvs))
             .attribute(3, Buffer.of(normals)).drawing();
+    }
+
+    public interface GeometryBrush
+    {
+        GeometryBrush plane(Vector3f center, Vector3f rotation, Vector2f scale);
+        Drawing drawing();
+    }
+    
+    public static GeometryBrush brush(OpenGL gl)
+    {
+        class GL_Brush implements GeometryBrush
+        {
+            Flow<Vertex> vertices;
+
+            GL_Brush(Flow<Vertex> vertices)
+            {
+                this.vertices = vertices;
+            }
+
+            @Override
+            public GeometryBrush plane(Vector3f center, Vector3f rotation, Vector2f scale)
+            {
+                Matrix4f matrix = Matrix4f.transform(center, rotation, Vector3f.newXZ(scale));
+                //Vertex bottomLeft = Vertex.of();
+
+                return new GL_Brush(vertices.concat(Flow.of(
+                    
+                )));
+            }
+
+            @Override
+            public Drawing drawing()
+            {
+                return of(gl, vertices.collect());
+            }
+        }
+        return new GL_Brush(Flow.of());
     }
 
     public static Drawing lineString(OpenGL gl, Vector2f tiling, Buffer<MaterialPoint> points)

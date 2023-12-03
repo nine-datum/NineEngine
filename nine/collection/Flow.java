@@ -21,4 +21,13 @@ public interface Flow<T>
     {
         return action -> read(item -> mapping.map(item, action));
     }
+    default Flow<T> concat(Flow<T> other)
+    {
+        return new ConcatFlow<T>(this, other);
+    }
+    @SafeVarargs
+    static <T> Flow<T> of(T... items)
+    {
+        return new ArrayFlow<T>(items);
+    }
 }

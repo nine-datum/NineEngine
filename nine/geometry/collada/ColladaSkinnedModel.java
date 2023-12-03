@@ -22,8 +22,6 @@ import nine.geometry.SkinnedModelAsset;
 import nine.io.Storage;
 import nine.math.Matrix4f;
 import nine.math.Matrix4fIdentity;
-import nine.math.Matrix4fMul;
-import nine.math.Matrix4fRefreshable;
 import nine.opengl.CompositeDrawing;
 import nine.opengl.Drawing;
 import nine.opengl.DrawingAttributeBuffer;
@@ -197,9 +195,8 @@ public class ColladaSkinnedModel implements SkinnedModelAsset
                 {
                     String key = bone.getKey();
                     int index = bone.getValue();
-                    Matrix4f matrix = new Matrix4fRefreshable(
-                        new Matrix4fMul(mulSkeleton.transform(key), invBind.transform(key)),
-                        refreshStatus);
+                    Matrix4f matrix = mulSkeleton.transform(key).mul(invBind.transform(key))
+                        .cached(refreshStatus);
                     bones[index] = matrix;
                 });
 

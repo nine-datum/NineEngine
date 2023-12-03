@@ -3,8 +3,6 @@ package nine.geometry.collada;
 import nine.buffer.TextValueBuffer;
 import nine.function.RefreshStatus;
 import nine.math.Matrix4f;
-import nine.math.Matrix4fMul;
-import nine.math.Matrix4fRefreshable;
 import nine.math.Matrix4fRowBuffer;
 import nine.math.Time;
 
@@ -48,7 +46,7 @@ public class ColladaBoneNodeReader implements NodeReader
                             new TextValueBuffer<>(content, Float::parseFloat));
                 }
 
-                Matrix4f transform = new Matrix4fRefreshable(new Matrix4fMul(parent, local), refresh);
+                Matrix4f transform = parent.mul(local).cached(refresh);
 
                 reader.read(name, transform);
                 child.children("node", new ColladaBoneNodeReader(transform, animator, refresh, reader, controllerReader));

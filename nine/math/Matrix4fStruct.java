@@ -28,6 +28,12 @@ public class Matrix4fStruct implements Matrix4f
         return sb.toString();
     }
 
+    @Override
+    public String string()
+    {
+        return toString();
+    }
+
     public void apply(Matrix4f matrix)
     {
         matrix.accept(e ->

@@ -2,7 +2,6 @@ package nine.main;
 
 import nine.function.FunctionDouble;
 import nine.math.Matrix4f;
-import nine.math.Matrix4fTransform;
 import nine.math.ValueBoolean;
 import nine.math.ValueFloat;
 import nine.math.Vector2f;
@@ -19,7 +18,7 @@ public class PlayerDrawing implements Drawing
             ValueFloat.of((float)Math.PI * -0.5f).sub(
             ValueFloat.vector2fAngle(new LastNotZeroVector2f(movement)));
         ValueBoolean moved = action -> movement.accept((x, y) -> action.call(x != 0 || y != 0));
-        Matrix4f transform = new Matrix4fTransform(
+        Matrix4f transform = Matrix4f.transform(
             Vector3f.newXZ(position),
             Vector3f.newY(yAngle)
         );

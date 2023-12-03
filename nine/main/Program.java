@@ -26,12 +26,8 @@ import nine.math.Delta;
 import nine.math.LocalTime;
 import nine.math.Matrix4f;
 import nine.math.Matrix4fIdentity;
-import nine.math.Matrix4fMul;
 import nine.math.Matrix4fPerspective;
-import nine.math.Matrix4fRefreshable;
 import nine.math.Matrix4fRotationX;
-import nine.math.Matrix4fTranslation;
-import nine.math.OrbitalCameraMatrix4f;
 import nine.math.ValueFloatDegreesToRadians;
 import nine.math.ValueFloat;
 import nine.math.Vector2f;
@@ -188,7 +184,7 @@ public class Program {
 			playerMovement.mul(timeDelta.mul(ValueFloat.of(3f))),
 			Vector2fFunction.identity, updateStatus);
 		
-		Matrix4f camera = new OrbitalCameraMatrix4f(
+		Matrix4f camera = Matrix4f.orbitalCamera(
 			Vector3f.newXYZ(0f, 2f, 0f).add(Vector3f.newXZ(playerPosition)),
 			new Vector3fAccumulated(
 				Vector3f.newYX(mouse.delta()).mul(
@@ -196,12 +192,12 @@ public class Program {
 				new CameraClampVector3fFunction(), updateStatus),
 			ValueFloat.of(5f));
 
-		Matrix4f projection = new Matrix4fRefreshable(new Matrix4fMul(new Matrix4fPerspective(
+		Matrix4f projection = new Matrix4fPerspective(
 			a -> a.call(width / (float)height),
 			ValueFloat.of(60f).degreesToRadians(),
 			ValueFloat.of(0.1f),
-			ValueFloat.of(100f)),
-			camera), updateStatus);
+			ValueFloat.of(100f)).mul(
+			camera).cached(updateStatus);
 
 		Vector3f worldLight = Vector3f.newXYZ(0f, -1f, 1f).normalized();
 
@@ -216,8 +212,7 @@ public class Program {
 				u.uniformMatrix("projection", projection)));
 		
 		Vector3fStruct position = new Vector3fStruct();
-		Matrix4f humanWorld = new Matrix4fMul(
-			new Matrix4fTranslation(position),
+		Matrix4f humanWorld = Matrix4f.translation(position).mul(
 			new Matrix4fRotationX(new ValueFloatDegreesToRadians(-90f)));
 
 		Skeleton idle = new AnimationFromColladaNode(new FileColladaNode(storage.open("models/Human_Anim_Idle_Test.dae"), ErrorPrinter.instance), updateStatus);
@@ -237,7 +232,11 @@ public class Program {
 			Vector2f.newXY(10f, 10f),
 			Buffer.of(
 				MaterialPoint.of(ValueFloat.of(200f), Vector3f.newXYZ(0f, 0f, -100f), Vector3f.newY(1f)),
-				MaterialPoint.of(ValueFloat.of(200f), Vector3f.newXYZ(0f, 0f, 100f), Vector3f.newY(1f))
+				MaterialPoint.of(ValueFloat.of(200f), Vector3f.newXYZ(0f, 0f, 100f), Vector3f.newY(1f)),
+
+				MaterialPoint.of(ValueFloat.of(10f), Vector3f.newXYZ(0f, 10f, 0f), Vector3f.newY(-1f)),
+				MaterialPoint.of(ValueFloat.of(10f), Vector3f.newXYZ(5f, 5f, 0f), Vector3f.newX(-1f)),
+				MaterialPoint.of(ValueFloat.of(10f), Vector3f.newXYZ(-5f, 50f, 0f), Vector3f.newX(1f))
 		)))
 		.transform(Matrix4fIdentity.identity, diffuseShaderPlayer));
 
@@ -248,7 +247,7 @@ public class Program {
 			finalDrawing.call(animatedDrawing.call(idle)),
 			finalDrawing.call(animatedDrawing.call(walk)),
 			(transform, drawing) -> new TransformedDrawing(
-				new Matrix4fMul(transform, new Matrix4fRotationX(new ValueFloatDegreesToRadians(-90f))),
+				transform.mul(new Matrix4fRotationX(new ValueFloatDegreesToRadians(-90f))),
 				skinShader.player(), drawing));
 
 
