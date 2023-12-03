@@ -67,23 +67,21 @@ public class Geometry
             {
                 Matrix4f matrix = Matrix4f.transform(center, rotation, Vector3f.newXZ(scale));
                 Vector3f normal = matrix.transformVector(Vector3f.newY(1f));
-                ValueFloat hScaleX = scale.x().mul(0.5f);
-                ValueFloat hScaleZ = scale.y().mul(0.5f);
 
                 Vertex bottomLeft = Vertex.of(
-                    matrix.transformPoint(Vector3f.newXYZ(hScaleX.negative(), ValueFloat.of(0), hScaleZ.negative())),
+                    matrix.transformPoint(Vector3f.newXYZ(-0.5f, 0f, -0.5f)),
                     Vector2f.newXY(0, 0),
                     normal);
                 Vertex bottomRight = Vertex.of(
-                    matrix.transformPoint(Vector3f.newXYZ(hScaleX, ValueFloat.of(0), hScaleZ.negative())),
+                    matrix.transformPoint(Vector3f.newXYZ(0.5f, 0f, -0.5f)),
                     Vector2f.newXY(0, 0),
                     normal);
                 Vertex topLeft = Vertex.of(
-                    matrix.transformPoint(Vector3f.newXYZ(hScaleX.negative(), ValueFloat.of(0), hScaleZ)),
+                    matrix.transformPoint(Vector3f.newXYZ(-0.5f, 0f, 0.5f)),
                     Vector2f.newXY(0, 0),
                     normal);
                 Vertex topRight = Vertex.of(
-                    matrix.transformPoint(Vector3f.newXYZ(hScaleX, ValueFloat.of(0), hScaleZ)),
+                    matrix.transformPoint(Vector3f.newXYZ(0.5f, 0f, 0.5f)),
                     Vector2f.newXY(0, 0),
                     normal);
 

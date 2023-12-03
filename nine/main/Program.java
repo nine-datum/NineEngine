@@ -237,7 +237,11 @@ public class Program {
 				MaterialPoint.of(ValueFloat.of(200f), Vector3f.newXYZ(0f, 0f, 100f), Vector3f.newY(1f))
 		));
 
-		var caveDrawing = Geometry.brush(gl).drawing();
+		var caveDrawing = Geometry.brush(gl)
+			.plane(Vector3f.newXYZ(0f, 4f, 0f), Vector3f.newXYZ(0f, 0f, (float)Math.PI * 2f), Vector2f.newXY(4f, 4f))
+			.plane(Vector3f.newXYZ(-2f, 2f, 0f), Vector3f.newXYZ(0f, 0f, (float)Math.PI * 0.5f), Vector2f.newXY(4f, 4f))
+			.plane(Vector3f.newXYZ(2f, 2f, 0f), Vector3f.newXYZ(0f, 0f, (float)Math.PI * 1.5f), Vector2f.newXY(4f, 4f))
+			.drawing();
 
 		var levelDrawing = finalDrawing.call(groundTexture.apply(Drawing.of(groundDrawing, caveDrawing)))
 			.transform(Matrix4fIdentity.identity, diffuseShaderPlayer);
