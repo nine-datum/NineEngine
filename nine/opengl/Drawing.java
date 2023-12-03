@@ -12,6 +12,11 @@ public interface Drawing
         return () -> { };
     }
 
+    static Drawing of(Drawing... drawings)
+    {
+        return new CompositeDrawing(drawings);
+    }
+
     default Drawing transform(Matrix4f transform, ShaderPlayer shader)
     {
         return new TransformedDrawing(transform, shader, this);

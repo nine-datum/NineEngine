@@ -20,6 +20,22 @@ public interface ValueFloat
     {
         return action -> accept(av -> b.accept(bv -> action.call(av / bv)));
     }
+    default ValueFloat add(float b)
+    {
+        return action -> accept(av -> action.call(av + b));
+    }
+    default ValueFloat sub(float b)
+    {
+        return action -> accept(av -> action.call(av - b));
+    }
+    default ValueFloat mul(float b)
+    {
+        return action -> accept(av -> action.call(av * b));
+    }
+    default ValueFloat div(float b)
+    {
+        return action -> accept(av -> action.call(av / b));
+    }
     default ValueFloat sin()
     {
         return action -> accept(v -> action.call((float)Math.sin(v)));
@@ -28,6 +44,10 @@ public interface ValueFloat
     {
         return action -> accept(v -> action.call((float)Math.cos(v)));
     }
+    default ValueFloat negative()
+    {
+        return action -> accept(v -> action.call(-v));
+    }
     public static ValueFloat pi()
     {
         return action -> action.call((float)Math.PI);
@@ -35,6 +55,12 @@ public interface ValueFloat
     default ValueFloat degreesToRadians()
     {
         return action -> accept(degrees -> action.call(degrees * (float)Math.PI * (1f / 180f)));
+    }
+    default float value()
+    {
+        float[] result = { 0f };
+        accept(f -> result[0] = f);
+        return result[0];
     }
     public static ValueFloat vector2fAngle(Vector2f vector)
     {

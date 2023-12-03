@@ -176,20 +176,22 @@ public class Program {
 		ValueFloat timeDelta = new Delta(time, updateStatus);
 		FPSCounter fps = new FPSCounter(time, System.out::println);
 
+		Vector3f cameraRotation = new Vector3fAccumulated(
+			Vector3f.newYX(mouse.delta()).mul(
+			timeDelta.mul(ValueFloat.of(0.1f))),
+			new CameraClampVector3fFunction(), updateStatus).negative();
+
 		Vector2f playerMovement = new Vector2fRefreshable(
-			new WASD_Vector2f(keyboard).normalized(),
+			new WASD_Vector2f(keyboard).cached(updateStatus).normalized().rotate(cameraRotation.y()),
 			updateStatus);
 			
 		Vector2f playerPosition = new Vector2fAccumulated(
 			playerMovement.mul(timeDelta.mul(ValueFloat.of(3f))),
 			Vector2fFunction.identity, updateStatus);
-		
+
 		Matrix4f camera = Matrix4f.orbitalCamera(
 			Vector3f.newXYZ(0f, 2f, 0f).add(Vector3f.newXZ(playerPosition)),
-			new Vector3fAccumulated(
-				Vector3f.newYX(mouse.delta()).mul(
-				timeDelta.mul(ValueFloat.of(0.1f))),
-				new CameraClampVector3fFunction(), updateStatus),
+			cameraRotation,
 			ValueFloat.of(5f));
 
 		Matrix4f projection = new Matrix4fPerspective(
@@ -227,19 +229,18 @@ public class Program {
 		FunctionSingle<Drawing, Drawing> finalDrawing = d -> gl.clockwise(gl.depthOn(gl.smooth(d)));
 
 		var groundTexture = gl.texture(storage.open("textures/ground.jpg"));
-		var groundDrawing = finalDrawing.call(groundTexture.apply(Geometry.lineString(
+		var groundDrawing = Geometry.lineString(
 			gl,
 			Vector2f.newXY(10f, 10f),
 			Buffer.of(
 				MaterialPoint.of(ValueFloat.of(200f), Vector3f.newXYZ(0f, 0f, -100f), Vector3f.newY(1f)),
-				MaterialPoint.of(ValueFloat.of(200f), Vector3f.newXYZ(0f, 0f, 100f), Vector3f.newY(1f)),
+				MaterialPoint.of(ValueFloat.of(200f), Vector3f.newXYZ(0f, 0f, 100f), Vector3f.newY(1f))
+		));
 
-				MaterialPoint.of(ValueFloat.of(10f), Vector3f.newXYZ(0f, 10f, 0f), Vector3f.newY(-1f)),
-				MaterialPoint.of(ValueFloat.of(10f), Vector3f.newXYZ(5f, 5f, 0f), Vector3f.newX(-1f)),
-				MaterialPoint.of(ValueFloat.of(10f), Vector3f.newXYZ(-5f, 50f, 0f), Vector3f.newX(1f))
-		)))
-		.transform(Matrix4fIdentity.identity, diffuseShaderPlayer));
+		var caveDrawing = Geometry.brush(gl).drawing();
 
+		var levelDrawing = finalDrawing.call(groundTexture.apply(Drawing.of(groundDrawing, caveDrawing)))
+			.transform(Matrix4fIdentity.identity, diffuseShaderPlayer);
 
 		Drawing player = new PlayerDrawing(
 			playerMovement,
@@ -264,7 +265,7 @@ public class Program {
 			fps.frame();
 
 			player.draw();
-			groundDrawing.draw();
+			levelDrawing.draw();
 			int l = instancesNumber;
 			int r = instancesRow;
 			for(int i = 0; i < l; i++)

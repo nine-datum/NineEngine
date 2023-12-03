@@ -68,7 +68,7 @@ public interface Matrix4f
     static Matrix4f orbitalCamera(Vector3f position, Vector3f rotation, ValueFloat distance)
     {
         return Matrix4f.translation(Vector3f.newZ(distance))
-            .mul(Matrix4f.rotation(rotation.negative()))
+            .mul(Matrix4f.rotation(rotation))
             .mul(Matrix4f.translation(position.negative()));
     }
     static Matrix4f perspective(ValueFloat aspect, ValueFloat fov, ValueFloat near, ValueFloat far)
@@ -104,6 +104,26 @@ public interface Matrix4f
                         ea.at(startA + 8) * eb.at(startB + 2) +
                         ea.at(startA + 12) * eb.at(startB + 3);
             });
+        }));
+    }
+    default Vector3f transformPoint(Vector3f point)
+    {
+        return action -> accept(elements -> point.accept((x, y, z) ->
+        {
+            float rx = elements.at(0) * x + elements.at(4) * y + elements.at(8) * z + elements.at(12);
+            float ry = elements.at(1) * x + elements.at(5) * y + elements.at(9) * z + elements.at(13);
+            float rz = elements.at(2) * x + elements.at(6) * y + elements.at(10) * z + elements.at(14);
+            action.call(rx, ry, rz);
+        }));
+    }
+    default Vector3f transformVector(Vector3f vector)
+    {
+        return action -> accept(elements -> vector.accept((x, y, z) ->
+        {
+            float rx = elements.at(0) * x + elements.at(4) * y + elements.at(8) * z;
+            float ry = elements.at(1) * x + elements.at(5) * y + elements.at(9) * z;
+            float rz = elements.at(2) * x + elements.at(6) * y + elements.at(10) * z;
+            action.call(rx, ry, rz);
         }));
     }
     default Matrix4f transponed()

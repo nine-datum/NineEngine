@@ -66,10 +66,35 @@ public class Geometry
             public GeometryBrush plane(Vector3f center, Vector3f rotation, Vector2f scale)
             {
                 Matrix4f matrix = Matrix4f.transform(center, rotation, Vector3f.newXZ(scale));
-                //Vertex bottomLeft = Vertex.of();
+                Vector3f normal = matrix.transformVector(Vector3f.newY(1f));
+                ValueFloat hScaleX = scale.x().mul(0.5f);
+                ValueFloat hScaleZ = scale.y().mul(0.5f);
+
+                Vertex bottomLeft = Vertex.of(
+                    matrix.transformPoint(Vector3f.newXYZ(hScaleX.negative(), ValueFloat.of(0), hScaleZ.negative())),
+                    Vector2f.newXY(0, 0),
+                    normal);
+                Vertex bottomRight = Vertex.of(
+                    matrix.transformPoint(Vector3f.newXYZ(hScaleX, ValueFloat.of(0), hScaleZ.negative())),
+                    Vector2f.newXY(0, 0),
+                    normal);
+                Vertex topLeft = Vertex.of(
+                    matrix.transformPoint(Vector3f.newXYZ(hScaleX.negative(), ValueFloat.of(0), hScaleZ)),
+                    Vector2f.newXY(0, 0),
+                    normal);
+                Vertex topRight = Vertex.of(
+                    matrix.transformPoint(Vector3f.newXYZ(hScaleX, ValueFloat.of(0), hScaleZ)),
+                    Vector2f.newXY(0, 0),
+                    normal);
 
                 return new GL_Brush(vertices.concat(Flow.of(
-                    
+                    topLeft,
+                    bottomLeft,
+                    bottomRight,
+
+                    bottomRight,
+                    topRight,
+                    topLeft
                 )));
             }
 

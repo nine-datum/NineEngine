@@ -1,5 +1,7 @@
 package nine.math;
 
+import nine.function.RefreshStatus;
+
 public interface Vector2f
 {
     public interface XYAction
@@ -87,6 +89,15 @@ public interface Vector2f
     default ValueFloat y()
     {
         return action -> accept((x, y) -> action.call(y));
+    }
+    default Vector2f rotate(ValueFloat angle)
+    {
+        return newXY(angle.cos(), angle.sin()).mul(x()).add(
+            newXY(angle.sin().negative(), angle.cos()).mul(y()));
+    }
+    default Vector2f cached(RefreshStatus refreshStatus)
+    {
+        return new Vector2fRefreshable(this, refreshStatus);
     }
     default int compareLength(Vector2f v)
     {
