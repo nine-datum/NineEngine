@@ -2,6 +2,22 @@ package nine.math;
 
 public interface ValueFloat
 {
+    class Struct implements ValueFloat
+    {
+        public float value;
+
+        Struct(float value)
+        {
+            this.value = value;
+        }
+
+        @Override
+        public void accept(FloatAcceptor acceptor)
+        {
+            acceptor.call(value);
+        }
+    }
+
     void accept(FloatAcceptor acceptor);
 
     default ValueFloat add(ValueFloat b)
@@ -73,8 +89,8 @@ public interface ValueFloat
             }
         });
     }
-    public static ValueFloat of(float v)
+    public static Struct of(float v)
     {
-        return new ValueFloatStruct(v);
+        return new Struct(v);
     }
 }

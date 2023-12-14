@@ -5,7 +5,6 @@ import nine.math.Matrix4f;
 import nine.math.Matrix4fIdentity;
 import nine.math.Matrix4fLerp;
 import nine.math.ValueFloat;
-import nine.math.ValueFloatStruct;
 
 public class KeyFrameAnimation implements Animation
 {
@@ -25,7 +24,7 @@ public class KeyFrameAnimation implements Animation
         {
             return Matrix4fIdentity.identity;
         }
-        ValueFloatStruct lerp = new ValueFloatStruct(0f);
+        ValueFloat.Struct lerp = ValueFloat.of(0f);
         Matrix4f[] ab = { Matrix4fIdentity.identity, Matrix4fIdentity.identity };
         Matrix4f matrix = new Matrix4fLerp(a -> ab[0].accept(a), a -> ab[1].accept(a), lerp);
         return a -> time.accept(t ->

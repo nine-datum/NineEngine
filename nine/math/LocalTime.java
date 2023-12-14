@@ -8,7 +8,7 @@ public class LocalTime implements ValueFloat
     public LocalTime()
     {
         time = new Time();
-        start = new ValueFloatStruct(time);
+        start = ValueFloat.of(time.value());
     }
 
     @Override
