@@ -1,6 +1,7 @@
 package nine.main;
 
 import nine.function.FunctionDouble;
+import nine.geometry.collada.Skeleton;
 import nine.math.Matrix4f;
 import nine.math.ValueBoolean;
 import nine.math.ValueFloat;
@@ -12,7 +13,7 @@ public class PlayerDrawing implements Drawing
 {
     Drawing drawing;
 
-    public PlayerDrawing(Vector2f movement, Vector2f position, Drawing idle, Drawing walk, FunctionDouble<Matrix4f, Drawing, Drawing> transformedDrawing)
+    public PlayerDrawing(Vector2f movement, Vector2f position, Skeleton idle, Skeleton walk, FunctionDouble<Matrix4f, Skeleton, Drawing> transformedDrawing)
     {
         ValueFloat yAngle = 
             ValueFloat.of((float)Math.PI * -0.5f).sub(
@@ -22,14 +23,16 @@ public class PlayerDrawing implements Drawing
             Vector3f.newXZ(position),
             Vector3f.newY(yAngle)
         );
-        drawing = transformedDrawing.call(transform, () ->
+        var walkDrawing = transformedDrawing.call(transform, walk);
+        var idleDrawing = transformedDrawing.call(transform, idle);
+        drawing = () ->
         {
             moved.accept(m ->
             {
-                if(m) walk.draw();
-                else idle.draw();
+                if(m) walkDrawing.draw();
+                else idleDrawing.draw();
             });
-        });
+        };
     }
 
     @Override

@@ -5,13 +5,10 @@ import org.lwjgl.opengl.*;
 import org.lwjgl.system.*;
 
 import nine.buffer.Buffer;
-import nine.drawing.TransformedDrawing;
 import nine.function.ErrorPrinter;
 import nine.function.FunctionSingle;
 import nine.function.UpdateRefreshStatus;
-import nine.geometry.SkinnedModel;
 import nine.geometry.collada.AnimatedSkeleton;
-import nine.geometry.collada.ColladaSkinnedModel;
 import nine.geometry.collada.FileColladaNode;
 import nine.geometry.procedural.Geometry;
 import nine.geometry.procedural.MaterialPoint;
@@ -38,9 +35,8 @@ import nine.opengl.CompositeUniform;
 import nine.opengl.Drawing;
 import nine.opengl.OpenGL;
 import nine.opengl.Shader;
+import nine.opengl.ShaderLoader;
 import nine.opengl.ShaderPlayer;
-import nine.opengl.shader.FileShaderSource;
-import nine.opengl.shader.ShaderVersionMacro;
 
 import java.nio.IntBuffer;
 
@@ -151,23 +147,9 @@ public class Program {
 		Mouse mouse = (Mouse)storage.loadScript("scripts/mouse.jena").managedCall(window, updateStatus).toObject(Mouse.class);
 		Keyboard keyboard = (Keyboard)storage.loadScript("scripts/keyboard.jena").managedCall(window, updateStatus).toObject(Keyboard.class);
 
-		Shader skinShader = gl.compiler().createProgram(
-			new FileShaderSource(storage.open("shaders/diffuse_skin_vertex.glsl"), new ShaderVersionMacro("400")),
-			new FileShaderSource(storage.open("shaders/diffuse_fragment.glsl"), new ShaderVersionMacro("400")), acceptor ->
-		{
-			acceptor.call(0, "position");
-			acceptor.call(1, "texcoord");
-			acceptor.call(2, "normal");
-		});
-
-		Shader diffuseShader = gl.compiler().createProgram(
-			new FileShaderSource(storage.open("shaders/diffuse_vertex.glsl"), new ShaderVersionMacro("400")),
-			new FileShaderSource(storage.open("shaders/diffuse_fragment.glsl"), new ShaderVersionMacro("400")), acceptor ->
-		{
-			acceptor.call(0, "position");
-			acceptor.call(1, "texcoord");
-			acceptor.call(2, "normal");
-		});
+		ShaderLoader shaderLoader = Shader.loader(storage, gl);
+		Shader skinShader = shaderLoader.load("shaders/diffuse_skin_vertex.glsl","shaders/diffuse_fragment.glsl");
+		Shader diffuseShader = shaderLoader.load("shaders/diffuse_vertex.glsl", "shaders/diffuse_fragment.glsl");
 
 		ValueFloat time = new LocalTime();
 		ValueFloat timeDelta = new Delta(time, updateStatus);
@@ -199,16 +181,6 @@ public class Program {
 			camera).cached(updateStatus);
 
 		Vector3f worldLight = Vector3f.newXYZ(0f, -1f, 1f).normalized();
-
-		ShaderPlayer skinShaderPlayer = skinShader.player().uniforms(u ->
-			new CompositeUniform(
-				u.uniformVector("worldLight", worldLight),
-				u.uniformMatrix("projection", projection)));
-
-		ShaderPlayer diffuseShaderPlayer = diffuseShader.player().uniforms(u ->
-			new CompositeUniform(
-				u.uniformVector("worldLight", worldLight),
-				u.uniformMatrix("projection", projection)));
 		
 		Vector3fStruct position = new Vector3fStruct();
 		Matrix4f humanWorld = Matrix4f.translation(position).mul(
@@ -217,12 +189,9 @@ public class Program {
 		AnimatedSkeleton idle = AnimatedSkeleton.fromCollada(new FileColladaNode(storage.open("models/Human_Anim_Idle_Test.dae"), ErrorPrinter.instance), updateStatus);
 		AnimatedSkeleton walk = AnimatedSkeleton.fromCollada(new FileColladaNode(storage.open("models/Human_Anim_Walk_Test.dae"), ErrorPrinter.instance), updateStatus);
 
-		SkinnedModel model = new ColladaSkinnedModel(new FileColladaNode(storage.open(args[0]), ErrorPrinter.instance))
-			.load(gl, storage);
+		Graphics graphics = Graphics.collada(gl, diffuseShader, skinShader, projection, worldLight, storage, updateStatus);
 
-		FunctionSingle<AnimatedSkeleton, Drawing> animatedDrawing = animation -> model
-			.load(animation.animate(time))
-			.instance(skinShaderPlayer);
+		var human = graphics.animatedModel(args[0]);
 
 		FunctionSingle<Drawing, Drawing> finalDrawing = d -> gl.clockwise(gl.depthOn(gl.smooth(d)));
 
@@ -241,20 +210,26 @@ public class Program {
 			.plane(Vector3f.newXYZ(2f, 2f, 0f), Vector3f.newXYZ(0f, 0f, (float)Math.PI * 1.5f), Vector2f.newXY(4f, 4f))
 			.drawing();
 
+
+		ShaderPlayer diffuseShaderPlayer = diffuseShader.player().uniforms(u ->
+		new CompositeUniform(
+			u.uniformVector("worldLight", worldLight),
+			u.uniformMatrix("projection", projection)));
+
 		var levelDrawing = finalDrawing.call(groundTexture.apply(Drawing.of(groundDrawing, caveDrawing)))
 			.transform(Matrix4fIdentity.identity, diffuseShaderPlayer);
 
 		Drawing player = new PlayerDrawing(
 			playerMovement,
 			playerPosition,
-			finalDrawing.call(animatedDrawing.call(idle)),
-			finalDrawing.call(animatedDrawing.call(walk)),
-			(transform, drawing) -> new TransformedDrawing(
+			idle.animate(time),
+			walk.animate(time),
+			(transform, skeleton) -> human.animate(
 				transform.mul(Matrix4f.rotationX(ValueFloat.of(-90f).degreesToRadians())),
-				skinShader.player(), drawing));
+				skeleton));
 
 
-		Drawing idleDrawing = new TransformedDrawing(humanWorld, skinShader.player(), finalDrawing.call(animatedDrawing.call(idle)));
+		Drawing idleDrawing = human.animate(humanWorld, idle.animate(time));
 
 		int instancesNumber = Integer.valueOf(args[1]);
 		int instancesRow = Integer.valueOf(args[2]);

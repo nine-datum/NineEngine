@@ -58,7 +58,8 @@ public class ColladaOpenGLGrahics implements Graphics
                     uniforms.uniformMatrix("transform", transform),
                     uniforms.uniformMatrix("projection", projection));
             });
-            return modelSource.load(animation).instance(shaderPlayer);
+            var drawing = modelSource.load(animation).instance(shaderPlayer);
+            return gl.clockwise(gl.depthOn(gl.smooth(drawing)));
         };
     }
 }
