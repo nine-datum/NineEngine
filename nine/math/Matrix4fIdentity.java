@@ -2,8 +2,6 @@ package nine.math;
 
 public class Matrix4fIdentity implements Matrix4f, Elements
 {
-    public static final Matrix4f identity = new Matrix4fIdentity();
-
     @Override
     public void accept(ElementsAcceptor acceptor)
     {

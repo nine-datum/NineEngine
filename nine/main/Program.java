@@ -22,7 +22,6 @@ import nine.math.Delta;
 import nine.math.LocalTime;
 import nine.math.Matrix4f;
 import nine.math.Matrix4fIdentity;
-import nine.math.Matrix4fPerspective;
 import nine.math.ValueFloat;
 import nine.math.Vector2f;
 import nine.math.Vector2fAccumulated;
@@ -173,7 +172,7 @@ public class Program {
 			cameraRotation,
 			ValueFloat.of(5f));
 
-		Matrix4f projection = new Matrix4fPerspective(
+		Matrix4f projection = Matrix4f.perspective(
 			a -> a.call(width / (float)height),
 			ValueFloat.of(60f).degreesToRadians(),
 			ValueFloat.of(0.1f),

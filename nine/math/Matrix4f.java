@@ -20,6 +20,8 @@ public interface Matrix4f
     
     void accept(ElementsAcceptor acceptor);
 
+    static final Matrix4f identity = new Matrix4fIdentity();
+
     static Matrix4f transform(Vector3f position, Vector3f rotation, Vector3f scale)
     {
         return translation(position).mul(rotation(rotation)).mul(scale(scale));
@@ -184,9 +186,21 @@ public interface Matrix4f
     {
         return action -> accept(e -> action.call(i -> e.at((i >> 2) + ((i & 3) << 2))));
     }
+    default Matrix4f inversed()
+    {
+        return new Matrix4fInversed(this);
+    }
     default Matrix4fStruct struct()
     {
         return new Matrix4fStruct(this);
+    }
+    default ValueFloat det()
+    {
+        return new Matrix4fDet(this);
+    }
+    default Matrix4f lerp(Matrix4f b, ValueFloat t)
+    {
+        return new Matrix4fLerp(this, b, t);
     }
     default Matrix4f cached(RefreshStatus refreshStatus)
     {
