@@ -10,10 +10,10 @@ import nine.function.ErrorPrinter;
 import nine.function.FunctionSingle;
 import nine.function.UpdateRefreshStatus;
 import nine.geometry.SkinnedModel;
+import nine.geometry.collada.AnimatedSkeleton;
 import nine.geometry.collada.AnimationFromColladaNode;
 import nine.geometry.collada.ColladaSkinnedModel;
 import nine.geometry.collada.FileColladaNode;
-import nine.geometry.collada.Skeleton;
 import nine.geometry.procedural.Geometry;
 import nine.geometry.procedural.MaterialPoint;
 import nine.input.Keyboard;
@@ -215,14 +215,15 @@ public class Program {
 		Matrix4f humanWorld = Matrix4f.translation(position).mul(
 			Matrix4f.rotationX(ValueFloat.of(-90f).degreesToRadians()));
 
-		Skeleton idle = new AnimationFromColladaNode(new FileColladaNode(storage.open("models/Human_Anim_Idle_Test.dae"), ErrorPrinter.instance), updateStatus);
-		Skeleton walk = new AnimationFromColladaNode(new FileColladaNode(storage.open("models/Human_Anim_Walk_Test.dae"), ErrorPrinter.instance), updateStatus);
+		AnimatedSkeleton idle = new AnimationFromColladaNode(new FileColladaNode(storage.open("models/Human_Anim_Idle_Test.dae"), ErrorPrinter.instance), updateStatus);
+		AnimatedSkeleton walk = new AnimationFromColladaNode(new FileColladaNode(storage.open("models/Human_Anim_Walk_Test.dae"), ErrorPrinter.instance), updateStatus);
 
 		SkinnedModel model = new ColladaSkinnedModel(new FileColladaNode(storage.open(args[0]), ErrorPrinter.instance))
 			.load(gl, storage);
 
-		FunctionSingle<Skeleton, Drawing> animatedDrawing = a -> model.load((key, bone) -> a.transform(key))
-			.instance(skinShaderPlayer, updateStatus);
+		FunctionSingle<AnimatedSkeleton, Drawing> animatedDrawing = animation -> model
+			.load(bone -> animation.transform(bone).animate(time))
+			.instance(skinShaderPlayer);
 
 		FunctionSingle<Drawing, Drawing> finalDrawing = d -> gl.clockwise(gl.depthOn(gl.smooth(d)));
 

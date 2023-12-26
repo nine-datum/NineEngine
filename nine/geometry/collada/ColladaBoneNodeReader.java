@@ -2,19 +2,17 @@ package nine.geometry.collada;
 
 import nine.buffer.TextValueBuffer;
 import nine.function.RefreshStatus;
-import nine.math.Matrix4f;
 import nine.math.Matrix4fRowBuffer;
-import nine.math.Time;
 
 public class ColladaBoneNodeReader implements NodeReader
 {
-    Matrix4f parent;
+    Animation parent;
     ColladaBoneReader reader;
     Animator animator;
     NodeReader controllerReader;
     RefreshStatus refresh;
 
-    public ColladaBoneNodeReader(Matrix4f parent, Animator animator, RefreshStatus refresh, ColladaBoneReader boneReader, NodeReader controllerReader)
+    public ColladaBoneNodeReader(Animation parent, Animator animator, RefreshStatus refresh, ColladaBoneReader boneReader, NodeReader controllerReader)
     {
         this.parent = parent;
         this.reader = boneReader;
@@ -32,21 +30,19 @@ public class ColladaBoneNodeReader implements NodeReader
             child.children("matrix", matrix ->
             matrix.content(content ->
             {
-                Matrix4f local;
-
                 Animation animation = animator.animation(id);
+                Animation local;
                 if(animation != null)
                 {
-                    local = animation.animate(new Time());
+                    local = animation;
                 }
                 else
                 {
-                    local =
+                    local = time ->
                         new Matrix4fRowBuffer(
                             new TextValueBuffer<>(content, Float::parseFloat));
                 }
-
-                Matrix4f transform = parent.mul(local).cached(refresh);
+                Animation transform = time -> parent.animate(time).mul(local.animate(time)).cached(refresh);
 
                 reader.read(name, transform);
                 child.children("node", new ColladaBoneNodeReader(transform, animator, refresh, reader, controllerReader));

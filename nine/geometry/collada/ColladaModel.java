@@ -39,6 +39,6 @@ public class ColladaModel implements ModelAsset
                     .drawing());
         });
 
-        return (shader, refreshStatus) -> shader.play(new CompositeDrawing(new IterableFlow<Drawing>(drawings)));
+        return shader -> shader.play(new CompositeDrawing(new IterableFlow<Drawing>(drawings)));
     }
 }

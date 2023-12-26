@@ -3,11 +3,10 @@ package nine.geometry.collada;
 import java.util.HashMap;
 
 import nine.function.RefreshStatus;
-import nine.math.Matrix4f;
 
-public class AnimationFromColladaNode implements Skeleton
+public class AnimationFromColladaNode implements AnimatedSkeleton
 {
-    Skeleton skeleton;
+    AnimatedSkeleton skeleton;
 
     public AnimationFromColladaNode(ColladaNode node, ColladaAnimationParser animationParser, ColladaSkeletonParser skeletonParser, RefreshStatus refresh)
     {
@@ -23,7 +22,7 @@ public class AnimationFromColladaNode implements Skeleton
         this(node, new ColladaBasicAnimationParser(), new ColladaBasicSkeletonParser(), refresh);
     }
     @Override
-    public Matrix4f transform(String bone)
+    public Animation transform(String bone)
     {
         return skeleton.transform(bone);
     }

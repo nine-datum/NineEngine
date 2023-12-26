@@ -2,22 +2,19 @@ package nine.geometry.collada;
 
 import java.util.Map;
 
-import nine.math.Matrix4f;
-import nine.math.Matrix4fIdentity;
-
-public class MapSkeleton implements Skeleton
+public class MapSkeleton implements AnimatedSkeleton
 {
-    Map<String, Matrix4f> map;
+    Map<String, Animation> map;
 
-    public MapSkeleton(Map<String, Matrix4f> map)
+    public MapSkeleton(Map<String, Animation> map)
     {
         this.map = map;
     }
 
     @Override
-    public Matrix4f transform(String bone)
+    public Animation transform(String bone)
     {
-        Matrix4f m = map.get(bone);
-        return m == null ? Matrix4fIdentity.identity : m;
+        Animation m = map.get(bone);
+        return m == null ? Animation.none : m;
     }
 }

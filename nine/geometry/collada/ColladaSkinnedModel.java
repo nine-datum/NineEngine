@@ -17,6 +17,7 @@ import nine.collection.Mapping;
 import nine.collection.RangeFlow;
 import nine.function.ActionSingle;
 import nine.function.ActionTrio;
+import nine.function.RefreshStatus;
 import nine.geometry.SkinnedModel;
 import nine.geometry.SkinnedModelAsset;
 import nine.io.Storage;
@@ -135,7 +136,6 @@ public class ColladaSkinnedModel implements SkinnedModelAsset
         }
         AddRawMeshAction addRawMeshAction = new AddRawMeshAction(meshes);
 
-        HashMap<String, Animation> animations = new HashMap<>();
         HashMap<String, Skeleton> invBindPoses = new HashMap<>();
         HashMap<String, Integer> boneIndices = new HashMap<>();
 
@@ -175,17 +175,13 @@ public class ColladaSkinnedModel implements SkinnedModelAsset
                 invBindPoses.put("#" + skinId, invBind);
             });
         });
-
-        animationParser.read(node, animations::put);
         
-        return skeletonTransform -> (shader, refreshStatus) ->
+        return animation -> shader ->
         {
             List<RawMesh> mixedMeshes = new ArrayList<>(meshes);
             AddRawMeshAction addMixedMeshAction = new AddRawMeshAction(mixedMeshes);
-            skeletonParser.read(node, animations::get, refreshStatus, (skinId, skeleton) ->
+            skeletonParser.read(node, Animator.none, RefreshStatus.once, (skinId, skeleton) ->
             {
-                Skeleton mulSkeleton = key -> skeletonTransform.bone(key, skeleton.transform(key));
-
                 Matrix4f[] bones = new Collector<>(Matrix4f[]::new)
                     .collect(new MapBuffer<>(new RangeBuffer(100), i -> Matrix4fIdentity.identity));
 
@@ -195,8 +191,7 @@ public class ColladaSkinnedModel implements SkinnedModelAsset
                 {
                     String key = bone.getKey();
                     int index = bone.getValue();
-                    Matrix4f matrix = mulSkeleton.transform(key).mul(invBind.transform(key))
-                        .cached(refreshStatus);
+                    Matrix4f matrix = animation.transform(key).mul(invBind.transform(key));
                     bones[index] = matrix;
                 });
 
