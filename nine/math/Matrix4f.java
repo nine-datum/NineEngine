@@ -30,9 +30,9 @@ public interface Matrix4f
     }
     static Matrix4f rotation(Vector3f rotation)
     {
-        return new Matrix4fRotationX(rotation.x())
-            .mul(new Matrix4fRotationY(rotation.y()))
-            .mul(new Matrix4fRotationZ(rotation.z()));
+        return rotationX(rotation.x())
+            .mul(rotationY(rotation.y()))
+            .mul(rotationZ(rotation.z()));
     }
     static Matrix4f scale(Vector3f scale)
     {
@@ -64,6 +64,60 @@ public interface Matrix4f
                 default: return 0f;
             }
         }));
+    }
+    static Matrix4f rotationX(ValueFloat angle)
+    {
+        var sinv = angle.sin();
+        var cosv = angle.cos();
+        return acceptor -> sinv.accept(sin -> cosv.accept(cos -> acceptor.call(index ->
+        {
+            switch(index)
+            {
+                case 0: return 1;
+                case 5: return cos;
+                case 6: return sin;
+                case 9: return -sin;
+                case 10: return cos;
+                case 15: return 1f;
+                default: return 0f;
+            }
+        })));
+    }
+    static Matrix4f rotationY(ValueFloat angle)
+    {
+        var sinv = angle.sin();
+        var cosv = angle.cos();
+        return acceptor -> sinv.accept(sin -> cosv.accept(cos -> acceptor.call(index ->
+        {
+            switch(index)
+            {
+                case 0: return cos;
+                case 2: return -sin;
+                case 8: return sin;
+                case 10: return cos;
+                case 5:
+                case 15: return 1f;
+                default: return 0f;
+            }
+        })));
+    }
+    static Matrix4f rotationZ(ValueFloat angle)
+    {
+        var sinv = angle.sin();
+        var cosv = angle.cos();
+        return acceptor -> sinv.accept(sin -> cosv.accept(cos -> acceptor.call(index ->
+        {
+            switch(index)
+            {
+                case 0: return cos;
+                case 1: return sin;
+                case 4: return -sin;
+                case 5: return cos;
+                case 10:
+                case 15: return 1f;
+                default: return 0f;
+            }
+        })));
     }
     static Matrix4f orbitalCamera(Vector3f position, Vector3f rotation, ValueFloat distance)
     {

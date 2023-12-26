@@ -27,7 +27,6 @@ import nine.math.LocalTime;
 import nine.math.Matrix4f;
 import nine.math.Matrix4fIdentity;
 import nine.math.Matrix4fPerspective;
-import nine.math.Matrix4fRotationX;
 import nine.math.ValueFloat;
 import nine.math.Vector2f;
 import nine.math.Vector2fAccumulated;
@@ -214,7 +213,7 @@ public class Program {
 		
 		Vector3fStruct position = new Vector3fStruct();
 		Matrix4f humanWorld = Matrix4f.translation(position).mul(
-			new Matrix4fRotationX(ValueFloat.of(-90f).degreesToRadians()));
+			Matrix4f.rotationX(ValueFloat.of(-90f).degreesToRadians()));
 
 		Skeleton idle = new AnimationFromColladaNode(new FileColladaNode(storage.open("models/Human_Anim_Idle_Test.dae"), ErrorPrinter.instance), updateStatus);
 		Skeleton walk = new AnimationFromColladaNode(new FileColladaNode(storage.open("models/Human_Anim_Walk_Test.dae"), ErrorPrinter.instance), updateStatus);
@@ -251,7 +250,7 @@ public class Program {
 			finalDrawing.call(animatedDrawing.call(idle)),
 			finalDrawing.call(animatedDrawing.call(walk)),
 			(transform, drawing) -> new TransformedDrawing(
-				transform.mul(new Matrix4fRotationX(ValueFloat.of(-90f).degreesToRadians())),
+				transform.mul(Matrix4f.rotationX(ValueFloat.of(-90f).degreesToRadians())),
 				skinShader.player(), drawing));
 
 
