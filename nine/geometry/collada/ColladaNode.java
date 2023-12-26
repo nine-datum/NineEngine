@@ -1,5 +1,7 @@
 package nine.geometry.collada;
 
+import nine.io.StorageResource;
+
 public interface ColladaNode
 {
     void attribute(String name, StringReader reader);
@@ -18,5 +20,10 @@ public interface ColladaNode
     default void manyAttributes(Selector selector, StringReader reader)
     {
         selector.select(name -> attribute(name, reader));
+    }
+
+    static ColladaNode fromFile(StorageResource file)
+    {
+        return new FileColladaNode(file, System.out::println);
     }
 }

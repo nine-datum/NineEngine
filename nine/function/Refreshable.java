@@ -14,4 +14,8 @@ public interface Refreshable
             return true;
         };
     }
+    static Refreshable always()
+    {
+        return () -> true;
+    }
 }
