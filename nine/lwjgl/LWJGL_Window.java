@@ -1,4 +1,4 @@
-package nine.main;
+package nine.lwjgl;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.GLFW_FALSE;

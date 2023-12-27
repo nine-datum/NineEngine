@@ -13,6 +13,7 @@ import nine.input.Mouse;
 import nine.input.WASD_Vector2f;
 import nine.io.FileStorage;
 import nine.io.Storage;
+import nine.lwjgl.LWJGL_Window;
 import nine.math.CameraClampVector3fFunction;
 import nine.math.Delta;
 import nine.math.LocalTime;
@@ -43,7 +44,7 @@ public class Program
 		String[] args;
 		if(cli_args.length == 0) args = new String[] { "models/Human_Anim_Idle_Test.dae", "100", "10" };
 		else args = cli_args;
-		
+
 		new LWJGL_Window().run(windowStartWidth, windowStartHeight, window ->
 		{
 			UpdateRefreshStatus updateStatus = new UpdateRefreshStatus();		
