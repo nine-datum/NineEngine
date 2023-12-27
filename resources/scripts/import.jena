@@ -6,6 +6,7 @@ jc = javaClass =>
     .float:(jc "java.lang.Float"),
     .bool:(jc "java.lang.Boolean"),
     .updateStatus:(jc "nine.function.RefreshStatus"),
+    .frameUpdateStatus:(jc "nine.function.UpdateRefreshStatus"),
     .window:(jc "nine.lwjgl.LWJGL_Window"),
     .windowStartAction:(jc "nine.opengl.WindowStartAction"),
 }
