@@ -5,8 +5,26 @@ jc = javaClass =>
     .string:(jc "java.lang.String"),
     .float:(jc "java.lang.Float"),
     .bool:(jc "java.lang.Boolean"),
+
+    .valueFloat:(jc "nine.math.ValueFloat"),
+    .vector2:(jc "nine.math.Vector2f"),
+    .vector3:(jc "nine.math.Vector3f"),
+    .matrix4:(jc "nine.math.Matrix4f"),
+    
     .updateStatus:(jc "nine.function.RefreshStatus"),
     .frameUpdateStatus:(jc "nine.function.UpdateRefreshStatus"),
+    
     .window:(jc "nine.lwjgl.LWJGL_Window"),
+    
     .windowStartAction:(jc "nine.opengl.WindowStartAction"),
+    .shader:(jc "nine.opengl.Shader"),
+    .opengl:(jc "nine.opengl.OpenGL"),
+    
+    .graphics:(jc "nine.main.Graphics"),
+    .animatedDrawing:(jc "nine.main.AnimatedDrawing"),
+    
+    .skeleton:(jc "nine.geometry.collada.Skeleton"),
+    .animatedSkeleton:(jc "nine.geometry.collada.AnimatedSkeleton"),
+    
+    .storage:(jc "nine.io.Storage"),
 }

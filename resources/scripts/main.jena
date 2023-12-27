@@ -1,20 +1,66 @@
 import = source("resources/scripts/import.jena") =>
+storage = import.storage.file[]() =>
 window = import.window.new[]() =>
 status = import.frameUpdateStatus.new[]() =>
+math =
+{
+    .float:f -> import.valueFloat.of[import.float] f,
+    .float2:xy -> import.vector2.newXY[import.float, import.float] xy,
+    .float3:xyz -> import.vector3.newXYZ[import.float, import.float, import.float] xyz,
+} =>
 windowStart =
 (
-    windowLoop = in -> width -> height ->
+    windowLoop = in -> graphics -> width -> height ->
     [
 
     ] => windowId ->
     (
+        gl = source "resources/scripts/opengl.jena" =>
+        shaderLoader = import.shader.loader[import.storage, import.opengl][storage, gl] =>
+        skinShader = shaderLoader.load[import.string, import.string]["resources/shaders/diffuse_skin_vertex.glsl", "resources/shaders/diffuse_fragment.glsl"] =>
+        diffuseShader = shaderLoader.load[import.string, import.string]["resources/shaders/diffuse_vertex.glsl", "resources/shaders/diffuse_fragment.glsl"] =>
+        light = math.float3[0, 0, 1] =>
+        projection = import.matrix4.perspective
+        [
+            import.valueFloat,
+            import.valueFloat,
+            import.valueFloat,
+            import.valueFloat
+        ][
+            math.float 1,
+            (math.float 60).degreesToRadians[](),
+            math.float 0.01,
+            math.float 100
+        ] =>
+        graphics = import.graphics.collada
+        [
+            import.opengl,
+            import.shader,
+            import.shader,
+            import.matrix4,
+            import.vector3,
+            import.storage,
+            import.updateStatus
+        ][
+            gl,
+            diffuseShader,
+            skinShader,
+            projection,
+            light,
+            storage,
+            status
+        ] =>
         in =
         {
-            .gl:(source "resources/scripts/opengl.jena"),
+            .graphics:
+            {
+                .animatedModel:file -> model = graphics.animatedModel[import.string] file => anim -> model[import.skeleton] anim,
+                .animation:file -> anim = graphics.animation[import.string] file => time -> anim.animate[import.valueFloat] time,
+            },
             .mouse:(source "resources/scripts/mouse.jena" [windowId, status]),
             .keyboard:(source "resources/scripts/keyboard.jena" [windowId, status]),
         } =>
-        args -> windowLoop in (args 0) (args 1)
+        args -> windowLoop in graphics (args 0) (args 1)
     )
 )
 =>

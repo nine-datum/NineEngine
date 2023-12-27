@@ -18,4 +18,9 @@ public interface Storage
         if(value[0] == null) throw new RuntimeException(String.format("Error loading script from file %s", path));
         return value[0];
     }
+
+    static Storage file()
+    {
+        return new FileStorage();
+    }
 }
