@@ -1,5 +1,7 @@
 package nine.math;
 
+import nine.function.RefreshStatus;
+
 public interface ValueFloat
 {
     class Struct implements ValueFloat
@@ -77,6 +79,10 @@ public interface ValueFloat
         float[] result = { 0f };
         accept(f -> result[0] = f);
         return result[0];
+    }
+    default ValueFloat delta(RefreshStatus refreshStatus)
+    {
+        return new Delta(this, refreshStatus);
     }
     public static ValueFloat vector2fAngle(Vector2f vector)
     {

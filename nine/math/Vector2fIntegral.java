@@ -3,14 +3,14 @@ package nine.math;
 import nine.function.RefreshStatus;
 import nine.function.Refreshable;
 
-public class Vector2fAccumulated implements Vector2f
+public class Vector2fIntegral implements Vector2f
 {
     float x, y;
     Vector2f delta;
     Refreshable refresh;
     Vector2fFunction function;
 
-    public Vector2fAccumulated(Vector2f delta, Vector2fFunction function, RefreshStatus status)
+    public Vector2fIntegral(Vector2f delta, Vector2fFunction function, RefreshStatus status)
     {
         this.delta = delta;
         this.function = function;

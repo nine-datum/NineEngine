@@ -99,6 +99,10 @@ public interface Vector2f
     {
         return new Vector2fRefreshable(this, refreshStatus);
     }
+    default Vector2f integral(Vector2fFunction function, RefreshStatus refreshStatus)
+    {
+        return new Vector2fIntegral(this, function, refreshStatus);
+    }
     default int compareLength(Vector2f v)
     {
         float[] buffer = new float[2];

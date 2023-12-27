@@ -21,11 +21,11 @@ import nine.math.Matrix4f;
 import nine.math.Matrix4fIdentity;
 import nine.math.ValueFloat;
 import nine.math.Vector2f;
-import nine.math.Vector2fAccumulated;
+import nine.math.Vector2fIntegral;
 import nine.math.Vector2fFunction;
 import nine.math.Vector2fRefreshable;
 import nine.math.Vector3f;
-import nine.math.Vector3fAccumulated;
+import nine.math.Vector3fIntegral;
 import nine.math.Vector3fStruct;
 import nine.opengl.CompositeUniform;
 import nine.opengl.Drawing;
@@ -63,7 +63,7 @@ public class Program
 			ValueFloat timeDelta = new Delta(time, updateStatus);
 			FPSCounter fps = new FPSCounter(time, System.out::println);
 
-			Vector3f cameraRotation = new Vector3fAccumulated(
+			Vector3f cameraRotation = new Vector3fIntegral(
 				Vector3f.newYX(mouse.delta()).mul(
 				timeDelta.mul(ValueFloat.of(0.1f))),
 				new CameraClampVector3fFunction(), updateStatus).negative();
@@ -72,7 +72,7 @@ public class Program
 				new WASD_Vector2f(keyboard).cached(updateStatus).normalized().rotate(cameraRotation.y()),
 				updateStatus);
 				
-			Vector2f playerPosition = new Vector2fAccumulated(
+			Vector2f playerPosition = new Vector2fIntegral(
 				playerMovement.mul(timeDelta.mul(ValueFloat.of(3f))),
 				Vector2fFunction.identity, updateStatus);
 

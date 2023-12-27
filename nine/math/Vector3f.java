@@ -1,6 +1,7 @@
 package nine.math;
 
 import nine.buffer.Buffer;
+import nine.function.RefreshStatus;
 
 public interface Vector3f
 {
@@ -91,6 +92,10 @@ public interface Vector3f
     default ValueFloat z()
     {
         return action -> accept((x, y, z) -> action.call(z));
+    }
+    default Vector3f integral(Vector3fFunction function, RefreshStatus refreshStatus)
+    {
+        return new Vector3fIntegral(this, function, refreshStatus);
     }
 
     public static Vector3f newX(ValueFloat x)
