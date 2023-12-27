@@ -1,0 +1,7 @@
+import = source("resources/scripts/import.jena") =>
+window = import.window.new[]() =>
+windowStart = windowId -> width -> height ->
+[
+    
+] =>
+window.run[import.int, import.int, import.windowStartAction][1200, 800, windowId -> args -> windowStart windowId (args 0) (args 1)]
