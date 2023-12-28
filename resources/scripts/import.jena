@@ -7,6 +7,7 @@ jc = javaClass =>
     .bool:(jc "java.lang.Boolean"),
 
     .valueFloat:(jc "nine.math.ValueFloat"),
+    .time:(jc "nine.math.Time"),
     .vector2:(jc "nine.math.Vector2f"),
     .vector3:(jc "nine.math.Vector3f"),
     .matrix4:(jc "nine.math.Matrix4f"),

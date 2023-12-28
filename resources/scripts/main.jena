@@ -2,18 +2,18 @@ import = source("resources/scripts/import.jena") =>
 storage = import.storage.file[]() =>
 window = import.window.new[]() =>
 status = import.frameUpdateStatus.new[]() =>
+screenWidth = box 1200 =>
+screenHeight = box 800 =>
 math =
 {
+    .time:(import.time.new[]()),
     .float:f -> import.valueFloat.of[import.float] f,
     .float2:xy -> import.vector2.newXY[import.float, import.float] xy,
     .float3:xyz -> import.vector3.newXYZ[import.float, import.float, import.float] xyz,
 } =>
 windowStart =
 (
-    windowLoop = in -> graphics -> width -> height ->
-    [
-
-    ] => windowId ->
+    windowId ->
     (
         gl = source "resources/scripts/opengl.jena" =>
         shaderLoader = import.shader.loader[import.storage, import.opengl][storage, gl] =>
@@ -27,7 +27,7 @@ windowStart =
             import.valueFloat,
             import.valueFloat
         ][
-            math.float 1,
+            action -> action.call[import.float](screenWidth.get / (screenHeight.get)),
             (math.float 60).degreesToRadians[](),
             math.float 0.01,
             math.float 100
@@ -54,14 +54,38 @@ windowStart =
         {
             .graphics:
             {
-                .animatedModel:file -> model = graphics.animatedModel[import.string] file => anim -> model[import.skeleton] anim,
-                .animation:file -> anim = graphics.animation[import.string] file => time -> anim.animate[import.valueFloat] time,
+                .animatedModel:file -> model = graphics.animatedModel[import.string] file =>
+                (
+                    root -> anim -> model.animate[import.matrix4, import.skeleton] [root, anim]
+                ),
+                .animation:file -> anim = graphics.animation[import.string] file =>
+                (
+                    time -> anim.animate[import.valueFloat] time
+                ),
             },
             .mouse:(source "resources/scripts/mouse.jena" [windowId, status]),
             .keyboard:(source "resources/scripts/keyboard.jena" [windowId, status]),
         } =>
-        args -> windowLoop in graphics (args 0) (args 1)
+        model =
+        {
+            .skin:(in.graphics.animatedModel "resources/models/Human_Anim_Idle_Test.dae"),
+            .idle:(in.graphics.animation "resources/models/Human_Anim_Idle_Test.dae"),
+            .walk:(in.graphics.animation "resources/models/Human_Anim_Walk_Test.dae"),
+        } =>
+        windowLoop = width -> height ->
+        [
+            screenWidth.set width,
+            screenHeight.set height,
+
+            rotation = import.matrix4.rotation[import.vector3](math.float3[-3.14 * 0.5, 0, 0]) =>
+            translation = import.matrix4.translation[import.vector3](math.float3[0, -1, 3]) =>
+            root = translation.mul[import.matrix4] rotation =>
+            (
+                model.skin(root)(model.walk(math.time)).draw[]()
+            ),
+        ] => 
+        args -> windowLoop (args 0) (args 1)
     )
 )
 =>
-window.run[import.int, import.int, import.windowStartAction][1200, 800, windowStart]
+window.run[import.int, import.int, import.windowStartAction][screenWidth.get, screenHeight.get, windowStart]
