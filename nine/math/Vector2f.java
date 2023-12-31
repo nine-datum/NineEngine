@@ -95,6 +95,10 @@ public interface Vector2f
         return newXY(angle.cos(), angle.sin()).mul(x()).add(
             newXY(angle.sin().negative(), angle.cos()).mul(y()));
     }
+    default ValueFloat angle()
+    {
+        return ValueFloat.vector2fAngle(this);
+    }
     default Vector2f cached(RefreshStatus refreshStatus)
     {
         return new Vector2fRefreshable(this, refreshStatus);

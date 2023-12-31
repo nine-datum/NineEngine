@@ -73,7 +73,7 @@ windowStart =
             .idle:(in.graphics.animation "resources/models/Human_Anim_Idle_Test.dae"),
             .walk:(in.graphics.animation "resources/models/Human_Anim_Walk_Test.dae"),
         } =>
-        wasd = import.wasd.new[import.keyboard](in.keyboard) =>
+        wasd = import.wasd.new[import.keyboard](in.keyboard).normalized[]() =>
         movement = (import.vector3.newXZ[import.vector2] (wasd.mul[import.valueFloat] (deltaTime.mul[import.valueFloat] (math.float 3)))).integral
         [
             import.vector3function,
@@ -82,17 +82,22 @@ windowStart =
             import.vector3function.field.identity,
             status,
         ] =>
+        turnAngle = box(0) =>
         windowLoop = width -> height ->
         [
             status.update[](),
             screenWidth.set width,
             screenHeight.set height,
-            rotation = import.matrix4.rotation[import.vector3](math.float3[-3.14 * 0.5, 0, 0]) =>
+            standing = wasd.length[]().value[]() == 0 =>
+            actualAngle = (turnAngle.set([-3.14 * 0.5 (wasd.angle[]().value[]() -), turnAngle.get] standing)) =>
+            rotation = import.matrix4.rotationY[import.valueFloat] (math.float actualAngle)
+                .mul[import.matrix4](import.matrix4.rotationX[import.valueFloat] (math.float(-3.14 * 0.5))) =>
             translation = import.matrix4.translation[import.vector3](math.float3[0, -1, 3].add[import.vector3]movement) =>
             root = translation.mul[import.matrix4] rotation =>
-            (
-                model.skin(root)(model.walk(time)).draw[]()
-            ),
+            [
+                animation = [model.walk, model.idle]standing =>
+                model.skin(root)(animation(time)).draw[]()
+            ],
         ] =>
         args -> windowLoop (args 0) (args 1)
     )
