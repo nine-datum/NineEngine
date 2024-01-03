@@ -89,7 +89,7 @@ windowStart =
             screenWidth.set width,
             screenHeight.set height,
             standing = wasd.length[]().value[]() == 0 =>
-            actualAngle = (turnAngle.set([-3.14 * 0.5 (wasd.angle[]().value[]() -), turnAngle.get] standing)) =>
+            actualAngle = (turnAngle.set([-3.14 * 1.5 (wasd.angle[]().value[]() -), turnAngle.get] standing)) =>
             rotation = import.matrix4.rotationY[import.valueFloat] (math.float actualAngle)
                 .mul[import.matrix4](import.matrix4.rotationX[import.valueFloat] (math.float(-3.14 * 0.5))) =>
             translation = import.matrix4.translation[import.vector3](math.float3[0, -1, 3].add[import.vector3]movement) =>
