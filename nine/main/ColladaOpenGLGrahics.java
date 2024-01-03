@@ -1,5 +1,7 @@
 package nine.main;
 
+import java.io.File;
+
 import nine.function.RefreshStatus;
 import nine.geometry.collada.AnimatedSkeleton;
 import nine.geometry.collada.ColladaNode;
@@ -48,7 +50,8 @@ public class ColladaOpenGLGrahics implements Graphics
     @Override
     public AnimatedDrawing animatedModel(String file)
     {
-        var modelSource = new ColladaSkinnedModel(ColladaNode.fromFile(storage.open(file))).load(gl, storage);
+        var textureStorage = this.storage.relative(new File(file).getParent());
+        var modelSource = new ColladaSkinnedModel(ColladaNode.fromFile(storage.open(file))).load(gl, textureStorage);
         return (transform, animation) ->
         {
             var shaderPlayer = skinShader.player().uniforms(uniforms ->

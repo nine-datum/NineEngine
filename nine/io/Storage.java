@@ -1,11 +1,18 @@
 package nine.io;
 
+import java.nio.file.Path;
+
 import jena.lang.source.Source;
 import jena.lang.value.Value;
 
 public interface Storage
 {
     StorageResource open(String path);
+
+    default Storage relative(String path)
+    {
+        return file -> open(Path.of(path, file).toString());
+    }
 
     default Value loadScript(String path)
     {

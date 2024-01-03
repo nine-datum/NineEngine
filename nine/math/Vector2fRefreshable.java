@@ -17,6 +17,12 @@ public class Vector2fRefreshable implements Vector2f
     }
 
     @Override
+    public Vector2f cached(RefreshStatus status)
+    {
+        return source.cached(status);
+    }
+
+    @Override
     public void accept(XYAction acceptor)
     {
         if(refresh.mark())

@@ -24,6 +24,7 @@ public class ColladaBoneNodeReader implements NodeReader
     @Override
     public void read(ColladaNode child)
     {
+        child.attribute("type", type ->
         child.attribute("id", id ->
         child.attribute("name", name ->
         {
@@ -44,10 +45,14 @@ public class ColladaBoneNodeReader implements NodeReader
                 }
                 Animation transform = time -> parent.animate(time).mul(local.animate(time)).cached(refresh);
 
-                reader.read(name, transform);
+                if(type.equals("JOINT"))
+                {
+                    reader.read(name, transform);
+                }
+                
                 child.children("node", new ColladaBoneNodeReader(transform, animator, refresh, reader, controllerReader));
             }));
             child.children("instance_controller", controllerReader);
-        }));
+        })));
     }
 }

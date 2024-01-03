@@ -144,7 +144,7 @@ public class ColladaSkinnedModel implements SkinnedModelAsset
         {
             String sourceId = "#" + source;
             DrawingAttributeBuffer buffer = new TexturedDrawingAttributeBuffer(
-                gl.texture(storage.open("resources/models/textures/" + materials.textureFile(material))),
+                gl.texture(storage.open(materials.textureFile(material))),
                 gl.vao(intBuffers.map("INDEX"))
                     .attribute(3, floatBuffers.map("VERTEX"))
                     .attribute(2, floatBuffers.map("TEXCOORD"))

@@ -42,7 +42,7 @@ public class LWJGL_Window_Test
 		int windowStartHeight = 800;
 
 		String[] args;
-		if(cli_args.length == 0) args = new String[] { "models/Human_Anim_Idle_Test.dae", "100", "10" };
+		if(cli_args.length == 0) args = new String[] { "resources/models/Knight/Idle.dae", "100", "10" };
 		else args = cli_args;
 
 		new LWJGL_Window().run(windowStartWidth, windowStartHeight, window ->
@@ -51,13 +51,13 @@ public class LWJGL_Window_Test
 
 			Storage storage = new FileStorage();
 
-			OpenGL gl = (OpenGL)storage.loadScript("scripts/opengl.jena").toObject(OpenGL.class);
-			Mouse mouse = (Mouse)storage.loadScript("scripts/mouse.jena").managedCall(window, updateStatus).toObject(Mouse.class);
-			Keyboard keyboard = (Keyboard)storage.loadScript("scripts/keyboard.jena").managedCall(window, updateStatus).toObject(Keyboard.class);
+			OpenGL gl = (OpenGL)storage.loadScript("resources/scripts/opengl.jena").toObject(OpenGL.class);
+			Mouse mouse = (Mouse)storage.loadScript("resources/scripts/mouse.jena").managedCall(window, updateStatus).toObject(Mouse.class);
+			Keyboard keyboard = (Keyboard)storage.loadScript("resources/scripts/keyboard.jena").managedCall(window, updateStatus).toObject(Keyboard.class);
 
 			ShaderLoader shaderLoader = Shader.loader(storage, gl);
-			Shader skinShader = shaderLoader.load("shaders/diffuse_skin_vertex.glsl","shaders/diffuse_fragment.glsl");
-			Shader diffuseShader = shaderLoader.load("shaders/diffuse_vertex.glsl", "shaders/diffuse_fragment.glsl");
+			Shader skinShader = shaderLoader.load("resources/shaders/diffuse_skin_vertex.glsl","resources/shaders/diffuse_fragment.glsl");
+			Shader diffuseShader = shaderLoader.load("resources/shaders/diffuse_vertex.glsl", "resources/shaders/diffuse_fragment.glsl");
 
 			ValueFloat time = new LocalTime();
 			ValueFloat timeDelta = new Delta(time, updateStatus);
@@ -96,8 +96,8 @@ public class LWJGL_Window_Test
 			Matrix4f humanWorld = Matrix4f.translation(position).mul(
 				Matrix4f.rotationX(ValueFloat.of(-90f).degreesToRadians()));
 
-			AnimatedSkeleton idle = AnimatedSkeleton.fromCollada(new FileColladaNode(storage.open("models/Human_Anim_Idle_Test.dae"), ErrorPrinter.instance), updateStatus);
-			AnimatedSkeleton walk = AnimatedSkeleton.fromCollada(new FileColladaNode(storage.open("models/Human_Anim_Walk_Test.dae"), ErrorPrinter.instance), updateStatus);
+			AnimatedSkeleton idle = AnimatedSkeleton.fromCollada(new FileColladaNode(storage.open("resources/models/Knight/Idle.dae"), ErrorPrinter.instance), updateStatus);
+			AnimatedSkeleton walk = AnimatedSkeleton.fromCollada(new FileColladaNode(storage.open("resources/models/Knight/Walk.dae"), ErrorPrinter.instance), updateStatus);
 
 			Graphics graphics = Graphics.collada(gl, diffuseShader, skinShader, projection, worldLight, storage, updateStatus);
 
@@ -105,7 +105,7 @@ public class LWJGL_Window_Test
 
 			FunctionSingle<Drawing, Drawing> finalDrawing = d -> gl.clockwise(gl.depthOn(gl.smooth(d)));
 
-			var groundTexture = gl.texture(storage.open("textures/ground.jpg"));
+			var groundTexture = gl.texture(storage.open("resources/textures/ground.jpg"));
 			var groundDrawing = Geometry.lineString(
 				gl,
 				Vector2f.newXY(10f, 10f),

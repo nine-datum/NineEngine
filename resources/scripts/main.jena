@@ -69,9 +69,9 @@ windowStart =
         } =>
         model =
         {
-            .skin:(in.graphics.animatedModel "resources/models/Human_Anim_Idle_Test.dae"),
-            .idle:(in.graphics.animation "resources/models/Human_Anim_Idle_Test.dae"),
-            .walk:(in.graphics.animation "resources/models/Human_Anim_Walk_Test.dae"),
+            .skin:(in.graphics.animatedModel "resources/models/Knight/Walk.dae"),
+            .idle:(in.graphics.animation "resources/models/Knight/Idle.dae"),
+            .walk:(in.graphics.animation "resources/models/Knight/Walk.dae"),
         } =>
         wasd = import.wasd.new[import.keyboard](in.keyboard).normalized[]() =>
         movement = (import.vector3.newXZ[import.vector2] (wasd.mul[import.valueFloat] (deltaTime.mul[import.valueFloat] (math.float 3)))).integral
