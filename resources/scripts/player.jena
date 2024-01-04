@@ -1,6 +1,17 @@
 import -> in ->
-(
-    shaderLoader = import.shader.loader[import.storage, import.opengl][storage, gl] =>
-    skinShader = shaderLoader.load[import.string, import.string]["resources/shaders/diffuse_skin_vertex.glsl", "resources/shaders/diffuse_fragment.glsl"] =>
-    ()       
-)
+{
+    .init:
+    {
+        .position:(box(in.math.float3[0, -1, 2])),
+        .rotation:(box 0),
+        .skin:(in.graphics.animatedModel "resources/models/Knight/Walk.dae"),
+        .idle:(in.graphics.animation "resources/models/Knight/Idle.dae"),
+        .walk:(in.graphics.animation "resources/models/Knight/Walk.dae"),
+    },
+    .update:init ->
+    [
+        init.skin
+            (import.matrix4.transform[import.vector3, import.vector3][init.position.get, in.math.float3[-3.14 * 0.5, 0, 0]])
+            (init.idle(in.time.value[]())).draw[](),
+    ]
+}
