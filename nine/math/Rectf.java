@@ -1,38 +1,62 @@
 package nine.math;
 
-public interface Rectf
+public class Rectf
 {
-    void accept(RectfAcceptor acceptor);
+    public final float x, y, w, h;
+
+    private Rectf(float x, float y, float w, float h)
+    {
+        this.x = x;
+        this.y = y;
+        this.w = w;
+        this.h = h;
+    }
+
+    public void accept(RectfAcceptor acceptor)
+    {
+        acceptor.call(x, y, w, h);
+    }
 
     public static Rectf fromLocationSize(Vector2f location, Vector2f size)
     {
-        return action -> location.accept((x, y) -> size.accept((w, h) -> action.call(x, y, w, h)));
+        return new Rectf(location.x, location.y, size.x, size.y);
     }
     public static Rectf fromLocationSize(float x, float y, float w, float h)
     {
-        return new RectfStruct(x, y, w, h);
+        return new Rectf(x, y, w, h);
     }
-    default Rectf normalized()
+    public Rectf normalized()
     {
-        return new RectfNormalized(this);
-    }
-    default Vector2f center()
-    {
-        return action -> accept((x, y, w, h) -> action.call(x + w * 0.5f, y + h * 0.5f));
-    }
-    default Vector2f size()
-    {
-        return action -> accept((x, y, w, h) -> action.call(w, h));
-    }
-    default Vector2f location()
-    {
-        return action -> accept((x, y, w, h) -> action.call(x, y));
-    }
-    default ValueBoolean contains(Vector2f point)
-    {
-        return action -> accept((x, y, w, h) -> point.accept((px, py) ->
+        float x = this.x;
+        float y = this.y;
+        float w = this.w;
+        float h = this.h;
+        if (w < 0)
         {
-            action.call(px >= x && py >= y && px < (x + w) && py < (y + h));
-        }));
+            x += w;
+            w = Math.abs(w);
+        }
+        if (h < 0)
+        {
+            y += h;
+            h = Math.abs(h);
+        }
+        return new Rectf(x, y, w, h);
+    }
+    public Vector2f center()
+    {
+        return Vector2f.newXY(x + w * 0.5f, y + h * 0.5f);
+    }
+    public Vector2f size()
+    {
+        return Vector2f.newXY(w, h);
+    }
+    public Vector2f location()
+    {
+        return Vector2f.newXY(x, y);
+    }
+    public boolean contains(Vector2f point)
+    {
+        return (point.x >= x && point.y >= y && point.x < (x + w) && point.y < (y + h));
     }
 }

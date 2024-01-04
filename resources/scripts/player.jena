@@ -1,0 +1,6 @@
+import -> in ->
+(
+    shaderLoader = import.shader.loader[import.storage, import.opengl][storage, gl] =>
+    skinShader = shaderLoader.load[import.string, import.string]["resources/shaders/diffuse_skin_vertex.glsl", "resources/shaders/diffuse_fragment.glsl"] =>
+    ()       
+)

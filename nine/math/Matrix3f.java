@@ -13,5 +13,5 @@ public interface Matrix3f
         [ 3 4 5 ] -- column 1
         [ 6 7 8 ] -- column 2
     */
-    void accept(ElementsAcceptor acceptor);
+    float at(int index);
 }

@@ -2,7 +2,7 @@ package nine.math;
 
 import nine.function.RefreshStatus;
 
-public interface Matrix4f
+public class Matrix4f
 {
     /*
         elements layout :
@@ -17,186 +17,205 @@ public interface Matrix4f
         [ 8  9  10 11 ] -- column 2
         [ 12 13 14 15 ] -- column 2
     */
-    
-    void accept(ElementsAcceptor acceptor);
+    private final float[] elements;
 
-    static final Matrix4f identity = new Matrix4fIdentity();
+    private static float[] newElements()
+    {
+        float[] elements = new float[16];
+        elements[0] = elements[5] = elements[10] = elements[15] = 1f;
+        return elements;
+    }
 
-    static Matrix4f transform(Vector3f position, Vector3f rotation, Vector3f scale)
+    private Matrix4f()
+    {
+        elements = newElements();
+    }
+    private Matrix4f(float[] elements)
+    {
+        this.elements = elements;
+    }
+
+    public static final Matrix4f identity = new Matrix4f();
+
+    public static Matrix4f transform(Vector3f position, Vector3f rotation, Vector3f scale)
     {
         return translation(position).mul(rotation(rotation)).mul(scale(scale));
     }
-    static Matrix4f transform(Vector3f position, Vector3f rotation)
+    public static Matrix4f transform(Vector3f position, Vector3f rotation)
     {
         return translation(position).mul(rotation(rotation));
     }
-    static Matrix4f rotation(Vector3f rotation)
+    public static Matrix4f rotation(Vector3f rotation)
     {
-        return rotationX(rotation.x())
-            .mul(rotationY(rotation.y()))
-            .mul(rotationZ(rotation.z()));
+        return rotationX(rotation.x)
+            .mul(rotationY(rotation.y))
+            .mul(rotationZ(rotation.z));
     }
-    static Matrix4f scale(Vector3f scale)
+    public static Matrix4f scale(Vector3f scale)
     {
-        return action -> scale.accept((x, y, z) -> action.call(index ->
-        {
-            switch(index)
-            {
-                case 0: return x;
-                case 5: return y;
-                case 10: return z;
-                case 15: return 1f;
-                default: return 0f;
-            }
-        }));
+        float[] elements = newElements();
+        elements[0] = scale.x;
+        elements[5] = scale.y;
+        elements[10] = scale.z;
+        return new Matrix4f(elements);
     }
-    static Matrix4f translation(Vector3f translation)
+    public static Matrix4f translation(Vector3f translation)
     {
-        return action -> translation.accept((tx, ty, tz) -> action.call(index ->
-        {
-            switch(index)
-            {
-                case 12: return tx;
-                case 13: return ty;
-                case 14: return tz;
-                case 0:
-                case 5:
-                case 10:
-                case 15: return 1f;
-                default: return 0f;
-            }
-        }));
+        var elements = newElements();
+        elements[12] = translation.x;
+        elements[13] = translation.y;
+        elements[14] = translation.z;
+        return new Matrix4f(elements);
     }
-    static Matrix4f rotationX(ValueFloat angle)
+    public static Matrix4f rotationX(float angle)
     {
-        var sinv = angle.sin();
-        var cosv = angle.cos();
-        return acceptor -> sinv.accept(sin -> cosv.accept(cos -> acceptor.call(index ->
-        {
-            switch(index)
-            {
-                case 0: return 1;
-                case 5: return cos;
-                case 6: return sin;
-                case 9: return -sin;
-                case 10: return cos;
-                case 15: return 1f;
-                default: return 0f;
-            }
-        })));
+        var sin = (float)Math.sin(angle);
+        var cos = (float)Math.cos(angle);
+        var elements = newElements();
+        elements[5] = cos;
+        elements[6] = sin;
+        elements[9] = -sin;
+        elements[10] = cos;
+        return new Matrix4f(elements);
     }
-    static Matrix4f rotationY(ValueFloat angle)
+    public static Matrix4f rotationY(float angle)
     {
-        var sinv = angle.sin();
-        var cosv = angle.cos();
-        return acceptor -> sinv.accept(sin -> cosv.accept(cos -> acceptor.call(index ->
-        {
-            switch(index)
-            {
-                case 0: return cos;
-                case 2: return -sin;
-                case 8: return sin;
-                case 10: return cos;
-                case 5:
-                case 15: return 1f;
-                default: return 0f;
-            }
-        })));
+        var sin = (float)Math.sin(angle);
+        var cos = (float)Math.cos(angle);
+        var elements = newElements();
+        elements[0] = cos;
+        elements[2] = -sin;
+        elements[8] = sin;
+        elements[10] = cos;
+        return new Matrix4f(elements);
     }
-    static Matrix4f rotationZ(ValueFloat angle)
+    public static Matrix4f rotationZ(float angle)
     {
-        var sinv = angle.sin();
-        var cosv = angle.cos();
-        return acceptor -> sinv.accept(sin -> cosv.accept(cos -> acceptor.call(index ->
-        {
-            switch(index)
-            {
-                case 0: return cos;
-                case 1: return sin;
-                case 4: return -sin;
-                case 5: return cos;
-                case 10:
-                case 15: return 1f;
-                default: return 0f;
-            }
-        })));
+        var sin = (float)Math.sin(angle);
+        var cos = (float)Math.cos(angle);
+        var elements = newElements();
+        elements[0] = cos;
+        elements[1] = sin;
+        elements[4] = -sin;
+        elements[5] = cos;
+        return new Matrix4f(elements);
     }
-    static Matrix4f orbitalCamera(Vector3f position, Vector3f rotation, ValueFloat distance)
+    public static Matrix4f orbitalCamera(Vector3f position, Vector3f rotation, float distance)
     {
         return Matrix4f.translation(Vector3f.newZ(distance))
             .mul(Matrix4f.rotation(rotation))
             .mul(Matrix4f.translation(position.negative()));
     }
-    static Matrix4f perspective(ValueFloat aspect, ValueFloat fov, ValueFloat near, ValueFloat far)
+    public static Matrix4f perspective(float aspect, float fov, float near, float far)
     {
-        return action -> fov.accept(fovV -> aspect.accept(aspectV -> far.accept(farV -> near.accept(nearV -> action.call(index ->
-        {
-            float tan = (float)Math.tan(fovV * 0.5f);
-            switch(index)
-            {
-                case 0: return 1f / (aspectV * tan);
-                case 5: return 1f / tan;
-                case 10: return (farV + nearV) / (farV - nearV);
-                case 11: return 1f;
-                case 14: return -2f * farV * nearV / (farV - nearV);
-                default: return 0f;
-            }
-        })))));
+        var elements = newElements();
+        float tan = (float)Math.tan(fov * 0.5f);
+        elements[0] = 1f / (aspect * tan);
+        elements[5] = 1f / tan;
+        elements[10] = (far + near) / (far - near);
+        elements[11] = 1f;
+        elements[14] = -2f * far * near / (far - near);
+        return new Matrix4f(elements);
     }
 
-    default Matrix4f mul(Matrix4f m)
+    public Matrix4f mul(Matrix4f m)
     {
-        return action -> accept(ea -> m.accept(eb ->
-        {
-            action.call(index ->
-            {
-                int i = index & 3;
-                int j = index >> 2;
-                int startA = i;
-                int startB = j << 2;
+        var elements = newElements();
 
-                return ea.at(startA) * eb.at(startB) +
-                        ea.at(startA + 4) * eb.at(startB + 1) +
-                        ea.at(startA + 8) * eb.at(startB + 2) +
-                        ea.at(startA + 12) * eb.at(startB + 3);
-            });
-        }));
-    }
-    default Vector3f transformPoint(Vector3f point)
-    {
-        return action -> accept(elements -> point.accept((x, y, z) ->
+        for(int index = 0; index < 16; index++)
         {
-            float rx = elements.at(0) * x + elements.at(4) * y + elements.at(8) * z + elements.at(12);
-            float ry = elements.at(1) * x + elements.at(5) * y + elements.at(9) * z + elements.at(13);
-            float rz = elements.at(2) * x + elements.at(6) * y + elements.at(10) * z + elements.at(14);
-            action.call(rx, ry, rz);
-        }));
+            int i = index & 3;
+            int j = index >> 2;
+            int startA = i;
+            int startB = j << 2;
+            var ea = this.elements;
+            var eb = m.elements;
+
+            elements[index] = ea[startA] * eb[startB] +
+                    ea[startA + 4] * eb[startB + 1] +
+                    ea[startA + 8] * eb[startB + 2] +
+                    ea[startA + 12] * eb[startB + 3];
+        }
+        return new Matrix4f(elements);
     }
-    default Vector3f transformVector(Vector3f vector)
+    public Vector3f transformPoint(Vector3f point)
     {
-        return action -> accept(elements -> vector.accept((x, y, z) ->
+        float x = point.x;
+        float y = point.y;
+        float z = point.z;
+        float rx = elements[0] * x + elements[4] * y + elements[8] * z + elements[12];
+        float ry = elements[1] * x + elements[5] * y + elements[9] * z + elements[13];
+        float rz = elements[2] * x + elements[6] * y + elements[10] * z + elements[14];
+        return Vector3f.newXYZ(rx, ry, rz);
+    }
+    public Vector3f transformVector(Vector3f vector)
+    {
+        float x = vector.x;
+        float y = vector.y;
+        float z = vector.z;
+        float rx = elements[0] * x + elements[4] * y + elements[8] * z;
+        float ry = elements[1] * x + elements[5] * y + elements[9] * z;
+        float rz = elements[2] * x + elements[6] * y + elements[10] * z;
+        return Vector3f.newXYZ(rx, ry, rz);
+    }
+    public Matrix4f transponed()
+    {
+        var t = new float[16];
+        for(int i = 0; i < 16; i++)
         {
-            float rx = elements.at(0) * x + elements.at(4) * y + elements.at(8) * z;
-            float ry = elements.at(1) * x + elements.at(5) * y + elements.at(9) * z;
-            float rz = elements.at(2) * x + elements.at(6) * y + elements.at(10) * z;
-            action.call(rx, ry, rz);
-        }));
+            t[i] = elements[(i >> 2) + ((i & 3) << 2)];
+        }
+        return new Matrix4f(t);
     }
-    default Matrix4f transponed()
+
+    static float at(float[] elements, int i, int j)
     {
-        return action -> accept(e -> action.call(i -> e.at((i >> 2) + ((i & 3) << 2))));
+        return elements[i + j * 4];
     }
-    default Matrix4f inversed()
+
+    public float det()
     {
-        return new Matrix4fInversed(this);
+        float subFactor00 = at(elements, 2, 2) * at(elements, 3, 3) - at(elements, 3, 2) * at(elements, 2, 3);
+		float subFactor01 = at(elements, 2, 1) * at(elements, 3, 3) - at(elements, 3, 1) * at(elements, 2, 3);
+		float subFactor02 = at(elements, 2, 1) * at(elements, 3, 2) - at(elements, 3, 1) * at(elements, 2, 2);
+		float subFactor03 = at(elements, 2, 0) * at(elements, 3, 3) - at(elements, 3, 0) * at(elements, 2, 3);
+		float subFactor04 = at(elements, 2, 0) * at(elements, 3, 2) - at(elements, 3, 0) * at(elements, 2, 2);
+		float subFactor05 = at(elements, 2, 0) * at(elements, 3, 1) - at(elements, 3, 0) * at(elements, 2, 1);
+
+		float dcof0 = (at(elements, 1, 1) * subFactor00 - at(elements, 1, 2) * subFactor01 + at(elements, 1, 3) * subFactor02);
+		float dcof1 = -(at(elements, 1, 0) * subFactor00 - at(elements, 1, 2) * subFactor03 + at(elements, 1, 3) * subFactor04);
+		float dcof2 = (at(elements, 1, 0) * subFactor01 - at(elements, 1, 1) * subFactor03 + at(elements, 1, 3) * subFactor05);
+		float dcof3 = -(at(elements, 1, 0) * subFactor02 - at(elements, 1, 1) * subFactor04 + at(elements, 1, 2) * subFactor05);
+
+		return
+			at(elements, 0, 0) * dcof0 + at(elements, 0, 1) * dcof1 +
+			at(elements, 0, 2) * dcof2 + at(elements, 0, 3) * dcof3;
     }
-    default Matrix4fStruct struct()
+
+    interface IntToFloat
     {
-        return new Matrix4fStruct(this);
+        float at(int index);
     }
-    default ValueFloat det()
+
+    private static float step(float[] s, int i, int j, int si, int sj)
     {
-        return new Matrix4fDet(this);
+        return s[((i + si) & 3) + (((j + sj) & 3) << 2)];
+    }
+
+    public Matrix4f inversed()
+    {
+        var result = new float[16];
+        var det = det();
+        for(int index = 0; index < 16; index++)
+        {
+            int i = index >> 2;
+            int j = index & 3;
+            Matrix3f detMatrix = a -> a.call(m -> step(s, (m % 3) + i, (m / 3) + j, 1, 1));
+            float[] box = { 0f };
+            new Matrix3fDet(detMatrix).accept(d -> box[0] = d);
+            result[i] = box[0] / det;
+        }
+        return new Matrix4f(result);
     }
     default Matrix4f lerp(Matrix4f b, ValueFloat t)
     {
