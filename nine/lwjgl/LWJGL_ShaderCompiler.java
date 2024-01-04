@@ -5,7 +5,6 @@ import java.util.stream.IntStream;
 
 import org.lwjgl.opengl.GL20;
 
-import nine.opengl.EmptyUniform;
 import nine.opengl.Shader;
 import nine.opengl.ShaderAttribute;
 import nine.opengl.ShaderCompiler;
@@ -53,7 +52,7 @@ public class LWJGL_ShaderCompiler implements ShaderCompiler
             @Override
             public ShaderPlayer player()
             {
-                return new LWJGL_ShaderPlayer(program, new EmptyUniform());
+                return new LWJGL_ShaderPlayer(program);
             }
         };
     }

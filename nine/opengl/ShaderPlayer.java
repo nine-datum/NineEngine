@@ -2,6 +2,6 @@ package nine.opengl;
 
 public interface ShaderPlayer
 {
-    ShaderPlayer uniforms(UniformBinding handler);
+    Uniforms uniforms();
     Drawing play(Drawing drawing);
 }

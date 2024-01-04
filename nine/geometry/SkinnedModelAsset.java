@@ -5,5 +5,5 @@ import nine.opengl.OpenGL;
 
 public interface SkinnedModelAsset
 {
-    SkinnedModel load(OpenGL gl, Storage storage);
+    ShadedSkinnedModel load(OpenGL gl, Storage storage);
 }

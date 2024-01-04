@@ -1,7 +1,7 @@
 package nine.opengl;
 
-public class EmptyUniform implements Uniform
+public class EmptyUniform<T> implements Uniform<T>
 {
     @Override
-    public void load() { }
+    public void load(T value) { }
 }

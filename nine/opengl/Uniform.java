@@ -1,11 +1,6 @@
 package nine.opengl;
 
-public interface Uniform
+public interface Uniform<T>
 {
-    void load();
-
-    static Uniform of(Uniform... list)
-    {
-        return new CompositeUniform(list);
-    }
+    void load(T value);
 }

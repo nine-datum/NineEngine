@@ -10,6 +10,6 @@ public interface FloatFunc
     }
     static float toRadians(float degrees)
     {
-        return degrees * 180f / (float)Math.PI;
+        return degrees / 180f * (float)Math.PI;
     }
 }

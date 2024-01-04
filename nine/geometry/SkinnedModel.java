@@ -1,8 +1,9 @@
 package nine.geometry;
 
 import nine.geometry.collada.Skeleton;
+import nine.opengl.Drawing;
 
 public interface SkinnedModel
 {
-    Model load(Skeleton animation);
+    Drawing instance(Skeleton animation);
 }

@@ -242,6 +242,6 @@ public class Matrix4f
     {
         float[] elements = new float[16];
         for(int i = 0; i < 16; i++) elements[i] = buffer.at(i + start);
-        return new Matrix4f(elements);
+        return new Matrix4f(elements).transponed();
     }
 }

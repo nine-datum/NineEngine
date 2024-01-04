@@ -20,26 +20,25 @@ public class LWJGL_Uniforms implements Uniforms
     }
 
     @Override
-    public Uniform uniformMatrix(String name, Matrix4f matrix)
+    public Uniform<Matrix4f> uniformMatrix(String name)
     {
         int location = GL20.glGetUniformLocation(program, name);
-        return () ->
+        float[] buffer = new float[16];
+        return matrix ->
         {
-            float[] buffer = new float[16];
             for(int i = 0; i < 16; i++) buffer[i] = matrix.at(i);
             GL20.glUniformMatrix4fv(location, false, buffer);
         };
     }
 
     @Override
-    public Uniform uniformMatrixArray(String name, Buffer<Matrix4f> matrices)
+    public Uniform<Buffer<Matrix4f>> uniformMatrixArray(String name, int capacity)
     {
-        int location = GL20.glGetUniformLocation(program, name);
-        int length = matrices.length();
-        float[] buffer = new float[16 * length];
-        
-        return () ->
+        int location = GL20.glGetUniformLocation(program, name);        
+        float[] buffer = new float[16 * capacity];
+        return matrices ->
         {
+            int length = matrices.length();
             for(int m = 0; m < length; m++)
             {
                 int mat = m;
@@ -51,21 +50,20 @@ public class LWJGL_Uniforms implements Uniforms
     }
 
     @Override
-    public Uniform uniformVector(String name, Vector3f vector)
+    public Uniform<Vector3f> uniformVector(String name)
     {
         int location = GL20.glGetUniformLocation(program, name);
-        return () -> vector.accept((x, y, z) ->
+        return vector ->
         {
-            GL20.glUniform3f(location, x, y, z);
-        });
+            GL20.glUniform3f(location, vector.x, vector.y, vector.z);
+        };
     }
 
     @Override
-    public Uniform uniformColor(String name, Color color)
+    public Uniform<Color> uniformColor(String name)
     {
         int location = GL20.glGetUniformLocation(program, name);
-        ColorFloatStruct floats = new ColorFloatStruct(color);
-        return () -> floats.acceptFloats((r, g, b, a) ->
+        return color -> new ColorFloatStruct(color).acceptFloats((r, g, b, a) ->
         {
             GL20.glUniform4f(location, r, g, b, a);
         });

@@ -10,8 +10,12 @@ public class TransformedDrawing implements Drawing
 
     public TransformedDrawing(Matrix4f transform, ShaderPlayer shader, Drawing drawing)
     {
-        ShaderPlayer player = shader.uniforms(u -> u.uniformMatrix("transform", transform));
-        this.drawing = player.play(drawing);
+        var uniform = shader.uniforms().uniformMatrix("transform");
+        this.drawing = shader.play(() ->
+        {
+            uniform.load(transform);
+            drawing.draw();
+        });
     }
 
     @Override

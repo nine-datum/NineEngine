@@ -7,8 +7,8 @@ import nine.math.Vector3f;
 
 public interface Uniforms
 {
-    Uniform uniformMatrix(String name, Matrix4f matrix);
-    Uniform uniformMatrixArray(String name, Buffer<Matrix4f> matrix);
-    Uniform uniformVector(String name, Vector3f vector);
-    Uniform uniformColor(String name, Color color);
+    Uniform<Matrix4f> uniformMatrix(String name);
+    Uniform<Buffer<Matrix4f>> uniformMatrixArray(String name, int capacity);
+    Uniform<Vector3f> uniformVector(String name);
+    Uniform<Color> uniformColor(String name);
 }

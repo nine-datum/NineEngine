@@ -6,18 +6,14 @@ import java.util.List;
 
 import nine.buffer.ArrayBuffer;
 import nine.buffer.Buffer;
-import nine.buffer.Collector;
 import nine.buffer.MapBuffer;
 import nine.buffer.RangeBuffer;
-import nine.collection.CachedFlow;
 import nine.collection.Flow;
-import nine.collection.IterableFlow;
-import nine.collection.MapFlow;
 import nine.collection.Mapping;
 import nine.collection.RangeFlow;
 import nine.function.ActionSingle;
 import nine.function.ActionTrio;
-import nine.geometry.SkinnedModel;
+import nine.geometry.ShadedSkinnedModel;
 import nine.geometry.SkinnedModelAsset;
 import nine.io.Storage;
 import nine.math.Matrix4f;
@@ -80,7 +76,7 @@ public class ColladaSkinnedModel implements SkinnedModelAsset
     }
 
     @Override
-    public SkinnedModel load(OpenGL gl, Storage storage)
+    public ShadedSkinnedModel load(OpenGL gl, Storage storage)
     {
         class TexturedDrawingAttributeBuffer implements DrawingAttributeBuffer
         {
@@ -174,31 +170,37 @@ public class ColladaSkinnedModel implements SkinnedModelAsset
             });
         });
         
-        return animation -> shader ->
+        ArrayList<Drawing> drawings = new ArrayList<>();
+        meshes.forEach(a -> a.accept((id, mesh, indices) -> drawings.add(mesh.drawing())));
+        
+        return shader ->
         {
-            Matrix4f[] bones = new Collector<>(Matrix4f[]::new)
-                .collect(new MapBuffer<>(new RangeBuffer(100), i -> Matrix4f.identity));
+            int MAX_MATRICES = 100;
 
-            Skeleton invBind = invBindPoses.entrySet().iterator().next().getValue();
+            var drawing = new CompositeDrawing(Flow.iterable(drawings));
+            var uniform = shader.uniforms().uniformMatrixArray("jointTransforms", MAX_MATRICES);
 
-            Flow.iterable(boneIndices.entrySet()).read(bone ->
+            return animation ->
             {
-                String key = bone.getKey();
-                int index = bone.getValue();
-                Matrix4f matrix = animation.transform(key).mul(invBind.transform(key));
-                bones[index] = matrix;
-            });
+                Matrix4f[] bones = new Matrix4f[MAX_MATRICES];
+                for(int i = 0; i < MAX_MATRICES; i++) bones[i] = Matrix4f.identity;
 
-            ArrayList<DrawingAttributeBuffer> drawings = new ArrayList<>();
-            meshes.forEach(a -> a.accept((id, mesh, indices) -> drawings.add(mesh)));
+                Skeleton invBind = invBindPoses.entrySet().iterator().next().getValue();
 
-            var shaderPlayer = shader.uniforms(u -> u.uniformMatrixArray("jointTransforms", new ArrayBuffer<>(bones)));
+                Flow.iterable(boneIndices.entrySet()).read(bone ->
+                {
+                    String key = bone.getKey();
+                    int index = bone.getValue();
+                    Matrix4f matrix = animation.transform(key).mul(invBind.transform(key));
+                    bones[index] = matrix;
+                });
 
-            return shaderPlayer.play(new CompositeDrawing(
-                new CachedFlow<>(
-                    new MapFlow<>(
-                        new IterableFlow<>(drawings),
-                        m -> m.drawing()))));
+                return shader.play(() ->
+                {
+                    uniform.load(new ArrayBuffer<>(bones));
+                    drawing.draw();
+                });
+            };
         };
     }
 }

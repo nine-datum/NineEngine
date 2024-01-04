@@ -19,7 +19,6 @@ import nine.math.Matrix4f;
 import nine.math.FloatFunc;
 import nine.math.Vector2f;
 import nine.math.Vector3f;
-import nine.opengl.CompositeUniform;
 import nine.opengl.Drawing;
 import nine.opengl.OpenGL;
 import nine.opengl.Shader;
@@ -75,6 +74,13 @@ public class LWJGL_Window_Test
 				.plane(Vector3f.newXYZ(2f, 2f, 0f), Vector3f.newXYZ(0f, 0f, (float)Math.PI * 1.5f), Vector2f.newXY(4f, 4f))
 				.drawing();
 
+			ShaderPlayer diffuseShaderPlayer = diffuseShader.player();
+			var diffuseShaderUniforms = diffuseShaderPlayer.uniforms();
+
+			var worldLightUniform = diffuseShaderUniforms.uniformVector("worldLight");
+			var projectionUniform = diffuseShaderUniforms.uniformMatrix("projection");
+
+
 			FloatFunc time = new LocalTime();
 			FloatFunc timeDelta = new Delta(time, updateStatus);
 			FPSCounter fps = new FPSCounter(time, System.out::println);
@@ -106,17 +112,19 @@ public class LWJGL_Window_Test
 				Matrix4f humanWorld = Matrix4f.translation(position).mul(
 					Matrix4f.rotationX(FloatFunc.toRadians(-90f)));
 
-				ShaderPlayer diffuseShaderPlayer = diffuseShader.player().uniforms(u -> new CompositeUniform(
-					u.uniformVector("worldLight", worldLight),
-					u.uniformMatrix("projection", projection)));
-
 				var levelDrawing = finalDrawing.call(groundTexture.apply(Drawing.of(groundDrawing, caveDrawing)))
 					.transform(Matrix4f.identity, diffuseShaderPlayer);
 
 				updateStatus.update();
 				fps.frame();
 				
-				levelDrawing.draw();
+				diffuseShaderPlayer.play(() ->
+				{
+					worldLightUniform.load(worldLight);
+					projectionUniform.load(projection);
+					levelDrawing.draw();
+				});
+				
 				int l = instancesNumber;
 				int r = instancesRow;
 				for(int i = 0; i < l; i++)
@@ -129,7 +137,7 @@ public class LWJGL_Window_Test
 						Drawing idleDrawing = human.animate(
 							projection,
 							worldLight,
-							humanWorld.mul(Matrix4f.translation(Vector3f.newXZ(px, py))),
+							Matrix4f.translation(Vector3f.newXZ(px, py)).mul(humanWorld),
 							idle.animate(time.value()));
 
 						idleDrawing.draw();
