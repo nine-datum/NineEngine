@@ -3,7 +3,6 @@ package nine.geometry.collada;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import nine.buffer.ArrayBuffer;
 import nine.buffer.Buffer;
@@ -11,13 +10,13 @@ import nine.buffer.Collector;
 import nine.buffer.MapBuffer;
 import nine.buffer.RangeBuffer;
 import nine.collection.CachedFlow;
+import nine.collection.Flow;
 import nine.collection.IterableFlow;
 import nine.collection.MapFlow;
 import nine.collection.Mapping;
 import nine.collection.RangeFlow;
 import nine.function.ActionSingle;
 import nine.function.ActionTrio;
-import nine.function.RefreshStatus;
 import nine.geometry.SkinnedModel;
 import nine.geometry.SkinnedModelAsset;
 import nine.io.Storage;
@@ -178,38 +177,29 @@ public class ColladaSkinnedModel implements SkinnedModelAsset
         
         return animation -> shader ->
         {
-            List<RawMesh> mixedMeshes = new ArrayList<>(meshes);
-            AddRawMeshAction addMixedMeshAction = new AddRawMeshAction(mixedMeshes);
-            skeletonParser.read(node, Animator.none, RefreshStatus.once, (skinId, skeleton) ->
+            Matrix4f[] bones = new Collector<>(Matrix4f[]::new)
+                .collect(new MapBuffer<>(new RangeBuffer(100), i -> Matrix4fIdentity.identity));
+
+            Skeleton invBind = invBindPoses.entrySet().iterator().next().getValue();
+
+            Flow.iterable(boneIndices.entrySet()).read(bone ->
             {
-                Matrix4f[] bones = new Collector<>(Matrix4f[]::new)
-                    .collect(new MapBuffer<>(new RangeBuffer(100), i -> Matrix4fIdentity.identity));
-
-                Skeleton invBind = invBindPoses.get(skinId);
-
-                new IterableFlow<Map.Entry<String, Integer>>(boneIndices.entrySet()).read(bone ->
-                {
-                    String key = bone.getKey();
-                    int index = bone.getValue();
-                    Matrix4f matrix = animation.transform(key).mul(invBind.transform(key));
-                    bones[index] = matrix;
-                });
-
-                addMixedMeshAction.call(skinId, (mesh, indices, meshAction) ->
-                {
-                    meshAction.call(action -> action.call(skinId, new ShadedDrawingAttributeBuffer(mesh, shader.uniforms(u ->
-                        u.uniformMatrixArray("jointTransforms", new ArrayBuffer<>(bones)))), indices));
-                });
+                String key = bone.getKey();
+                int index = bone.getValue();
+                Matrix4f matrix = animation.transform(key).mul(invBind.transform(key));
+                bones[index] = matrix;
             });
 
             ArrayList<DrawingAttributeBuffer> drawings = new ArrayList<>();
-            mixedMeshes.forEach(a -> a.accept((id, mesh, indices) -> drawings.add(mesh)));
+            meshes.forEach(a -> a.accept((id, mesh, indices) -> drawings.add(mesh)));
 
-            return new CompositeDrawing(
+            var shaderPlayer = shader.uniforms(u -> u.uniformMatrixArray("jointTransforms", new ArrayBuffer<>(bones)));
+
+            return shaderPlayer.play(new CompositeDrawing(
                 new CachedFlow<>(
                     new MapFlow<>(
                         new IterableFlow<>(drawings),
-                        m -> m.drawing())));
+                        m -> m.drawing()))));
         };
     }
 }

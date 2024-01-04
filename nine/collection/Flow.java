@@ -30,4 +30,8 @@ public interface Flow<T>
     {
         return new ArrayFlow<T>(items);
     }
+    static <T> Flow<T> iterable(Iterable<T> iterable)
+    {
+        return new IterableFlow<T>(iterable);
+    }
 }
