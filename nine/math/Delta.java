@@ -3,36 +3,34 @@ package nine.math;
 import nine.function.RefreshStatus;
 import nine.function.Refreshable;
 
-public class Delta implements ValueFloat
+public class Delta implements FloatFunc
 {
-    ValueFloat value;
+    FloatFunc value;
     Refreshable refresh;
     float lastValue;
     float lastDelta;
     boolean initialized;
 
-    public Delta(ValueFloat value, RefreshStatus refreshStatus)
+    public Delta(FloatFunc value, RefreshStatus refreshStatus)
     {
         this.value = value;
         refresh = refreshStatus.make();
     }
 
     @Override
-    public void accept(FloatAcceptor acceptor)
+    public float value()
     {
         if(refresh.mark())
         {
-            value.accept(v ->
+            float v = value.value();
+            if(!initialized)
             {
-                if(!initialized)
-                {
-                    lastValue = v;
-                    initialized = true;
-                }
-                lastDelta = v - lastValue;
                 lastValue = v;
-            });
+                initialized = true;
+            }
+            lastDelta = v - lastValue;
+            lastValue = v;
         }
-        acceptor.call(lastDelta);
+        return lastDelta;
     }
 }

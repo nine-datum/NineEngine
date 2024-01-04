@@ -1,11 +1,11 @@
 package nine.math;
 
-public class Time implements ValueFloat
+public class Time implements FloatFunc
 {
     @Override
-    public void accept(FloatAcceptor acceptor)
+    public float value()
     {
         long masked = System.currentTimeMillis() % 86_400_000;
-        acceptor.call((masked * 0.001f));
+        return (masked * 0.001f);
     }
 }

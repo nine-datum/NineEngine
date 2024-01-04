@@ -1,16 +1,16 @@
 package nine.main;
 
 import nine.geometry.collada.StringReader;
-import nine.math.ValueFloat;
+import nine.math.FloatFunc;
 
 public class FPSCounter
 {
 	int frames;
     float lastResetTime;
-    ValueFloat time;
+    FloatFunc time;
     StringReader reader;
 
-	public FPSCounter(ValueFloat time, StringReader reader)
+	public FPSCounter(FloatFunc time, StringReader reader)
     {
         this.time = time;
         this.reader = reader;
@@ -18,15 +18,13 @@ public class FPSCounter
 
     public void frame()
 	{
-        time.accept(t ->
+        var t = time.value();
+        if(t - lastResetTime > 1f)
         {
-            if(t - lastResetTime > 1f)
-            {
-                reader.read(String.valueOf(frames));
-                frames = 0;
-                lastResetTime = t;
-            }
-        });
+            reader.read(String.valueOf(frames));
+            frames = 0;
+            lastResetTime = t;
+        }
         frames++;
 	}
 }

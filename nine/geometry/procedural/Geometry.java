@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import nine.buffer.Buffer;
 import nine.collection.Flow;
 import nine.math.Matrix4f;
-import nine.math.ValueFloat;
 import nine.math.Vector2f;
 import nine.math.Vector3f;
 import nine.opengl.Drawing;
@@ -116,7 +115,7 @@ public class Geometry
         (lw, lp, ln) ->
         {
             Vector3f dir = lp.sub(point);
-            Vector3f left = dir.normalized().cross(normal).mul(width.mul(ValueFloat.of(0.5f)));
+            Vector3f left = dir.normalized().cross(normal).mul(width * 0.5f);
             float uvY = i;
             var leftBottom = Vertex.of(lp.add(left), Vector2f.newXY(0f, uvY).mul(tiling), normal);
             var rightBottom = Vertex.of(lp.add(left.negative()), Vector2f.newXY(1f, uvY).mul(tiling), normal);

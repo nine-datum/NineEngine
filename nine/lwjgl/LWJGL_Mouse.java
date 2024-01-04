@@ -47,20 +47,14 @@ public class LWJGL_Mouse implements Mouse
     @Override
     public Vector2f position()
     {
-        return p ->
-        {
-            update();
-            p.call(posX, posY);
-        };
+        update();
+        return Vector2f.newXY(posX, posY);
     }
 
     @Override
     public Vector2f delta()
     {
-        return d ->
-        {
-            update();
-            d.call(posX - lastPosX, posY - lastPosY);
-        };
+        update();
+        return Vector2f.newXY(posX - lastPosX, posY - lastPosY);
     }
 }

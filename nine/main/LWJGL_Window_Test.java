@@ -10,23 +10,15 @@ import nine.geometry.procedural.Geometry;
 import nine.geometry.procedural.MaterialPoint;
 import nine.input.Keyboard;
 import nine.input.Mouse;
-import nine.input.WASD_Vector2f;
 import nine.io.FileStorage;
 import nine.io.Storage;
 import nine.lwjgl.LWJGL_Window;
-import nine.math.CameraClampVector3fFunction;
 import nine.math.Delta;
 import nine.math.LocalTime;
 import nine.math.Matrix4f;
-import nine.math.Matrix4fIdentity;
-import nine.math.ValueFloat;
+import nine.math.FloatFunc;
 import nine.math.Vector2f;
-import nine.math.Vector2fIntegral;
-import nine.math.Vector2fFunction;
-import nine.math.Vector2fRefreshable;
 import nine.math.Vector3f;
-import nine.math.Vector3fIntegral;
-import nine.math.Vector3fStruct;
 import nine.opengl.CompositeUniform;
 import nine.opengl.Drawing;
 import nine.opengl.OpenGL;
@@ -59,47 +51,10 @@ public class LWJGL_Window_Test
 			Shader skinShader = shaderLoader.load("resources/shaders/diffuse_skin_vertex.glsl","resources/shaders/diffuse_fragment.glsl");
 			Shader diffuseShader = shaderLoader.load("resources/shaders/diffuse_vertex.glsl", "resources/shaders/diffuse_fragment.glsl");
 
-			ValueFloat time = new LocalTime();
-			ValueFloat timeDelta = new Delta(time, updateStatus);
-			FPSCounter fps = new FPSCounter(time, System.out::println);
-
-			Vector3f cameraRotation = new Vector3fIntegral(
-				Vector3f.newYX(mouse.delta()).mul(
-				timeDelta.mul(ValueFloat.of(0.1f))),
-				new CameraClampVector3fFunction(), updateStatus).negative();
-
-			Vector2f playerMovement = new Vector2fRefreshable(
-				new WASD_Vector2f(keyboard).cached(updateStatus).normalized().rotate(cameraRotation.y()),
-				updateStatus);
-				
-			Vector2f playerPosition = new Vector2fIntegral(
-				playerMovement.mul(timeDelta.mul(ValueFloat.of(3f))),
-				Vector2fFunction.identity, updateStatus);
-
-			Matrix4f camera = Matrix4f.orbitalCamera(
-				Vector3f.newXYZ(0f, 2f, 0f).add(Vector3f.newXZ(playerPosition)),
-				cameraRotation,
-				ValueFloat.of(5f));
-
-			int[] windowSize = {windowStartWidth, windowStartHeight};
-
-			Matrix4f projection = Matrix4f.perspective(
-				a -> a.call(windowSize[0] / (float)windowSize[1]),
-				ValueFloat.of(60f).degreesToRadians(),
-				ValueFloat.of(0.1f),
-				ValueFloat.of(100f)).mul(
-				camera).cached(updateStatus);
-
-			Vector3f worldLight = Vector3f.newXYZ(0f, -1f, 1f).normalized();
-			
-			Vector3fStruct position = new Vector3fStruct();
-			Matrix4f humanWorld = Matrix4f.translation(position).mul(
-				Matrix4f.rotationX(ValueFloat.of(-90f).degreesToRadians()));
-
 			AnimatedSkeleton idle = AnimatedSkeleton.fromCollada(new FileColladaNode(storage.open("resources/models/Knight/Idle.dae"), ErrorPrinter.instance), updateStatus);
 			AnimatedSkeleton walk = AnimatedSkeleton.fromCollada(new FileColladaNode(storage.open("resources/models/Knight/Walk.dae"), ErrorPrinter.instance), updateStatus);
 
-			Graphics graphics = Graphics.collada(gl, diffuseShader, skinShader, projection, worldLight, storage, updateStatus);
+			Graphics graphics = Graphics.collada(gl, diffuseShader, skinShader, storage, updateStatus);
 
 			var human = graphics.animatedModel(args[0]);
 
@@ -110,8 +65,8 @@ public class LWJGL_Window_Test
 				gl,
 				Vector2f.newXY(10f, 10f),
 				Buffer.of(
-					MaterialPoint.of(ValueFloat.of(200f), Vector3f.newXYZ(0f, 0f, -100f), Vector3f.newY(1f)),
-					MaterialPoint.of(ValueFloat.of(200f), Vector3f.newXYZ(0f, 0f, 100f), Vector3f.newY(1f))
+					MaterialPoint.of(200f, Vector3f.newXYZ(0f, 0f, -100f), Vector3f.newY(1f)),
+					MaterialPoint.of(200f, Vector3f.newXYZ(0f, 0f, 100f), Vector3f.newY(1f))
 			));
 
 			var caveDrawing = Geometry.brush(gl)
@@ -120,39 +75,47 @@ public class LWJGL_Window_Test
 				.plane(Vector3f.newXYZ(2f, 2f, 0f), Vector3f.newXYZ(0f, 0f, (float)Math.PI * 1.5f), Vector2f.newXY(4f, 4f))
 				.drawing();
 
-
-			ShaderPlayer diffuseShaderPlayer = diffuseShader.player().uniforms(u ->
-			new CompositeUniform(
-				u.uniformVector("worldLight", worldLight),
-				u.uniformMatrix("projection", projection)));
-
-			var levelDrawing = finalDrawing.call(groundTexture.apply(Drawing.of(groundDrawing, caveDrawing)))
-				.transform(Matrix4fIdentity.identity, diffuseShaderPlayer);
-
-			Drawing player = new PlayerDrawing(
-				playerMovement,
-				playerPosition,
-				idle.animate(time),
-				walk.animate(time),
-				(transform, skeleton) -> human.animate(
-					transform.mul(Matrix4f.rotationX(ValueFloat.of(-90f).degreesToRadians())),
-					skeleton));
-
-
-			Drawing idleDrawing = human.animate(humanWorld, idle.animate(time));
+			FloatFunc time = new LocalTime();
+			FloatFunc timeDelta = new Delta(time, updateStatus);
+			FPSCounter fps = new FPSCounter(time, System.out::println);
 
 			int instancesNumber = Integer.valueOf(args[1]);
 			int instancesRow = Integer.valueOf(args[2]);
+			Vector2f[] mouseInput = { Vector2f.newXY(0f, 0f) };
 
 			return (width, height) ->
 			{
-				windowSize[0] = width;
-				windowSize[1] = height;
+				mouseInput[0] = mouseInput[0].add(mouse.delta().mul(timeDelta.value() * 0.1f));
+
+				Vector3f cameraRotation = Vector3f.newYX(mouseInput[0]).negative();
+
+				Matrix4f camera = Matrix4f.orbitalCamera(
+					Vector3f.newXYZ(0f, 2f, 0f),
+					cameraRotation,
+					5f);
+
+				Vector3f worldLight = Vector3f.newXYZ(0f, -1f, 1f).normalized();
+
+				Matrix4f projection = Matrix4f.perspective(
+					width / (float)height,
+					FloatFunc.toRadians(60f),
+					0.1f,
+					100f).mul(camera);
+			
+				Vector3f position = Vector3f.newXYZ(0f, 0f, 0f);
+				Matrix4f humanWorld = Matrix4f.translation(position).mul(
+					Matrix4f.rotationX(FloatFunc.toRadians(-90f)));
+
+				ShaderPlayer diffuseShaderPlayer = diffuseShader.player().uniforms(u -> new CompositeUniform(
+					u.uniformVector("worldLight", worldLight),
+					u.uniformMatrix("projection", projection)));
+
+				var levelDrawing = finalDrawing.call(groundTexture.apply(Drawing.of(groundDrawing, caveDrawing)))
+					.transform(Matrix4f.identity, diffuseShaderPlayer);
 
 				updateStatus.update();
 				fps.frame();
-
-				player.draw();
+				
 				levelDrawing.draw();
 				int l = instancesNumber;
 				int r = instancesRow;
@@ -160,9 +123,17 @@ public class LWJGL_Window_Test
 				{
 					int px = (i % r) * 2 - 2 * (r / 2);
 					int py = ((i / r) % r) * 2 - 2 * (r / 2);
-					position.x = px;
-					position.z = py;
-					if(px != 0 || py != 0) idleDrawing.draw();
+
+					if(px != 0 || py != 0)
+					{
+						Drawing idleDrawing = human.animate(
+							projection,
+							worldLight,
+							humanWorld.mul(Matrix4f.translation(Vector3f.newXZ(px, py))),
+							idle.animate(time.value()));
+
+						idleDrawing.draw();
+					}
 				}
 			};
 		});

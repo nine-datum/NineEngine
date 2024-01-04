@@ -2,7 +2,7 @@ package nine.geometry.collada;
 
 import nine.buffer.TextValueBuffer;
 import nine.function.RefreshStatus;
-import nine.math.Matrix4fRowBuffer;
+import nine.math.Matrix4f;
 
 public class ColladaBoneNodeReader implements NodeReader
 {
@@ -39,11 +39,9 @@ public class ColladaBoneNodeReader implements NodeReader
                 }
                 else
                 {
-                    local = time ->
-                        new Matrix4fRowBuffer(
-                            new TextValueBuffer<>(content, Float::parseFloat));
+                    local = time -> Matrix4f.fromBuffer(new TextValueBuffer<>(content, Float::parseFloat), 0);
                 }
-                Animation transform = time -> parent.animate(time).mul(local.animate(time)).cached(refresh);
+                Animation transform = time -> parent.animate(time).mul(local.animate(time));
 
                 if(type.equals("JOINT"))
                 {

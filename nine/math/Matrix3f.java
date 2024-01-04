@@ -14,4 +14,14 @@ public interface Matrix3f
         [ 6 7 8 ] -- column 2
     */
     float at(int index);
+
+    public static float det(Elements s)
+    {
+        return s.at(0) * s.at(4) * s.at(8) - 
+            s.at(0) * s.at(5) * s.at(7) -
+            s.at(1) * s.at(3) * s.at(8) +
+            s.at(2) * s.at(3) * s.at(7) +
+            s.at(1) * s.at(5) * s.at(6) -
+            s.at(2) * s.at(4) * s.at(6);
+    }
 }

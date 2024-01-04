@@ -1,6 +1,6 @@
 package nine.math;
 
-import nine.function.RefreshStatus;
+import nine.buffer.Buffer;
 
 public class Matrix4f
 {
@@ -33,6 +33,11 @@ public class Matrix4f
     private Matrix4f(float[] elements)
     {
         this.elements = elements;
+    }
+
+    public float at(int index)
+    {
+        return elements[index];
     }
 
     public static final Matrix4f identity = new Matrix4f();
@@ -192,11 +197,6 @@ public class Matrix4f
 			at(elements, 0, 2) * dcof2 + at(elements, 0, 3) * dcof3;
     }
 
-    interface IntToFloat
-    {
-        float at(int index);
-    }
-
     private static float step(float[] s, int i, int j, int si, int sj)
     {
         return s[((i + si) & 3) + (((j + sj) & 3) << 2)];
@@ -210,33 +210,38 @@ public class Matrix4f
         {
             int i = index >> 2;
             int j = index & 3;
-            Matrix3f detMatrix = a -> a.call(m -> step(s, (m % 3) + i, (m / 3) + j, 1, 1));
-            float[] box = { 0f };
-            new Matrix3fDet(detMatrix).accept(d -> box[0] = d);
-            result[i] = box[0] / det;
+            float subdet = Matrix3f.det(m -> step(elements, (m % 3) + i, (m / 3) + j, 1, 1));
+            result[i] = subdet / det;
         }
         return new Matrix4f(result);
     }
-    default Matrix4f lerp(Matrix4f b, ValueFloat t)
+    public Matrix4f lerp(Matrix4f b, float t)
     {
-        return new Matrix4fLerp(this, b, t);
-    }
-    default Matrix4f cached(RefreshStatus refreshStatus)
-    {
-        var status = refreshStatus.make();
-        var cache = new Matrix4fStruct();
-
-        return action ->
+        var lerped = new float[16];
+        for(int i = 0; i < 16; i++)
         {
-            if(status.mark())
-            {
-                cache.apply(this);
-            }
-            cache.accept(action);
-        };
+            var ea = elements[i];
+            var eb = b.elements[i];
+            lerped[i] = ea + (eb - ea) * t;
+        }
+        return new Matrix4f(lerped);
     }
-    default String string()
+    public String toString()
     {
-        return struct().toString();
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
+        for(int i = 0; i < 16; i++)
+        {
+            if(i != 0) sb.append(", ");
+            sb.append(String.valueOf(elements[i]));
+        } 
+        sb.append("]");
+        return sb.toString();
+    }
+    public static Matrix4f fromBuffer(Buffer<Float> buffer, int start)
+    {
+        float[] elements = new float[16];
+        for(int i = 0; i < 16; i++) elements[i] = buffer.at(i + start);
+        return new Matrix4f(elements);
     }
 }

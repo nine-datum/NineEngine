@@ -21,7 +21,6 @@ import nine.geometry.SkinnedModel;
 import nine.geometry.SkinnedModelAsset;
 import nine.io.Storage;
 import nine.math.Matrix4f;
-import nine.math.Matrix4fIdentity;
 import nine.opengl.CompositeDrawing;
 import nine.opengl.Drawing;
 import nine.opengl.DrawingAttributeBuffer;
@@ -178,7 +177,7 @@ public class ColladaSkinnedModel implements SkinnedModelAsset
         return animation -> shader ->
         {
             Matrix4f[] bones = new Collector<>(Matrix4f[]::new)
-                .collect(new MapBuffer<>(new RangeBuffer(100), i -> Matrix4fIdentity.identity));
+                .collect(new MapBuffer<>(new RangeBuffer(100), i -> Matrix4f.identity));
 
             Skeleton invBind = invBindPoses.entrySet().iterator().next().getValue();
 

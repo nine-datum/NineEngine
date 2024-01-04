@@ -3,11 +3,10 @@ package nine.geometry.collada;
 import java.util.HashMap;
 
 import nine.function.RefreshStatus;
-import nine.math.ValueFloat;
 
 public interface AnimatedSkeleton
 {
-    Skeleton animate(ValueFloat time);
+    Skeleton animate(float time);
 
     static AnimatedSkeleton fromCollada(ColladaNode node, RefreshStatus refresh)
     {

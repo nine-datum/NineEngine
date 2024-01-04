@@ -6,7 +6,6 @@ jc = javaClass =>
     .float:(jc "java.lang.Float"),
     .bool:(jc "java.lang.Boolean"),
 
-    .valueFloat:(jc "nine.math.ValueFloat"),
     .delta:(jc "nine.math.Delta"),
     .time:(jc "nine.math.Time"),
     .vector2:(jc "nine.math.Vector2f"),
@@ -25,7 +24,6 @@ jc = javaClass =>
 
     .keyboard:(jc "nine.input.Keyboard"),
     .mouse:(jc "nine.input.Mouse"),
-    .wasd:(jc "nine.input.WASD_Vector2f"),
     
     .graphics:(jc "nine.main.Graphics"),
     .animatedDrawing:(jc "nine.main.AnimatedDrawing"),

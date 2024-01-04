@@ -1,5 +1,8 @@
 package nine.math;
 
+import nine.input.Key;
+import nine.input.Keyboard;
+
 public class Vector2f
 {
     public final float x, y;
@@ -113,6 +116,20 @@ public class Vector2f
     }
     public static Vector2f newXY(float x, float y)
     {
+        return new Vector2f(x, y);
+    }
+    public static Vector2f wasd(Keyboard keyboard)
+    {
+        Key w = keyboard.keyOf('w');
+        Key a = keyboard.keyOf('a');
+        Key s = keyboard.keyOf('s');
+        Key d = keyboard.keyOf('d');
+        float x = 0f;
+        float y = 0f;
+        if(w.isDown()) y++;
+        if(s.isDown()) y--;
+        if(d.isDown()) x++;
+        if(a.isDown()) x--;
         return new Vector2f(x, y);
     }
 }

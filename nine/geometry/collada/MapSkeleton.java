@@ -2,8 +2,7 @@ package nine.geometry.collada;
 
 import java.util.Map;
 
-import nine.math.Matrix4fIdentity;
-import nine.math.ValueFloat;
+import nine.math.Matrix4f;
 
 public class MapSkeleton implements AnimatedSkeleton
 {
@@ -15,12 +14,12 @@ public class MapSkeleton implements AnimatedSkeleton
     }
 
     @Override
-    public Skeleton animate(ValueFloat time)
+    public Skeleton animate(float time)
     {
         return bone ->
         {
             var m = map.get(bone).animate(time);
-            return m == null ? Matrix4fIdentity.identity : m;
+            return m == null ? Matrix4f.identity : m;
         };
     }
 }

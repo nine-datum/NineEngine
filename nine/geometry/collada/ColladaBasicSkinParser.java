@@ -15,7 +15,6 @@ import nine.buffer.TextElementsBuffer;
 import nine.buffer.TextValueBuffer;
 import nine.collection.RangeFlow;
 import nine.math.Matrix4f;
-import nine.math.Matrix4fRowBuffer;
 
 public class ColladaBasicSkinParser implements ColladaSkinParser
 {
@@ -124,7 +123,7 @@ public class ColladaBasicSkinParser implements ColladaSkinParser
                         skinSource,
                         names.get(0),
                         key -> inv_bind_poses.get(key),
-                        new Matrix4fRowBuffer(matrixBuffer),
+                        Matrix4f.fromBuffer(matrixBuffer, 0),
                         new FloatArrayBuffer(weightArray),
                         new IntegerArrayBuffer(jointArray),
                         weightsPerVertex);

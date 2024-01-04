@@ -1,19 +1,19 @@
 package nine.math;
 
-public class LocalTime implements ValueFloat
+public class LocalTime implements FloatFunc
 {
-    ValueFloat start;
-    ValueFloat time;
+    FloatFunc start;
+    FloatFunc time;
 
     public LocalTime()
     {
         time = new Time();
-        start = ValueFloat.of(time.value());
+        start = FloatFunc.of(time.value());
     }
 
     @Override
-    public void accept(FloatAcceptor acceptor)
+    public float value()
     {
-        time.accept(t -> start.accept(s -> acceptor.call(t - s)));
+        return time.value() - start.value();
     }
 }
