@@ -4,19 +4,18 @@ import -> in ->
     {
         .position:(box(in.math.float3[0, -1, 2])),
         .rotation:(box 0),
-        .skin:(in.graphics.animatedModel "resources/models/Knight/LongSword_Idle.dae"),
+        .skin:(in.graphics.animatedModel "resources/models/knight_female/Model.dae"),
         .longSword:(in.graphics.model "resources/models/Weapons/LongSword.dae"),
-        .idle:(in.graphics.animation "resources/models/Knight/LongSword_Idle.dae"),
-        .walk:(in.graphics.animation "resources/models/Knight/Walk.dae"),
+        .idle:(in.graphics.animation "resources/models/knight_female/Model.dae"),
+        .walk:(in.graphics.animation "resources/models/knight_female/Model.dae"),
     },
     .update:init ->
     time = in.time.value[]() =>
-    playerRoot = (import.matrix4.transform[import.vector3, import.vector3][init.position.get, in.math.float3[-3.14 * 0.5, 0, time]]) =>
+    playerRoot = (import.matrix4.transform[import.vector3, import.vector3, import.vector3]
+        [init.position.get, in.math.float3[0, time, 0], in.math.float3[0.01, 0.01, 0.01]]) =>
     [
         init.skin
             playerRoot
             (init.idle time).draw[](),
-        init.longSword
-            (playerRoot.mul[import.matrix4] (init.idle time .transform[import.string] "WeaponR")).draw[](),
     ]
 }
