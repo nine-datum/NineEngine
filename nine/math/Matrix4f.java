@@ -118,9 +118,10 @@ public class Matrix4f
         float tan = (float)Math.tan(fov * 0.5f);
         elements[0] = 1f / (aspect * tan);
         elements[5] = 1f / tan;
-        elements[10] = (far + near) / (far - near);
-        elements[11] = 1f;
+        elements[10] = -(far + near) / (far - near);
+        elements[11] = -1f;
         elements[14] = -2f * far * near / (far - near);
+        elements[15] = 0;
         return new Matrix4f(elements);
     }
 

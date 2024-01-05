@@ -57,6 +57,25 @@ public interface Buffer<T> extends IntegerMapping<T>
     {
         return new BufferToFlow<T>(this);
     }
+    default Buffer<T> flip()
+    {
+        var source = this;
+        return new Buffer<T>()
+        {
+
+            @Override
+            public T at(int i)
+            {
+                return source.at(source.length() - 1 - i);
+            }
+
+            @Override
+            public int length()
+            {
+                return source.length();
+            }
+        };
+    }
     default Iterable<T> iterable()
     {
         return new Iterable<T>()

@@ -61,7 +61,7 @@ public class ColladaOpenGLGrahics implements Graphics
                 projectionUniform.load(projection);
                 drawing.draw();
             };
-            return shaderPlayer.play(gl.clockwise(gl.depthOn(gl.smooth(initializedDrawing))));
+            return shaderPlayer.play(gl.depthOn(gl.smooth(initializedDrawing)));
         };
     }
 
@@ -85,7 +85,7 @@ public class ColladaOpenGLGrahics implements Graphics
                 projectionUniform.load(projection);
                 shadedModel.draw();
             };
-            return shaderPlayer.play(gl.clockwise(gl.depthOn(gl.smooth(initializedDrawing))));
+            return shaderPlayer.play(gl.depthOn(gl.smooth(initializedDrawing)));
         };
     }
 }
