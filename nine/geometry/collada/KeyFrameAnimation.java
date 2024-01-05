@@ -25,7 +25,7 @@ public class KeyFrameAnimation implements Animation
         Matrix4f a = Matrix4f.identity;
         Matrix4f b = Matrix4f.identity;
 
-        int keysLength = keys.length() - 1;
+        int keysLength = keys.length();
         float last = keys.at(keysLength - 1);
         float frac = time - (last * (int)(time / last));
         
