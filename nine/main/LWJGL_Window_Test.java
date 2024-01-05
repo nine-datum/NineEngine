@@ -69,9 +69,9 @@ public class LWJGL_Window_Test
 			));
 
 			var caveDrawing = Geometry.brush(gl)
-				.plane(Vector3f.newXYZ(0f, 4f, 0f), Vector3f.newXYZ(0f, 0f, (float)Math.PI * 2f), Vector2f.newXY(4f, 4f))
-				.plane(Vector3f.newXYZ(-2f, 2f, 0f), Vector3f.newXYZ(0f, 0f, (float)Math.PI * 0.5f), Vector2f.newXY(4f, 4f))
-				.plane(Vector3f.newXYZ(2f, 2f, 0f), Vector3f.newXYZ(0f, 0f, (float)Math.PI * 1.5f), Vector2f.newXY(4f, 4f))
+				.plane(Vector3f.newXYZ(0f + 1, 4f, 0f), Vector3f.newXYZ(0f, 0f, (float)Math.PI * 2f), Vector2f.newXY(4f, 4f))
+				.plane(Vector3f.newXYZ(-2f + 1, 2f, 0f), Vector3f.newXYZ(0f, 0f, (float)Math.PI * 0.5f), Vector2f.newXY(4f, 4f))
+				.plane(Vector3f.newXYZ(2f + 1, 2f, 0f), Vector3f.newXYZ(0f, 0f, (float)Math.PI * 1.5f), Vector2f.newXY(4f, 4f))
 				.drawing();
 
 			ShaderPlayer diffuseShaderPlayer = diffuseShader.player();
@@ -79,6 +79,7 @@ public class LWJGL_Window_Test
 
 			var worldLightUniform = diffuseShaderUniforms.uniformVector("worldLight");
 			var projectionUniform = diffuseShaderUniforms.uniformMatrix("projection");
+			var transformUniform = diffuseShaderUniforms.uniformMatrix("transform");
 
 
 			FloatFunc time = new LocalTime();
@@ -112,8 +113,7 @@ public class LWJGL_Window_Test
 				Matrix4f humanWorld = Matrix4f.translation(position).mul(
 					Matrix4f.rotationX(FloatFunc.toRadians(-90f)));
 
-				var levelDrawing = finalDrawing.call(groundTexture.apply(Drawing.of(groundDrawing, caveDrawing)))
-					.transformUniform(Matrix4f.identity, diffuseShaderPlayer);
+				var levelDrawing = finalDrawing.call(groundTexture.apply(Drawing.of(groundDrawing, caveDrawing)));
 
 				updateStatus.update();
 				fps.frame();
@@ -122,8 +122,9 @@ public class LWJGL_Window_Test
 				{
 					worldLightUniform.load(worldLight);
 					projectionUniform.load(projection);
+					transformUniform.load(Matrix4f.identity);
 					levelDrawing.draw();
-				});
+				}).draw();
 				
 				int l = instancesNumber;
 				int r = instancesRow;
