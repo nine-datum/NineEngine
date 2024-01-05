@@ -244,4 +244,16 @@ public class Matrix4f
         for(int i = 0; i < 16; i++) elements[i] = buffer.at(i + start);
         return new Matrix4f(elements).transponed();
     }
+    public static Matrix4f fromArray(float[] elements)
+    {
+        if(elements.length != 16) throw new RuntimeException("Wrong elements length");
+        return new Matrix4f(elements);
+    }
+    public static Matrix4f fromArray(Float[] elements)
+    {
+        if(elements.length != 16) throw new RuntimeException("Wrong elements length");
+        float[] newElements = new float[16];
+        for(int i = 0; i < 16; i++) newElements[i] = elements[i];
+        return new Matrix4f(newElements);
+    }
 }
