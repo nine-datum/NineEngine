@@ -4,8 +4,8 @@ import -> in ->
     {
         .position:(box(in.math.float3[0, -1, 2])),
         .rotation:(box 0),
-        .skin:(in.graphics.animatedModel "resources/models/Knight/Walk.dae"),
-        .idle:(in.graphics.animation "resources/models/Knight/Idle.dae"),
+        .skin:(in.graphics.animatedModel "resources/models/Knight/LongSword_Idle.dae"),
+        .idle:(in.graphics.animation "resources/models/Knight/LongSword_Idle.dae"),
         .walk:(in.graphics.animation "resources/models/Knight/Walk.dae"),
     },
     .update:init ->

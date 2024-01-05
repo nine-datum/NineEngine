@@ -2,7 +2,6 @@ package nine.geometry.collada;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 import nine.buffer.ArrayBuffer;
 import nine.buffer.Buffer;
@@ -11,8 +10,6 @@ import nine.buffer.RangeBuffer;
 import nine.collection.Flow;
 import nine.collection.Mapping;
 import nine.collection.RangeFlow;
-import nine.function.ActionSingle;
-import nine.function.ActionTrio;
 import nine.geometry.ShadedSkinnedModel;
 import nine.geometry.SkinnedModelAsset;
 import nine.io.Storage;
@@ -68,11 +65,16 @@ public class ColladaSkinnedModel implements SkinnedModelAsset
 
     interface RawMeshAction
     {
-        void call(String id, DrawingAttributeBuffer buffer, Buffer<Integer> rawIndices);
+        void call(DrawingAttributeBuffer buffer, Buffer<Integer> rawIndices);
     }
     interface RawMesh
     {
         void accept(RawMeshAction action);
+
+        static RawMesh of(DrawingAttributeBuffer buffer, Buffer<Integer> rawIndices)
+        {
+            return action -> action.call(buffer, rawIndices);
+        }
     }
 
     @Override
@@ -101,34 +103,8 @@ public class ColladaSkinnedModel implements SkinnedModelAsset
             }
         }
 
-        ArrayList<RawMesh> meshes = new ArrayList<RawMesh>();
-
-        class AddRawMeshAction
-        {
-            List<RawMesh> meshes;
-
-            public AddRawMeshAction(List<RawMesh> meshes)
-            {
-                this.meshes = meshes;
-            }
-
-            void call(String id, ActionTrio<DrawingAttributeBuffer, Buffer<Integer>, ActionSingle<RawMesh>> action)
-            {
-                ArrayList<RawMesh> append = new ArrayList<>();
-                ArrayList<RawMesh> remove = new ArrayList<>();
-                meshes.forEach(m -> m.accept((meshId, mesh, rawIndices) ->
-                {
-                    if(meshId.equals(id))
-                    {
-                        action.call(mesh, rawIndices, append::add);
-                        remove.add(m);
-                    }
-                }));
-                meshes.removeAll(remove);
-                meshes.addAll(append);
-            }
-        }
-        AddRawMeshAction addRawMeshAction = new AddRawMeshAction(meshes);
+        HashMap<String, RawMesh> meshes = new HashMap<>();
+        HashMap<String, RawMesh> skinnedMeshes = new HashMap<>();
 
         HashMap<String, Skeleton> invBindPoses = new HashMap<>();
         HashMap<String, Integer> boneIndices = new HashMap<>();
@@ -143,12 +119,13 @@ public class ColladaSkinnedModel implements SkinnedModelAsset
                     .attribute(3, floatBuffers.map("VERTEX"))
                     .attribute(2, floatBuffers.map("TEXCOORD"))
                     .attribute(3, floatBuffers.map("NORMAL")));
-            meshes.add(action -> action.call(sourceId, buffer, intBuffers.map("INDEX_VERTEX")));
+            meshes.put(sourceId, RawMesh.of(buffer, intBuffers.map("INDEX_VERTEX")));
         }));
 
         skinParser.read(node, (skinId, sourceId, names, invBind, matrix, weights, joints, weightPerIndex) ->
         {
-            addRawMeshAction.call(sourceId, (mesh, indices, meshAction) ->
+            var rawMesh = meshes.get(sourceId);
+            if(rawMesh != null) rawMesh.accept((mesh, indices) ->
             {
                 Mapping<Buffer<Float>, Buffer<Float>> mapBuffer = buffer ->
                     new MapBuffer<>(new RangeBuffer(indices.length() * weightPerIndex), i ->
@@ -156,12 +133,20 @@ public class ColladaSkinnedModel implements SkinnedModelAsset
                         int pos = i / weightPerIndex;
                         int add = i % weightPerIndex;
                         int index = indices.at(pos);
-                        return buffer.at(index * weightPerIndex + add);
+                        try
+                        {
+                            return buffer.at(index * weightPerIndex + add);
+                        }
+                        catch(Throwable th)
+                        {
+                            System.out.println("error");
+                            return 0f;
+                        }
                     });
                 Buffer<Float> ordered_joints = mapBuffer.map(new MapBuffer<>(joints, j -> (float)j));
                 Buffer<Float> ordered_weights = mapBuffer.map(weights);
 
-                meshAction.call(action -> action.call("#" + skinId, mesh
+                skinnedMeshes.put("#" + skinId, RawMesh.of(mesh
                     .attribute(weightPerIndex, ordered_joints)
                     .attribute(weightPerIndex, ordered_weights), indices));
 
@@ -171,7 +156,7 @@ public class ColladaSkinnedModel implements SkinnedModelAsset
         });
         
         ArrayList<Drawing> drawings = new ArrayList<>();
-        meshes.forEach(a -> a.accept((id, mesh, indices) -> drawings.add(mesh.drawing())));
+        skinnedMeshes.values().forEach(a -> a.accept((mesh, indices) -> drawings.add(mesh.drawing())));
         
         return shader ->
         {
