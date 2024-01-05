@@ -1,6 +1,7 @@
 package nine.math;
 
 import nine.buffer.Buffer;
+import nine.function.ActionSingle;
 
 public class Matrix4f
 {
@@ -255,5 +256,11 @@ public class Matrix4f
         float[] newElements = new float[16];
         for(int i = 0; i < 16; i++) newElements[i] = elements[i];
         return new Matrix4f(newElements);
+    }
+    public Matrix4f apply(ActionSingle<float[]> function)
+    {
+        float[] elements = this.elements.clone();
+        function.call(elements);
+        return new Matrix4f(elements);
     }
 }
