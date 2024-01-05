@@ -18,7 +18,6 @@ import nine.opengl.CompositeDrawing;
 import nine.opengl.Drawing;
 import nine.opengl.DrawingAttributeBuffer;
 import nine.opengl.OpenGL;
-import nine.opengl.Texture;
 
 public class ColladaSkinnedModel implements SkinnedModelAsset
 {
@@ -80,29 +79,6 @@ public class ColladaSkinnedModel implements SkinnedModelAsset
     @Override
     public ShadedSkinnedModel load(OpenGL gl, Storage storage)
     {
-        class TexturedDrawingAttributeBuffer implements DrawingAttributeBuffer
-        {
-            Texture texture;
-            DrawingAttributeBuffer source;
-
-            public TexturedDrawingAttributeBuffer(Texture texture, DrawingAttributeBuffer source) {
-                this.texture = texture;
-                this.source = source;
-            }
-
-            @Override
-            public DrawingAttributeBuffer attribute(int stride, Buffer<Float> data)
-            {
-                return new TexturedDrawingAttributeBuffer(texture, source.attribute(stride, data));
-            }
-
-            @Override
-            public Drawing drawing()
-            {
-                return texture.apply(source.drawing());
-            }
-        }
-
         HashMap<String, RawMesh> meshes = new HashMap<>();
         HashMap<String, RawMesh> skinnedMeshes = new HashMap<>();
 

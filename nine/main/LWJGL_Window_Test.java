@@ -113,7 +113,7 @@ public class LWJGL_Window_Test
 					Matrix4f.rotationX(FloatFunc.toRadians(-90f)));
 
 				var levelDrawing = finalDrawing.call(groundTexture.apply(Drawing.of(groundDrawing, caveDrawing)))
-					.transform(Matrix4f.identity, diffuseShaderPlayer);
+					.transformUniform(Matrix4f.identity, diffuseShaderPlayer);
 
 				updateStatus.update();
 				fps.frame();

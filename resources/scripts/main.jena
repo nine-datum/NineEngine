@@ -50,6 +50,11 @@ windowStart =
         {
             .graphics:
             {
+                .model:file -> model = graphics.model[import.string] file =>
+                (
+                    root -> model.transform[import.matrix4, import.vector3, import.matrix4]
+                        [projection(), light, root]
+                ),
                 .animatedModel:file -> model = graphics.animatedModel[import.string] file =>
                 (
                     root -> anim -> model.animate[import.matrix4, import.vector3, import.matrix4, import.skeleton]

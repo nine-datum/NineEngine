@@ -4,7 +4,7 @@ import -> in ->
     {
         .position:(box(in.math.float3[0, -1, 2])),
         .rotation:(box 0),
-        .skin:(in.graphics.animatedModel "resources/models/Knight/LongSword_Idle.dae"),
+        .skin:(in.graphics.model "resources/models/Knight/LongSword_Idle.dae"),
         .idle:(in.graphics.animation "resources/models/Knight/LongSword_Idle.dae"),
         .walk:(in.graphics.animation "resources/models/Knight/Walk.dae"),
     },
@@ -12,6 +12,6 @@ import -> in ->
     [
         init.skin
             (import.matrix4.transform[import.vector3, import.vector3][init.position.get, in.math.float3[-3.14 * 0.5, 0, 0]])
-            (init.idle(in.time.value[]())).draw[](),
+            .draw[](),
     ]
 }

@@ -1,6 +1,6 @@
 package nine.opengl;
 
-import nine.drawing.TransformedDrawing;
+import nine.drawing.TransformUniformDrawing;
 import nine.math.Matrix4f;
 
 public interface Drawing
@@ -17,8 +17,8 @@ public interface Drawing
         return new CompositeDrawing(drawings);
     }
 
-    default Drawing transform(Matrix4f transform, ShaderPlayer shader)
+    default Drawing transformUniform(Matrix4f transform, ShaderPlayer shader)
     {
-        return new TransformedDrawing(transform, shader, this);
+        return new TransformUniformDrawing(transform, shader, this);
     }
 }

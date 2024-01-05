@@ -4,6 +4,7 @@ import java.io.File;
 
 import nine.function.RefreshStatus;
 import nine.geometry.collada.AnimatedSkeleton;
+import nine.geometry.collada.ColladaModel;
 import nine.geometry.collada.ColladaNode;
 import nine.geometry.collada.ColladaSkinnedModel;
 import nine.io.Storage;
@@ -59,6 +60,30 @@ public class ColladaOpenGLGrahics implements Graphics
                 transformUniform.load(transform);
                 projectionUniform.load(projection);
                 drawing.draw();
+            };
+            return shaderPlayer.play(gl.clockwise(gl.depthOn(gl.smooth(initializedDrawing))));
+        };
+    }
+
+    @Override
+    public TransformedDrawing model(String file)
+    {
+        var textureStorage = this.storage.relative(new File(file).getParent());
+        var modelSource = new ColladaModel(ColladaNode.fromFile(storage.open(file))).load(gl, textureStorage);
+        var shaderPlayer = diffuseShader.player();
+        var uniforms = shaderPlayer.uniforms();
+        var lightUniform = uniforms.uniformVector("worldLight");
+        var transformUniform = uniforms.uniformMatrix("transform");
+        var projectionUniform = uniforms.uniformMatrix("projection");
+        var shadedModel = modelSource.instance(shaderPlayer);
+        return (projection, light, transform) ->
+        {
+            Drawing initializedDrawing = () ->
+            {
+                lightUniform.load(light);
+                transformUniform.load(transform);
+                projectionUniform.load(projection);
+                shadedModel.draw();
             };
             return shaderPlayer.play(gl.clockwise(gl.depthOn(gl.smooth(initializedDrawing))));
         };

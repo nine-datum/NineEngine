@@ -9,6 +9,7 @@ import nine.opengl.Shader;
 public interface Graphics
 {
 	AnimatedSkeleton animation(String file);
+    TransformedDrawing model(String file);
 	AnimatedDrawing animatedModel(String file);
 
     static Graphics collada(
