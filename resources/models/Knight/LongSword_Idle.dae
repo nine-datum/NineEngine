@@ -5,8 +5,8 @@
       <author>Blender User</author>
       <authoring_tool>Blender 4.0.1 commit date:2023-11-16, commit time:16:40, hash:d0dd92834a08</authoring_tool>
     </contributor>
-    <created>2024-01-05T16:25:21</created>
-    <modified>2024-01-05T16:25:21</modified>
+    <created>2024-01-05T18:54:00</created>
+    <modified>2024-01-05T18:54:00</modified>
     <unit name="meter" meter="1"/>
     <up_axis>Z_UP</up_axis>
   </asset>
@@ -857,6 +857,38 @@
           <input semantic="INTERPOLATION" source="#Armature_Idle_Weapon_ArmL_pose_matrix-interpolation"/>
         </sampler>
         <channel source="#Armature_Idle_Weapon_ArmL_pose_matrix-sampler" target="Armature_ArmL/transform"/>
+      </animation>
+      <animation id="Armature_Idle_Weapon_HandL_pose_matrix" name="Armature">
+        <source id="Armature_Idle_Weapon_HandL_pose_matrix-input">
+          <float_array id="Armature_Idle_Weapon_HandL_pose_matrix-input-array" count="22">0.04166662 0.08333331 0.125 0.1666666 0.2083333 0.25 0.2916666 0.3333333 0.375 0.4166666 0.4583333 0.5 0.5416667 0.5833333 0.625 0.6666667 0.7083333 0.75 0.7916667 0.8333333 0.875 0.9166667</float_array>
+          <technique_common>
+            <accessor source="#Armature_Idle_Weapon_HandL_pose_matrix-input-array" count="22" stride="1">
+              <param name="TIME" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="Armature_Idle_Weapon_HandL_pose_matrix-output">
+          <float_array id="Armature_Idle_Weapon_HandL_pose_matrix-output-array" count="352">0.9292735 0.287265 -0.2322278 -2.98023e-8 -0.3417616 0.4300395 -0.8356225 0.2931915 -0.140178 0.8558884 0.4978004 -1.49012e-8 0 0 0 1 0.944591 0.2954715 -0.1429842 1.49012e-8 -0.2563308 0.3918781 -0.8835871 0.2931918 -0.2050425 0.8712797 0.445903 -1.49012e-8 0 0 0 1 0.9498423 0.3117312 -0.02496523 0 -0.1365499 0.341597 -0.929874 0.2931916 -0.2813427 0.8866426 0.3670302 1.49012e-8 0 0 0 1 0.9381533 0.3338754 0.09162568 2.98023e-8 -0.01056582 0.2921324 -0.9563195 0.2931917 -0.3460584 0.8962066 0.2775927 1.49012e-8 0 0 0 1 0.9180205 0.3543966 0.1778808 -2.98023e-8 0.08784648 0.2556794 -0.9627623 0.2931915 -0.3866801 0.8994617 0.2035864 -1.49012e-8 0 0 0 1 0.9074205 0.3633312 0.2111367 0 0.1270766 0.2416597 -0.9620044 0.2931916 -0.4005494 0.8997729 0.1731161 -1.49012e-8 0 0 0 1 0.909746 0.3606664 0.2056263 2.98023e-8 0.1194723 0.2469053 -0.9616464 0.2931916 -0.3976038 0.8994206 0.1815315 0 0 0 0 1 0.915973 0.3534298 0.1899494 0 0.09823705 0.2614591 -0.9602023 0.2931915 -0.3890281 0.8981795 0.2047696 0 0 0 0 1 0.9247296 0.3428878 0.165236 -5.96046e-8 0.06579129 0.2835907 -0.956686 0.2931915 -0.3748954 0.895547 0.2396857 0 0 0 0 1 0.9344752 0.3304026 0.1326279 0 0.02467393 0.3115243 -0.9499177 0.2931916 -0.3551721 0.8909472 0.2829595 1.49012e-8 0 0 0 1 0.9436958 0.3173306 0.09348521 2.98023e-8 -0.02244219 0.3433503 -0.9389393 0.2931917 -0.3300524 0.8839753 0.3311398 -1.49012e-8 0 0 0 1 0.9510941 0.3049105 0.04949392 -1.49012e-8 -0.07281668 0.3770131 -0.9233413 0.2931917 -0.3001963 0.8745804 0.3807775 -1.49012e-8 0 0 0 1 0.9557551 0.2941516 0.002662517 -1.49012e-8 -0.1237831 0.4103728 -0.9034777 0.2931915 -0.2668521 0.8631737 0.4286269 2.98023e-8 0 0 0 1 0.9572582 0.2857475 -0.04478121 1.49012e-8 -0.1729257 0.4413096 -0.8805357 0.2931916 -0.2318484 0.8506436 0.4718602 2.98023e-8 0 0 0 1 0.955708 0.280041 -0.0905506 -7.45058e-9 -0.2182298 0.4678301 -0.8564526 0.2931915 -0.1974795 0.8382792 0.5082221 2.98023e-8 0 0 0 1 0.95168 0.277055 -0.1324601 0 -0.2581469 0.4881285 -0.8337209 0.2931916 -0.166329 0.8276298 0.5360631 1.49012e-8 0 0 0 1 0.9460969 0.2765827 -0.1685318 3.72529e-9 -0.2915379 0.5005633 -0.8151332 0.2931917 -0.1410909 0.8203283 0.5542156 1.49012e-8 0 0 0 1 0.9400625 0.2783269 -0.1970195 0 -0.3174891 0.5035485 -0.8035172 0.2931918 -0.1244315 0.8179079 0.5617328 0 0 0 0 1 0.9344406 0.280849 -0.2189622 -3.72529e-9 -0.3368663 0.4976683 -0.7992792 0.2931916 -0.1155062 0.8206401 0.5596501 2.98023e-8 0 0 0 1 0.9295526 0.2827572 -0.236602 7.45058e-9 -0.3515643 0.48647 -0.7998434 0.2931917 -0.1110617 0.8266772 0.5516068 -1.49012e-8 0 0 0 1 0.9256271 0.2840057 -0.2501107 0 -0.3621208 0.4727352 -0.8033618 0.2931916 -0.1099232 0.8341836 0.5404209 1.49012e-8 0 0 0 1 0.9227927 0.2846906 -0.2596245 0 -0.3690257 0.4592957 -0.8080022 0.2931916 -0.1107863 0.8414267 0.5288929 1.49012e-8 0 0 0 1</float_array>
+          <technique_common>
+            <accessor source="#Armature_Idle_Weapon_HandL_pose_matrix-output-array" count="22" stride="16">
+              <param name="TRANSFORM" type="float4x4"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="Armature_Idle_Weapon_HandL_pose_matrix-interpolation">
+          <Name_array id="Armature_Idle_Weapon_HandL_pose_matrix-interpolation-array" count="22">LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR</Name_array>
+          <technique_common>
+            <accessor source="#Armature_Idle_Weapon_HandL_pose_matrix-interpolation-array" count="22" stride="1">
+              <param name="INTERPOLATION" type="name"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <sampler id="Armature_Idle_Weapon_HandL_pose_matrix-sampler">
+          <input semantic="INPUT" source="#Armature_Idle_Weapon_HandL_pose_matrix-input"/>
+          <input semantic="OUTPUT" source="#Armature_Idle_Weapon_HandL_pose_matrix-output"/>
+          <input semantic="INTERPOLATION" source="#Armature_Idle_Weapon_HandL_pose_matrix-interpolation"/>
+        </sampler>
+        <channel source="#Armature_Idle_Weapon_HandL_pose_matrix-sampler" target="Armature_HandL/transform"/>
       </animation>
       <animation id="Armature_Idle_Weapon_ArmR_pose_matrix" name="Armature">
         <source id="Armature_Idle_Weapon_ArmR_pose_matrix-input">
