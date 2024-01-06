@@ -19,7 +19,7 @@ windowStart =
         shaderLoader = import.shader.loader[import.storage, import.opengl][storage, gl] =>
         skinShader = shaderLoader.load[import.string, import.string]["resources/shaders/diffuse_skin_vertex.glsl", "resources/shaders/diffuse_fragment.glsl"] =>
         diffuseShader = shaderLoader.load[import.string, import.string]["resources/shaders/diffuse_vertex.glsl", "resources/shaders/diffuse_fragment.glsl"] =>
-        light = math.float3[0, 0, 1] =>
+        light = () -> math.float3[0, 0, 1] =>
         projection = () -> import.matrix4.perspective
         [
             import.float,
@@ -48,40 +48,24 @@ windowStart =
         ] =>
         in =
         {
-            .graphics:
-            {
-                .model:file -> model = graphics.model[import.string] file =>
-                (
-                    root -> model.transform[import.matrix4, import.vector3, import.matrix4]
-                        [projection(), light, root]
-                ),
-                .animatedModel:file -> model = graphics.animatedModel[import.string] file =>
-                (
-                    root -> anim -> model.animate[import.matrix4, import.vector3, import.matrix4, import.skeleton]
-                        [projection(), light, root, anim]
-                ),
-                .animation:file -> anim = graphics.animation[import.string] file =>
-                (
-                    time -> anim.animate[import.float] time
-                ),
-            },
             .mouse:(source "resources/scripts/mouse.jena" [windowId, status]),
             .keyboard:(source "resources/scripts/keyboard.jena" [windowId, status]),
         } =>
-        player = source "resources/scripts/player.jena" import
+        scene = source "resources/scripts/scene.jena" import
         {
-            .graphics:(in.graphics),
+            .graphics:graphics,
             .keyboard:(in.keyboard),
             .mouse:(in.mouse),
             .math:math,
-            .time:time,
+            .projection:projection,
+            .light:light,
         } =>
         windowLoop = width -> height ->
         [
             status.update[](),
             screenWidth.set width,
             screenHeight.set height,
-            player.update(player.init),
+            scene.update(scene.init),
         ] =>
         args -> windowLoop (args 0) (args 1)
     )

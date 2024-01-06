@@ -1,4 +1,4 @@
-package nine.main;
+package nine.game;
 
 import nine.geometry.collada.Skeleton;
 import nine.math.Matrix4f;

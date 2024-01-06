@@ -22,6 +22,8 @@ public class Vector2f
     {
         acceptor.call(x, y);
     }
+
+    public static final Vector2f zero = new Vector2f(0f, 0f);
     
     public String toString()
     {
@@ -46,6 +48,23 @@ public class Vector2f
         if (ry < y) ry = y;
         else if (ry > (y + rect.h)) ry = y + rect.h;
         return new Vector2f(rx, ry);
+    }
+    public Vector2f clamp(Vector2f min, Vector2f max)
+    {
+        float x = this.x;
+        float y = this.y;
+        if(x < min.x) x = min.x; 
+        if(y < min.y) y = min.y;
+        if(x > max.x) x = max.x; 
+        if(y > max.y) y = max.y; 
+        return new Vector2f(x, y);
+    }
+    public Vector2f clampX(float min, float max)
+    {
+        float x = this.x;
+        if(x < min) x = min; 
+        if(x > max) x = max; 
+        return new Vector2f(x, y);
     }
     public float length()
     {

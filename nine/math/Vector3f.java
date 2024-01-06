@@ -25,6 +25,12 @@ public final class Vector3f
         acceptor.call(x, y, z);
     }
 
+    public static final Vector3f zero = new Vector3f(0, 0, 0);
+    public static final Vector3f right = new Vector3f(1, 0, 0);
+    public static final Vector3f up = new Vector3f(0, 1, 0);
+    public static final Vector3f forward = new Vector3f(0, 0, 1);
+    public static final Vector3f one = new Vector3f(1, 1, 1);
+
     public String toString()
     {
         return String.format("%f, %f, %f", x, y, z);
@@ -87,6 +93,14 @@ public final class Vector3f
     public Vector3f add(Vector3f b)
     {
         return new Vector3f(x + b.x, y + b.y, z + b.z);
+    }
+    public Vector2f xy()
+    {
+        return Vector2f.newXY(x, y);
+    }
+    public Vector2f xz()
+    {
+        return Vector2f.newXY(x, z);
     }
     public static Vector3f newX(float x)
     {

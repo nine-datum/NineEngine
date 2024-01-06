@@ -4,6 +4,7 @@ import nine.buffer.Buffer;
 import nine.function.ErrorPrinter;
 import nine.function.FunctionSingle;
 import nine.function.UpdateRefreshStatus;
+import nine.game.Graphics;
 import nine.geometry.collada.AnimatedSkeleton;
 import nine.geometry.collada.FileColladaNode;
 import nine.geometry.procedural.Geometry;

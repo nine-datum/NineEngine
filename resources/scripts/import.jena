@@ -26,11 +26,16 @@ jc = javaClass =>
     .keyboard:(jc "nine.input.Keyboard"),
     .mouse:(jc "nine.input.Mouse"),
     
-    .graphics:(jc "nine.main.Graphics"),
-    .animatedDrawing:(jc "nine.main.AnimatedDrawing"),
+    .graphics:(jc "nine.game.Graphics"),
+    .animatedDrawing:(jc "nine.game.AnimatedDrawing"),
     
     .skeleton:(jc "nine.geometry.collada.Skeleton"),
     .animatedSkeleton:(jc "nine.geometry.collada.AnimatedSkeleton"),
     
     .storage:(jc "nine.io.Storage"),
+
+    .player:(jc "nine.game.Player"),
+    .scene:(jc "nine.game.Scene"),
+    .sceneLight:(jc "nine.game.Scene$Light"),
+    .sceneProjection:(jc "nine.game.Scene$Projection"),
 }

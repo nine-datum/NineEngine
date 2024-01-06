@@ -3,6 +3,8 @@ package nine.main;
 import java.io.File;
 
 import nine.function.RefreshStatus;
+import nine.game.AnimatedDrawing;
+import nine.game.Graphics;
 import nine.geometry.collada.AnimatedSkeleton;
 import nine.geometry.collada.ColladaModel;
 import nine.geometry.collada.ColladaNode;

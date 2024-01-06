@@ -1,0 +1,10 @@
+import -> in ->
+{
+    .init:(import.scene.create
+        [import.graphics, import.keyboard, import.mouse, import.sceneProjection, import.sceneLight]
+        [in.graphics, in.keyboard, in.mouse, in.projection, in.light]),
+    .update:init ->
+    (
+        init.draw[]()
+    )
+}
