@@ -1,6 +1,8 @@
 package nine.math;
 
 import nine.buffer.Buffer;
+import nine.input.Key;
+import nine.input.Keyboard;
 
 public final class Vector3f
 {
@@ -125,5 +127,24 @@ public final class Vector3f
     public static Vector3f newBuffer(Buffer<Float> buffer, int start)
     {
         return new Vector3f(buffer.at(start), buffer.at(start + 1), buffer.at(start + 2));
+    }
+    public static Vector3f wasdeq(Keyboard keyboard)
+    {
+        Key w = keyboard.keyOf('w');
+        Key a = keyboard.keyOf('a');
+        Key s = keyboard.keyOf('s');
+        Key d = keyboard.keyOf('d');
+        Key e = keyboard.keyOf('e');
+        Key q = keyboard.keyOf('q');
+        float x = 0f;
+        float y = 0f;
+        float z = 0f;
+        if(w.isDown()) y++;
+        if(s.isDown()) y--;
+        if(d.isDown()) x++;
+        if(a.isDown()) x--;
+        if(e.isDown()) z++;
+        if(q.isDown()) z--;
+        return new Vector3f(x, y, z);
     }
 }

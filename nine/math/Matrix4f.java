@@ -75,8 +75,8 @@ public class Matrix4f
     }
     public static Matrix4f rotationX(float angle)
     {
-        var sin = (float)Math.sin(angle);
-        var cos = (float)Math.cos(angle);
+        var sin = (float)Math.sin(-angle);
+        var cos = (float)Math.cos(-angle);
         var elements = newElements();
         elements[5] = cos;
         elements[6] = sin;
@@ -109,7 +109,7 @@ public class Matrix4f
     public static Matrix4f orbitalCamera(Vector3f position, Vector3f rotation, float distance)
     {
         return Matrix4f.translation(Vector3f.newZ(distance))
-            .mul(Matrix4f.rotation(rotation))
+            .mul(Matrix4f.rotation(rotation.negative()))
             .mul(Matrix4f.translation(position.negative()));
     }
     public static Matrix4f perspective(float aspect, float fov, float near, float far)
@@ -118,8 +118,8 @@ public class Matrix4f
         float tan = (float)Math.tan(fov * 0.5f);
         elements[0] = 1f / (aspect * tan);
         elements[5] = 1f / tan;
-        elements[10] = -(far + near) / (far - near);
-        elements[11] = -1f;
+        elements[10] = (far + near) / (far - near);
+        elements[11] = 1f;
         elements[14] = -2f * far * near / (far - near);
         elements[15] = 0;
         return new Matrix4f(elements);
@@ -244,7 +244,19 @@ public class Matrix4f
     {
         float[] elements = new float[16];
         for(int i = 0; i < 16; i++) elements[i] = buffer.at(i + start);
-        return new Matrix4f(elements).transponed();
+        return new Matrix4f(elements).transponed().apply(e ->
+        {
+            /*var s = e.clone();
+            e[1] = s[2];
+            e[5] = s[6];
+            e[9] = s[10];
+            e[13] = s[14];
+
+            e[2] = s[1];
+            e[6] = s[5];
+            e[10] = s[9];
+            e[14] = s[13];*/
+        });
     }
     public static Matrix4f fromArray(float[] elements)
     {

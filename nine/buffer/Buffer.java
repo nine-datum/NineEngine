@@ -1,5 +1,6 @@
 package nine.buffer;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -102,5 +103,17 @@ public interface Buffer<T> extends IntegerMapping<T>
                 };
             }
         };
+    }
+    default Buffer<T> fromRightToLeftHanded()
+    {
+        int len = length();
+        List<T> buffer = new ArrayList<T>(len);
+        for(int i = 0; i < len; i+=3)
+        {
+            buffer.add(at(i));
+            buffer.add(at(i + 2));
+            buffer.add(at(i + 1));
+        }
+        return of(buffer);
     }
 }
