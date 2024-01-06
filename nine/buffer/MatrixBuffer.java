@@ -15,7 +15,7 @@ public class MatrixBuffer implements Buffer<Matrix4f>
         buffer = new CachedBuffer<>(
             new MapBuffer<>(
                 new RangeBuffer(values.length() / 16),
-                i -> Matrix4f.fromBuffer(values, i * 16)));
+                i -> Matrix4f.from_COLLADA_Buffer(values, i * 16)));
     }
 
     @Override

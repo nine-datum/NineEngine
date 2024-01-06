@@ -39,7 +39,7 @@ public class ColladaBoneNodeReader implements NodeReader
                 }
                 else
                 {
-                    Matrix4f contentMatrix = Matrix4f.fromBuffer(new TextValueBuffer<>(content, Float::parseFloat), 0);
+                    Matrix4f contentMatrix = Matrix4f.from_COLLADA_Buffer(new TextValueBuffer<>(content, Float::parseFloat), 0);
                     local = time -> contentMatrix;
                 }
                 Animation transform = time -> parent.animate(time).mul(local.animate(time));

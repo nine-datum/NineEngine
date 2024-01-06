@@ -123,7 +123,7 @@ public class ColladaBasicSkinParser implements ColladaSkinParser
                         skinSource,
                         names.get(0),
                         key -> inv_bind_poses.get(key),
-                        Matrix4f.fromBuffer(matrixBuffer, 0),
+                        Matrix4f.from_COLLADA_Buffer(matrixBuffer, 0),
                         new FloatArrayBuffer(weightArray),
                         new IntegerArrayBuffer(jointArray),
                         weightsPerVertex);

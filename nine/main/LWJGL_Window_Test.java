@@ -55,7 +55,7 @@ public class LWJGL_Window_Test
 
 			Graphics graphics = Graphics.collada(gl, diffuseShader, skinShader, storage, updateStatus);
 
-			var human = graphics.model(args[0]);
+			var human = graphics.animatedModel(args[0]);
 
 			FunctionSingle<Drawing, Drawing> finalDrawing = d -> gl.clockwise(gl.depthOn(gl.smooth(d)));
 
@@ -138,10 +138,11 @@ public class LWJGL_Window_Test
 
 					if(px != 0 || py != 0)
 					{
-						Drawing idleDrawing = human.transform(
+						Drawing idleDrawing = human.animate(
 							projection,
 							worldLight,
-							Matrix4f.translation(Vector3f.newXYZ(px, 0f, py)).mul(humanWorld));
+							Matrix4f.translation(Vector3f.newXYZ(px, 0f, py)).mul(humanWorld),
+							idle.animate(time.value()));
 
 						idleDrawing.draw();
 					}

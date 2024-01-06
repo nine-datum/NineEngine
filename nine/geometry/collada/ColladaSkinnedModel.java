@@ -92,9 +92,9 @@ public class ColladaSkinnedModel implements SkinnedModelAsset
             DrawingAttributeBuffer buffer = new TexturedDrawingAttributeBuffer(
                 gl.texture(storage.open(materials.textureFile(material))),
                 gl.vao(intBuffers.map("INDEX"))
-                    .attribute(3, floatBuffers.map("VERTEX"))
+                    .attribute(3, floatBuffers.map("VERTEX").fromRightToLeftHanded())
                     .attribute(2, floatBuffers.map("TEXCOORD"))
-                    .attribute(3, floatBuffers.map("NORMAL")));
+                    .attribute(3, floatBuffers.map("NORMAL").fromRightToLeftHanded()));
             meshes.put(sourceId, RawMesh.of(buffer, intBuffers.map("INDEX_VERTEX")));
         }));
 

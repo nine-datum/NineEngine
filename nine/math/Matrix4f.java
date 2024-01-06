@@ -240,23 +240,18 @@ public class Matrix4f
         sb.append("]");
         return sb.toString();
     }
-    public static Matrix4f fromBuffer(Buffer<Float> buffer, int start)
+    public static Matrix4f from_COLLADA_Buffer(Buffer<Float> buffer, int start)
     {
         float[] elements = new float[16];
         for(int i = 0; i < 16; i++) elements[i] = buffer.at(i + start);
-        return new Matrix4f(elements).transponed().apply(e ->
+        var flipZY = new Matrix4f(new float[]
         {
-            /*var s = e.clone();
-            e[1] = s[2];
-            e[5] = s[6];
-            e[9] = s[10];
-            e[13] = s[14];
-
-            e[2] = s[1];
-            e[6] = s[5];
-            e[10] = s[9];
-            e[14] = s[13];*/
+            1, 0, 0, 0,
+            0, 0, 1, 0,
+            0, 1, 0, 0,
+            0, 0, 0, 1,
         });
+        return flipZY.mul(new Matrix4f(elements).transponed()).mul(flipZY);
     }
     public static Matrix4f fromArray(float[] elements)
     {
