@@ -43,6 +43,14 @@ public class Matrix4f
 
     public static final Matrix4f identity = new Matrix4f();
 
+    public static final Matrix4f flipZY = new Matrix4f(new float[]
+    {
+        1, 0, 0, 0,
+        0, 0, 1, 0,
+        0, 1, 0, 0,
+        0, 0, 0, 1,
+    });
+
     public static Matrix4f transform(Vector3f position, Vector3f rotation, Vector3f scale)
     {
         return translation(position).mul(rotation(rotation)).mul(scale(scale));
@@ -244,13 +252,6 @@ public class Matrix4f
     {
         float[] elements = new float[16];
         for(int i = 0; i < 16; i++) elements[i] = buffer.at(i + start);
-        var flipZY = new Matrix4f(new float[]
-        {
-            1, 0, 0, 0,
-            0, 0, 1, 0,
-            0, 1, 0, 0,
-            0, 0, 0, 1,
-        });
         return flipZY.mul(new Matrix4f(elements).transponed()).mul(flipZY);
     }
     public static Matrix4f fromArray(float[] elements)

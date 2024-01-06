@@ -11,7 +11,7 @@ import -> in ->
     },
     .update:init ->
     time = in.time.value[]() =>
-    playerRoot = (import.matrix4.transform[import.vector3, import.vector3][init.position.get, in.math.float3[-3.14 * 0.5, 0, time]]) =>
+    playerRoot = (import.matrix4.transform[import.vector3, import.vector3][init.position.get, in.math.float3[0, time, 0]]) =>
     [
         init.skin
             playerRoot
