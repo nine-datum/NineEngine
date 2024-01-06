@@ -218,7 +218,7 @@ public class Player implements UpdatedDrawing
                     {
                         var direction = Matrix4f.rotation(rotation).transformVector(Vector3f.forward);
                         position = position.add(direction.mul(deltaTime.value() * 3f));
-                        position = Vector3f.newXYZ(position.x, (float)Math.sin(t / jump * 3.14f) * 0.5f, position.z);
+                        //position = Vector3f.newXYZ(position.x, (float)Math.sin(t / jump * 3.14f) * 0.5f, position.z);
                     }
                     if(t > 2.5f)
                     {
