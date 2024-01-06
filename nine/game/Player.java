@@ -179,7 +179,7 @@ public class Player implements UpdatedDrawing
                     time);
                 return HumanState.ofDrawing(drawing, self ->
                 {
-                    if(weaponKeyDown()) return transitionState(Player.this::withSwordOnBack, time, idle, weaponIdle, this::weaponIdle, 0.5f);
+                    if(weaponKeyDown()) return weaponIdle();
                     return updateIdle(self, this::walk);
                 });
             }

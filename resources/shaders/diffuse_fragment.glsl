@@ -8,5 +8,5 @@ uniform vec3 worldLight;
 
 void main (void)
 {	
-	out_Color = vec4(texture(texture2d, uv).rgb * (dot(worldNormal, -worldLight) + 1) * 0.5, 1);
+	out_Color = vec4(texture(texture2d, uv).rgb * (dot(worldNormal, -worldLight) + 1) * 0.75, 1);
 }
