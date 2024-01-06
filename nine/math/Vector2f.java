@@ -66,6 +66,13 @@ public class Vector2f
         if(x > max) x = max; 
         return new Vector2f(x, y);
     }
+    public Vector2f clampY(float min, float max)
+    {
+        float y = this.y;
+        if(y < min) y = min; 
+        if(y > max) y = max; 
+        return new Vector2f(x, y);
+    }
     public float length()
     {
         return (float)Math.sqrt(x * x + y * y);

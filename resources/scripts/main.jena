@@ -19,19 +19,7 @@ windowStart =
         shaderLoader = import.shader.loader[import.storage, import.opengl][storage, gl] =>
         skinShader = shaderLoader.load[import.string, import.string]["resources/shaders/diffuse_skin_vertex.glsl", "resources/shaders/diffuse_fragment.glsl"] =>
         diffuseShader = shaderLoader.load[import.string, import.string]["resources/shaders/diffuse_vertex.glsl", "resources/shaders/diffuse_fragment.glsl"] =>
-        light = () -> math.float3[0, 0, 1] =>
-        projection = () -> import.matrix4.perspective
-        [
-            import.float,
-            import.float,
-            import.float,
-            import.float
-        ][
-            screenWidth.get / (screenHeight.get),
-            60 / 180 * 3.14,
-            0.01,
-            100
-        ] =>
+        
         graphics = import.graphics.collada
         [
             import.opengl,
@@ -57,8 +45,8 @@ windowStart =
             .keyboard:(in.keyboard),
             .mouse:(in.mouse),
             .math:math,
-            .projection:projection,
-            .light:light,
+            .screenWidth:() -> screenWidth.get,
+            .screenHeight:() -> screenHeight.get,
         } =>
         windowLoop = width -> height ->
         [

@@ -43,7 +43,7 @@ public class Matrix4f
 
     public static final Matrix4f identity = new Matrix4f();
 
-    public static final Matrix4f flipZY = new Matrix4f(new float[]
+    private static final Matrix4f flipZY = new Matrix4f(new float[]
     {
         1, 0, 0, 0,
         0, 0, 1, 0,
@@ -61,9 +61,9 @@ public class Matrix4f
     }
     public static Matrix4f rotation(Vector3f rotation)
     {
-        return rotationX(rotation.x)
+        return rotationZ(rotation.z)
             .mul(rotationY(rotation.y))
-            .mul(rotationZ(rotation.z));
+            .mul(rotationX(rotation.x));
     }
     public static Matrix4f scale(Vector3f scale)
     {
@@ -120,6 +120,12 @@ public class Matrix4f
             .mul(Matrix4f.rotation(rotation.negative()))
             .mul(Matrix4f.translation(position.negative()));
     }
+    public static Matrix4f firstPersonCamera(Vector3f position, Vector3f rotation)
+    {
+        return Matrix4f.rotationX(-rotation.x)
+            .mul(Matrix4f.rotationY(-rotation.y))
+            .mul(Matrix4f.translation(position.negative()));
+    }
     public static Matrix4f perspective(float aspect, float fov, float near, float far)
     {
         var elements = newElements();
@@ -168,10 +174,10 @@ public class Matrix4f
         float x = vector.x;
         float y = vector.y;
         float z = vector.z;
-        float rx = elements[0] * x + elements[4] * y + elements[8] * z;
-        float ry = elements[1] * x + elements[5] * y + elements[9] * z;
-        float rz = elements[2] * x + elements[6] * y + elements[10] * z;
-        return Vector3f.newXYZ(rx, ry, rz);
+        var right = Vector3f.newXYZ(elements[0], elements[1], elements[2]).mul(x);
+        var up = Vector3f.newXYZ(elements[4], elements[5], elements[6]).mul(y);
+        var forward = Vector3f.newXYZ(elements[8], elements[9], elements[10]).mul(z);
+        return right.add(up).add(forward);
     }
     public Matrix4f transponed()
     {

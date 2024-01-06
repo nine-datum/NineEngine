@@ -1,5 +1,6 @@
 package nine.opengl;
 
+import nine.collection.Flow;
 import nine.drawing.TransformUniformDrawing;
 import nine.math.Matrix4f;
 
@@ -13,6 +14,10 @@ public interface Drawing
     }
 
     static Drawing of(Drawing... drawings)
+    {
+        return new CompositeDrawing(drawings);
+    }
+    static Drawing of(Flow<Drawing> drawings)
     {
         return new CompositeDrawing(drawings);
     }

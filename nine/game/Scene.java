@@ -2,6 +2,7 @@ package nine.game;
 
 import nine.input.Keyboard;
 import nine.input.Mouse;
+import nine.main.TransformedDrawing;
 import nine.math.Matrix4f;
 import nine.math.Vector2f;
 import nine.math.Vector3f;
@@ -23,7 +24,8 @@ public class Scene implements Drawing
         this.light = light;
         this.projection = projection;
         this.mouse = mouse;
-        this.player = Player.create(graphics, keyboard, mouse);
+        player = Player.create(graphics, keyboard, mouse);
+        scene = graphics.model("resources/models/Scenes/Mountains.dae");
     }
 
     public static Scene create(Graphics graphics, Keyboard keyboard, Mouse mouse, Projection projection, Light light)
@@ -35,19 +37,23 @@ public class Scene implements Drawing
     Projection projection;
     Mouse mouse;
     Player player;
+    TransformedDrawing scene;
     Vector2f mouseRotation = Vector2f.zero;
 
     @Override
     public void draw()
     {
         var mouseInput = mouse.delta().mul(0.01f);
-        mouseRotation = mouseRotation.add(mouseInput).clampX(-90f, 90f);
+        mouseRotation = mouseRotation.add(mouseInput).clampY(-3.14f * 0.5f, 3.14f * 0.5f);
         var cameraRotation = Vector3f.newXY(-mouseRotation.y, mouseRotation.x);
 
         var cameraForward = Matrix4f.rotation(cameraRotation).transformVector(Vector3f.forward);
-        var cameraPosition = player.position.add(cameraForward.negative().mul(3f));
+        var cameraPosition = player.position.add(Vector3f.newXYZ(0f, 1.5f, 0f)).add(cameraForward.mul(-3f));
 
-        player.update(
+        UpdatedDrawing.of(
+            player,
+            UpdatedDrawing.ofModel(scene, () -> Matrix4f.scale(Vector3f.newXYZ(10f, 10f, 10f))))
+        .update(
             projection.projection(),
             cameraPosition,
             cameraRotation,

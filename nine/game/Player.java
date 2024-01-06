@@ -23,6 +23,7 @@ public class Player implements UpdatedDrawing
     FloatFunc time;
     FloatFunc deltaTime;
     HumanState state;
+    Vector3f cameraRotation = Vector3f.zero;
 
     AnimatedDrawing model;
     AnimatedSkeleton idle;
@@ -60,6 +61,9 @@ public class Player implements UpdatedDrawing
     public Drawing update(Matrix4f projection, Vector3f cameraPosition, Vector3f cameraRotation, Vector3f worldLight)
     {
         updateStatus.update();
+        deltaTime.value();
+        this.cameraRotation = cameraRotation;
+
         state = state.next();
         return state.update(projection, cameraPosition, cameraRotation, worldLight);
     }
@@ -76,7 +80,8 @@ public class Player implements UpdatedDrawing
                 {
                     Vector3f m = Vector3f.newXZ(Vector2f.wasd(keyboard));
                     if(m.x == 0 && m.z == 0) return idle();
-
+                    m = Matrix4f.rotationY(cameraRotation.y).transformVector(m);
+                    
                     position = position.add(m.mul(deltaTime.value() * 3f));
                     rotation = Vector3f.newY(-m.xz().normalized().angle() - FloatFunc.toRadians(90));
                     

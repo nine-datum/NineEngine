@@ -1,8 +1,22 @@
 import -> in ->
+
+light = () -> in.math.float3[1, -1, 1].normalized[]() =>
+projection = () -> import.matrix4.perspective
+[
+    import.float,
+    import.float,
+    import.float,
+    import.float
+][
+    in.screenWidth() / (in.screenHeight()),
+    60 / 180 * 3.14,
+    0.01,
+    1000
+] =>
 {
     .init:(import.scene.create
         [import.graphics, import.keyboard, import.mouse, import.sceneProjection, import.sceneLight]
-        [in.graphics, in.keyboard, in.mouse, in.projection, in.light]),
+        [in.graphics, in.keyboard, in.mouse, projection, light]),
     .update:init ->
     (
         init.draw[]()
