@@ -2,6 +2,7 @@ package nine.game;
 
 import nine.function.ActionSingle;
 import nine.function.Function;
+import nine.function.FunctionSingle;
 import nine.function.UpdateRefreshStatus;
 import nine.geometry.collada.AnimatedSkeleton;
 import nine.input.Keyboard;
@@ -65,7 +66,7 @@ public class Player implements UpdatedDrawing
 
     Matrix4f root()
     {
-        return Matrix4f.transform(position, rotation);
+        return Matrix4f.transform(position, rotation.add(Vector3f.newY(3.14f)));
     }
 
     @Override
@@ -73,20 +74,22 @@ public class Player implements UpdatedDrawing
     {
         updateStatus.update();
         deltaTime.value();
+
         this.cameraRotation = cameraRotation;
 
         state = state.next();
+        keyboard.update();
         return state.update(projection, cameraPosition, cameraRotation, worldLight);
     }
 
     HumanState updateWalk(float movementSpeed, HumanState self, Function<HumanState> idle)
     {
-        Vector3f m = Vector3f.newXZ(Vector2f.wasd(keyboard));
+        Vector3f m = Vector3f.newXZ(Vector2f.wasd(keyboard)).normalized();
         if(m.x == 0 && m.z == 0) return idle.call();
         m = Matrix4f.rotationY(cameraRotation.y).transformVector(m);
 
-        position = position.add(m.mul(deltaTime.value() * 3f));
-        rotation = Vector3f.newY(-m.xz().normalized().angle() - FloatFunc.toRadians(90));
+        position = position.add(m.mul(deltaTime.value() * movementSpeed));
+        rotation = Vector3f.newY(-m.xz().angle() + FloatFunc.toRadians(90));
         return self;
     }
     HumanState updateIdle(HumanState self, Function<HumanState> walk)
@@ -95,6 +98,7 @@ public class Player implements UpdatedDrawing
         if(m.x != 0 || m.z != 0) return walk.call();
         return self;
     }
+
     UpdatedDrawing withSwordOnBack(UpdatedDrawing drawing, AnimatedSkeleton skeleton, FloatFunc time)
     {
         Matrix4f swordLocation = Matrix4f.transform(Vector3f.newXYZ(0.3f, -0.2f, 0.8f), Vector3f.newXYZ(3.14f * 0.3f, 0f, 3.14f * 0.5f));
@@ -117,6 +121,35 @@ public class Player implements UpdatedDrawing
     boolean weaponKeyDown()
     {
         return keyboard.keyOf('r').isUp();
+    }
+    boolean heavyAttackKeyDown()
+    {
+        return keyboard.keyOf('e').isDown();
+    }
+    boolean lightAttackKeyDown()
+    {
+        return keyboard.keyOf('q').isDown();
+    }
+
+    interface WithSwordDrawing
+    {
+        UpdatedDrawing apply(UpdatedDrawing drawing, AnimatedSkeleton skeleton, FloatFunc time);
+    }
+
+    HumanState transitionState(WithSwordDrawing withSwordFunc, FloatFunc startTime, AnimatedSkeleton start, AnimatedSkeleton end, Function<HumanState> destination, float length)
+    {
+        var time = new LocalTime();
+        AnimatedSkeleton skeleton = t ->
+        {
+            var lerp = t / length;
+            return name -> start.animate(startTime.value()).transform(name).lerp(end.animate(0f).transform(name), lerp);
+        };
+        var drawing = withSwordFunc.apply(UpdatedDrawing.ofModel(model, skeleton, time, Player.this::root), skeleton, time);
+        return HumanState.ofDrawing(drawing, self ->
+        {
+            if(time.value() < length) return self;
+            return destination.call();
+        });
     }
 
     HumanStates states()
@@ -146,7 +179,7 @@ public class Player implements UpdatedDrawing
                     time);
                 return HumanState.ofDrawing(drawing, self ->
                 {
-                    if(weaponKeyDown()) return weaponIdle();
+                    if(weaponKeyDown()) return transitionState(Player.this::withSwordOnBack, time, idle, weaponIdle, this::weaponIdle, 0.5f);
                     return updateIdle(self, this::walk);
                 });
             }
@@ -154,13 +187,46 @@ public class Player implements UpdatedDrawing
             @Override
             public HumanState attackLight()
             {
-                return null;
+                var time = new LocalTime();
+                var drawing = withSwordInHand(
+                    UpdatedDrawing.ofModel(model, lightAttack, time, Player.this::root),
+                    lightAttack,
+                    time);
+                return HumanState.ofDrawing(drawing, self ->
+                {
+                    var direction = Matrix4f.rotation(rotation).transformVector(Vector3f.forward);
+                    position = position.add(direction.mul(deltaTime.value()));
+
+                    if(time.value() > 1.2f) return weaponIdle();
+                    return self;
+                });
             }
 
             @Override
             public HumanState attackHeavy()
             {
-                return null;
+                var time = new LocalTime();
+                var drawing = withSwordInHand(
+                    UpdatedDrawing.ofModel(model, heavyAttack, time, Player.this::root),
+                    heavyAttack,
+                    time);
+                return HumanState.ofDrawing(drawing, self ->
+                {
+                    float jump = 1.3f;
+                    float t = time.value();
+                    if(t < jump)
+                    {
+                        var direction = Matrix4f.rotation(rotation).transformVector(Vector3f.forward);
+                        position = position.add(direction.mul(deltaTime.value() * 3f));
+                        position = Vector3f.newXYZ(position.x, (float)Math.sin(t / jump * 3.14f) * 0.5f, position.z);
+                    }
+                    if(t > 2.5f)
+                    {
+                        position = position.withY(0f);
+                        return weaponIdle();
+                    }
+                    return self;
+                });
             }
 
             @Override
@@ -174,7 +240,9 @@ public class Player implements UpdatedDrawing
                 return HumanState.ofDrawing(drawing, self ->
                 {
                     if(weaponKeyDown()) return walk();
-                    return updateWalk(3f, self, this::weaponIdle);
+                    if(lightAttackKeyDown()) return attackLight();
+                    if(heavyAttackKeyDown()) return attackHeavy();
+                    return updateWalk(5f, self, this::weaponIdle);
                 });
             }
 
@@ -189,6 +257,8 @@ public class Player implements UpdatedDrawing
                 return HumanState.ofDrawing(drawing, self ->
                 {
                     if(weaponKeyDown()) return idle();
+                    if(lightAttackKeyDown()) return attackLight();
+                    if(heavyAttackKeyDown()) return attackHeavy();
                     return updateIdle(self, this::weaponWalk);
                 });
             }

@@ -2,8 +2,6 @@ package nine.lwjgl;
 
 import org.lwjgl.glfw.GLFW;
 
-import nine.function.RefreshStatus;
-import nine.function.Refreshable;
 import nine.input.Key;
 import nine.input.Keyboard;
 
@@ -13,11 +11,9 @@ public class LWJGL_Keyboard implements Keyboard
     int UP = 1;
     int NONE = 0;
     int[] keys;
-    RefreshStatus refreshStatus;
 
-    public LWJGL_Keyboard(long window, RefreshStatus refreshStatus)
+    public LWJGL_Keyboard(long window)
     {
-        this.refreshStatus = refreshStatus;
         keys = new int[256];
         GLFW.glfwSetKeyCallback(window, this::callback);
     }
@@ -41,29 +37,27 @@ public class LWJGL_Keyboard implements Keyboard
     public Key keyOf(char symbol)
     {
         int index = Character.getNumericValue(Character.toUpperCase(symbol));
-        Refreshable refresh = refreshStatus.make();
         return new Key()
         {
-            int fresh()
-            {
-                int value = keys[index];
-                if(refresh.mark())
-                {
-                    if(keys[index] == UP) keys[index] = NONE;
-                }
-                return value;
-            }
-
             @Override
             public boolean isDown()
             {
-                return fresh() != NONE;
+                return keys[index] != NONE;
             }
             @Override
             public boolean isUp()
             {
-                return fresh() == UP;
+                return keys[index] == UP;
             }
         };
+    }
+
+    @Override
+    public void update()
+    {
+        for(int i = 0; i < keys.length; i++)
+        {
+            if(keys[i] == UP) keys[i] = NONE;
+        }
     }
 }

@@ -102,6 +102,18 @@ public final class Vector3f
     {
         return Vector2f.newXY(x, z);
     }
+    public Vector3f withX(float x)
+    {
+        return new Vector3f(x, y, z);
+    }
+    public Vector3f withY(float y)
+    {
+        return new Vector3f(x, y, z);
+    }
+    public Vector3f withZ(float z)
+    {
+        return new Vector3f(x, y, z);
+    }
     public Vector3f lerp(Vector3f b, float t)
     {
         float dx = b.x - x;

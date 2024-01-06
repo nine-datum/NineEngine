@@ -37,7 +37,7 @@ windowStart =
         in =
         {
             .mouse:(source "resources/scripts/mouse.jena" [windowId, status]),
-            .keyboard:(source "resources/scripts/keyboard.jena" [windowId, status]),
+            .keyboard:(source "resources/scripts/keyboard.jena" windowId),
         } =>
         scene = source "resources/scripts/scene.jena" import
         {
