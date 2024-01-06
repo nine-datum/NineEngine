@@ -42,4 +42,5 @@ public interface UpdatedDrawing
             };
         };
     }
+    static final UpdatedDrawing none = (proj, cpos, crot, light) -> () -> { };
 }

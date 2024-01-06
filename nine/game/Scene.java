@@ -39,6 +39,7 @@ public class Scene implements Drawing
     Player player;
     TransformedDrawing scene;
     Vector2f mouseRotation = Vector2f.zero;
+    Vector3f cameraTarget = Vector3f.up;
 
     @Override
     public void draw()
@@ -48,7 +49,9 @@ public class Scene implements Drawing
         var cameraRotation = Vector3f.newXY(-mouseRotation.y, mouseRotation.x);
 
         var cameraForward = Matrix4f.rotation(cameraRotation).transformVector(Vector3f.forward);
-        var cameraPosition = player.position.add(Vector3f.newXYZ(0f, 1.5f, 0f)).add(cameraForward.mul(-3f));
+        var target = player.position;
+        cameraTarget = cameraTarget.lerp(target, 0.1f);
+        var cameraPosition = cameraTarget.add(Vector3f.newXYZ(0f, 1.5f, 0f)).add(cameraForward.mul(-3f));
 
         UpdatedDrawing.of(
             player,
