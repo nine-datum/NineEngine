@@ -45,7 +45,7 @@ public class Player implements UpdatedDrawing
 
         updateStatus = new UpdateRefreshStatus();
         time = new Time();
-        deltaTime = time.delta(updateStatus);
+        deltaTime = () -> 1f / 60f;
 
         model = graphics.animatedModel("resources/models/Knight/LongSword_Idle.dae");
         idle = graphics.animation("resources/models/Knight/Idle.dae");
@@ -73,7 +73,6 @@ public class Player implements UpdatedDrawing
     public Drawing update(Matrix4f projection, Vector3f cameraPosition, Vector3f cameraRotation, Vector3f worldLight)
     {
         updateStatus.update();
-        deltaTime.value();
 
         this.cameraRotation = cameraRotation;
 
