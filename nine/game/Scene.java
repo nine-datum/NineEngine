@@ -24,7 +24,8 @@ public class Scene implements Drawing
         this.light = light;
         this.projection = projection;
         this.mouse = mouse;
-        player = Player.create(graphics, keyboard, mouse);
+        this.keyboard = keyboard;
+        player = Human.playerKnight(graphics, keyboard, mouse, () -> cameraRotation, Vector3f.newXYZ(0f, 0f, 0f), 0f);
         scene = graphics.model("resources/models/Scenes/Mountains.dae");
     }
 
@@ -36,17 +37,21 @@ public class Scene implements Drawing
     Light light;
     Projection projection;
     Mouse mouse;
-    Player player;
+    Keyboard keyboard;
+    Human player;
     TransformedDrawing scene;
     Vector2f mouseRotation = Vector2f.zero;
+    Vector3f cameraRotation = Vector3f.zero;
     Vector3f cameraTarget = Vector3f.up;
 
     @Override
     public void draw()
     {
+        keyboard.update();
+
         var mouseInput = mouse.delta().mul(0.01f);
         mouseRotation = mouseRotation.add(mouseInput).clampY(-3.14f * 0.5f, 3.14f * 0.5f);
-        var cameraRotation = Vector3f.newXY(-mouseRotation.y, mouseRotation.x);
+        cameraRotation = Vector3f.newXY(-mouseRotation.y, mouseRotation.x);
 
         var cameraForward = Matrix4f.rotation(cameraRotation).transformVector(Vector3f.forward);
         var target = player.position;

@@ -52,7 +52,7 @@ public class LWJGL_Window_Test
 			Shader diffuseShader = shaderLoader.load("resources/shaders/diffuse_vertex.glsl", "resources/shaders/diffuse_fragment.glsl");
 
 			AnimatedSkeleton idle = AnimatedSkeleton.fromCollada(new FileColladaNode(storage.open("resources/models/Knight/LongSword_Idle.dae"), ErrorPrinter.instance), updateStatus);
-			AnimatedSkeleton walk = AnimatedSkeleton.fromCollada(new FileColladaNode(storage.open("resources/models/Knight/Walk.dae"), ErrorPrinter.instance), updateStatus);
+			//AnimatedSkeleton walk = AnimatedSkeleton.fromCollada(new FileColladaNode(storage.open("resources/models/Knight/Walk.dae"), ErrorPrinter.instance), updateStatus);
 
 			Graphics graphics = Graphics.collada(gl, diffuseShader, skinShader, storage, updateStatus);
 

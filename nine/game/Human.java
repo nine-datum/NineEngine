@@ -1,9 +1,6 @@
 package nine.game;
 
-import nine.function.ActionSingle;
 import nine.function.Function;
-import nine.function.FunctionSingle;
-import nine.function.UpdateRefreshStatus;
 import nine.geometry.collada.AnimatedSkeleton;
 import nine.input.Keyboard;
 import nine.input.Mouse;
@@ -12,25 +9,19 @@ import nine.math.FloatFunc;
 import nine.math.LocalTime;
 import nine.math.Matrix4f;
 import nine.math.Time;
-import nine.math.Vector2f;
 import nine.math.Vector3f;
 import nine.opengl.Drawing;
 
-public class Player implements UpdatedDrawing
+public class Human implements UpdatedDrawing
 {
-    Vector3f position = Vector3f.newXYZ(0f, 0f, 2f);
-    Vector3f rotation = Vector3f.newXYZ(0f, 0f, 0f);
-    Keyboard keyboard;
-    Mouse mouse;
-    ActionSingle<Vector3f> cameraRotationAction;
-    UpdateRefreshStatus updateStatus;
-    FloatFunc time;
-    FloatFunc deltaTime;
+    Vector3f position;
+    Vector3f rotation;
+    FloatFunc time = new Time();
+    FloatFunc deltaTime = () -> 1f / 60f;
     HumanState state;
-    Vector3f cameraRotation = Vector3f.zero;
 
     AnimatedDrawing model;
-    TransformedDrawing sword;
+    TransformedDrawing weapon;
     AnimatedSkeleton idle;
     AnimatedSkeleton walk;
     AnimatedSkeleton weaponIdle;
@@ -38,30 +29,51 @@ public class Player implements UpdatedDrawing
     AnimatedSkeleton lightAttack;
     AnimatedSkeleton heavyAttack;
 
-    private Player(Graphics graphics, Keyboard keyboard, Mouse mouse)
+    HumanController controller;
+
+    private Human()
     {
-        this.keyboard = keyboard;
-        this.mouse = mouse;
-
-        updateStatus = new UpdateRefreshStatus();
-        time = new Time();
-        deltaTime = () -> 1f / 60f;
-
-        model = graphics.animatedModel("resources/models/Knight/LongSword_Idle.dae");
-        idle = graphics.animation("resources/models/Knight/Idle.dae");
-        walk = graphics.animation("resources/models/Knight/Walk.dae");
-        weaponIdle = graphics.animation("resources/models/Knight/LongSword_Idle.dae");
-        weaponWalk = graphics.animation("resources/models/Knight/LongSword_Walk.dae");
-        lightAttack = graphics.animation("resources/models/Knight/LongSword_Attack_Forward.dae");
-        heavyAttack = graphics.animation("resources/models/Knight/LongSword_Attack_Left.dae");
-        sword = graphics.model("resources/models/Weapons/LongSword.dae");
-
-        state = states().idle();
     }
 
-    public static Player create(Graphics graphics, Keyboard keyboard, Mouse mouse)
+    public final static HumanCreateFunction human = (model, weapon, idle, walk, weaponIdle, weaponWalk, lightAttack, heavyAttack) -> (controller, position, rotation) ->
     {
-        return new Player(graphics, keyboard, mouse);
+        var human = new Human();
+        human.model = model;
+        human.weapon = weapon;
+        human.idle = idle;
+        human.walk = walk;
+        human.weaponIdle = weaponIdle;
+        human.weaponWalk = weaponWalk;
+        human.lightAttack = lightAttack;
+        human.heavyAttack = heavyAttack;
+        human.controller = controller;
+        human.position = position;
+        human.rotation = Vector3f.newY(rotation);
+        human.state = human.states().idle();
+        return human;
+    };
+
+    public static Human playerKnight(Graphics graphics, Keyboard keyboard, Mouse mouse, Function<Vector3f> cameraRotation, Vector3f position, float rotation)
+    {
+        var model = graphics.animatedModel("resources/models/Knight/LongSword_Idle.dae");
+        var idle = graphics.animation("resources/models/Knight/Idle.dae");
+        var walk = graphics.animation("resources/models/Knight/Walk.dae");
+        var weaponIdle = graphics.animation("resources/models/Knight/LongSword_Idle.dae");
+        var weaponWalk = graphics.animation("resources/models/Knight/LongSword_Walk.dae");
+        var lightAttack = graphics.animation("resources/models/Knight/LongSword_Attack_Forward.dae");
+        var heavyAttack = graphics.animation("resources/models/Knight/LongSword_Attack_Left.dae");
+        var weapon = graphics.model("resources/models/Weapons/LongSword.dae");
+        
+        return human.instance(
+            model,
+            weapon,
+            idle,
+            walk,
+            weaponIdle,
+            weaponWalk,
+            lightAttack,
+            heavyAttack)
+        .create(HumanController.player(keyboard, cameraRotation), position, rotation);
     }
 
     Matrix4f root()
@@ -72,28 +84,23 @@ public class Player implements UpdatedDrawing
     @Override
     public Drawing update(Matrix4f projection, Vector3f cameraPosition, Vector3f cameraRotation, Vector3f worldLight)
     {
-        updateStatus.update();
-
-        this.cameraRotation = cameraRotation;
-
         state = state.next();
-        keyboard.update();
         return state.update(projection, cameraPosition, cameraRotation, worldLight);
     }
 
     HumanState updateWalk(float movementSpeed, HumanState self, Function<HumanState> idle)
     {
-        Vector3f m = Vector3f.newXZ(Vector2f.wasd(keyboard)).normalized();
+        Vector3f m = controller.movement().normalized();
         if(m.x == 0 && m.z == 0) return idle.call();
-        m = Matrix4f.rotationY(cameraRotation.y).transformVector(m);
 
         position = position.add(m.mul(deltaTime.value() * movementSpeed));
         rotation = Vector3f.newY(-m.xz().angle() + FloatFunc.toRadians(90));
         return self;
     }
+
     HumanState updateIdle(HumanState self, Function<HumanState> walk)
     {
-        Vector3f m = Vector3f.newXZ(Vector2f.wasd(keyboard));
+        Vector3f m = controller.movement();
         if(m.x != 0 || m.z != 0) return walk.call();
         return self;
     }
@@ -101,7 +108,7 @@ public class Player implements UpdatedDrawing
     UpdatedDrawing withSwordOnBack(UpdatedDrawing drawing, AnimatedSkeleton skeleton, FloatFunc time)
     {
         Matrix4f swordLocation = Matrix4f.transform(Vector3f.newXYZ(0.3f, -0.2f, 0.8f), Vector3f.newXYZ(3.14f * 0.3f, 0f, 3.14f * 0.5f));
-        var swordDrawing = UpdatedDrawing.ofModel(sword, () ->
+        var swordDrawing = UpdatedDrawing.ofModel(weapon, () ->
         {
             return root().mul(skeleton.animate(time.value()).transform("Body")).mul(swordLocation);
         });
@@ -110,24 +117,11 @@ public class Player implements UpdatedDrawing
     UpdatedDrawing withSwordInHand(UpdatedDrawing drawing, AnimatedSkeleton skeleton, FloatFunc time)
     {
         Matrix4f swordLocation = Matrix4f.identity;
-        var swordDrawing = UpdatedDrawing.ofModel(sword, () ->
+        var swordDrawing = UpdatedDrawing.ofModel(weapon, () ->
         {
             return root().mul(skeleton.animate(time.value()).transform("WeaponR")).mul(swordLocation);
         });
         return UpdatedDrawing.of(drawing, swordDrawing);
-    }
-
-    boolean weaponKeyDown()
-    {
-        return keyboard.keyOf('r').isUp();
-    }
-    boolean heavyAttackKeyDown()
-    {
-        return keyboard.keyOf('e').isDown();
-    }
-    boolean lightAttackKeyDown()
-    {
-        return keyboard.keyOf('q').isDown();
     }
 
     interface WithSwordDrawing
@@ -143,7 +137,7 @@ public class Player implements UpdatedDrawing
             var lerp = t / length;
             return name -> start.animate(startTime.value()).transform(name).lerp(end.animate(0f).transform(name), lerp);
         };
-        var drawing = withSwordFunc.apply(UpdatedDrawing.ofModel(model, skeleton, time, Player.this::root), skeleton, time);
+        var drawing = withSwordFunc.apply(UpdatedDrawing.ofModel(model, skeleton, time, Human.this::root), skeleton, time);
         return HumanState.ofDrawing(drawing, self ->
         {
             if(time.value() < length) return self;
@@ -159,12 +153,12 @@ public class Player implements UpdatedDrawing
             public HumanState walk()
             {
                 var drawing = withSwordOnBack(
-                    UpdatedDrawing.ofModel(model, walk, time, Player.this::root),
+                    UpdatedDrawing.ofModel(model, walk, time, Human.this::root),
                     walk,
                     time);
                 return HumanState.ofDrawing(drawing, self ->
                 {
-                    if(weaponKeyDown()) return weaponWalk();
+                    if(controller.weapon()) return weaponWalk();
                     return updateWalk(3f, self, this::idle);
                 });
             }
@@ -173,12 +167,12 @@ public class Player implements UpdatedDrawing
             public HumanState idle()
             {
                 var drawing = withSwordOnBack(
-                    UpdatedDrawing.ofModel(model, idle, time, Player.this::root),
+                    UpdatedDrawing.ofModel(model, idle, time, Human.this::root),
                     idle,
                     time);
                 return HumanState.ofDrawing(drawing, self ->
                 {
-                    if(weaponKeyDown()) return weaponIdle();
+                    if(controller.weapon()) return weaponIdle();
                     return updateIdle(self, this::walk);
                 });
             }
@@ -188,7 +182,7 @@ public class Player implements UpdatedDrawing
             {
                 var time = new LocalTime();
                 var drawing = withSwordInHand(
-                    UpdatedDrawing.ofModel(model, lightAttack, time, Player.this::root),
+                    UpdatedDrawing.ofModel(model, lightAttack, time, Human.this::root),
                     lightAttack,
                     time);
                 return HumanState.ofDrawing(drawing, self ->
@@ -206,7 +200,7 @@ public class Player implements UpdatedDrawing
             {
                 var time = new LocalTime();
                 var drawing = withSwordInHand(
-                    UpdatedDrawing.ofModel(model, heavyAttack, time, Player.this::root),
+                    UpdatedDrawing.ofModel(model, heavyAttack, time, Human.this::root),
                     heavyAttack,
                     time);
                 return HumanState.ofDrawing(drawing, self ->
@@ -217,7 +211,6 @@ public class Player implements UpdatedDrawing
                     {
                         var direction = Matrix4f.rotation(rotation).transformVector(Vector3f.forward);
                         position = position.add(direction.mul(deltaTime.value() * 3f));
-                        //position = Vector3f.newXYZ(position.x, (float)Math.sin(t / jump * 3.14f) * 0.5f, position.z);
                     }
                     if(t > 2.5f)
                     {
@@ -233,14 +226,14 @@ public class Player implements UpdatedDrawing
             {
                 var time = new LocalTime();
                 var drawing = withSwordInHand(
-                    UpdatedDrawing.ofModel(model, weaponWalk, time, Player.this::root),
+                    UpdatedDrawing.ofModel(model, weaponWalk, time, Human.this::root),
                     weaponWalk,
                     time);
                 return HumanState.ofDrawing(drawing, self ->
                 {
-                    if(weaponKeyDown()) return walk();
-                    if(lightAttackKeyDown()) return attackLight();
-                    if(heavyAttackKeyDown()) return attackHeavy();
+                    if(controller.weapon()) return walk();
+                    if(controller.lightAttack()) return attackLight();
+                    if(controller.heavyAttack()) return attackHeavy();
                     return updateWalk(5f, self, this::weaponIdle);
                 });
             }
@@ -250,14 +243,14 @@ public class Player implements UpdatedDrawing
             {
                 var time = new LocalTime();
                 var drawing = withSwordInHand(
-                    UpdatedDrawing.ofModel(model, weaponIdle, time, Player.this::root),
+                    UpdatedDrawing.ofModel(model, weaponIdle, time, Human.this::root),
                     weaponIdle,
                     time);
                 return HumanState.ofDrawing(drawing, self ->
                 {
-                    if(weaponKeyDown()) return idle();
-                    if(lightAttackKeyDown()) return attackLight();
-                    if(heavyAttackKeyDown()) return attackHeavy();
+                    if(controller.weapon()) return idle();
+                    if(controller.lightAttack()) return attackLight();
+                    if(controller.heavyAttack()) return attackHeavy();
                     return updateIdle(self, this::weaponWalk);
                 });
             }

@@ -34,7 +34,7 @@ jc = javaClass =>
     
     .storage:(jc "nine.io.Storage"),
 
-    .player:(jc "nine.game.Player"),
+    .human:(jc "nine.game.Human"),
     .scene:(jc "nine.game.Scene"),
     .sceneLight:(jc "nine.game.Scene$Light"),
     .sceneProjection:(jc "nine.game.Scene$Projection"),
