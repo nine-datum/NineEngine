@@ -47,8 +47,6 @@ public class Scene implements Drawing
     @Override
     public void draw()
     {
-        keyboard.update();
-
         var mouseInput = mouse.delta().mul(0.01f);
         mouseRotation = mouseRotation.add(mouseInput).clampY(-3.14f * 0.5f, 3.14f * 0.5f);
         cameraRotation = Vector3f.newXY(-mouseRotation.y, mouseRotation.x);
@@ -66,5 +64,8 @@ public class Scene implements Drawing
             cameraPosition,
             cameraRotation,
             light.light()).draw();
+
+            
+        keyboard.update();
     }
 }
