@@ -1,5 +1,7 @@
 package nine.game;
 
+import java.util.Map;
+
 import nine.function.Function;
 import nine.geometry.collada.AnimatedSkeleton;
 import nine.main.TransformedDrawing;
@@ -20,12 +22,7 @@ public class Human implements UpdatedDrawing
 
     AnimatedDrawing model;
     TransformedDrawing weapon;
-    AnimatedSkeleton idle;
-    AnimatedSkeleton walk;
-    AnimatedSkeleton weaponIdle;
-    AnimatedSkeleton weaponWalk;
-    AnimatedSkeleton lightAttack;
-    AnimatedSkeleton heavyAttack;
+    HumanAnimator animator;
 
     HumanController controller;
 
@@ -33,17 +30,12 @@ public class Human implements UpdatedDrawing
     {
     }
 
-    public final static HumanCreateFunction human = (model, weapon, idle, walk, weaponIdle, weaponWalk, lightAttack, heavyAttack) -> (controller, position, rotation) ->
+    public final static HumanCreateFunction human = (model, weapon, animator) -> (controller, position, rotation) ->
     {
         var human = new Human();
         human.model = model;
         human.weapon = weapon;
-        human.idle = idle;
-        human.walk = walk;
-        human.weaponIdle = weaponIdle;
-        human.weaponWalk = weaponWalk;
-        human.lightAttack = lightAttack;
-        human.heavyAttack = heavyAttack;
+        human.animator = animator;
         human.controller = controller;
         human.position = position;
         human.rotation = Vector3f.newY(rotation);
@@ -62,15 +54,19 @@ public class Human implements UpdatedDrawing
         var heavyAttack = graphics.animation("resources/models/Knight/LongSword_Attack_Left.dae");
         var weapon = graphics.model("resources/models/Weapons/LongSword.dae");
         
+        var animator = HumanAnimator.of(Map.ofEntries(
+            Map.entry("idle", idle),
+            Map.entry("walk", walk),
+            Map.entry("weaponIdle", weaponIdle),
+            Map.entry("weaponWalk", weaponWalk),
+            Map.entry("lightAttack", lightAttack),
+            Map.entry("heavyAttack", heavyAttack)
+        ));
+
         return human.instance(
             model,
             weapon,
-            idle,
-            walk,
-            weaponIdle,
-            weaponWalk,
-            lightAttack,
-            heavyAttack);
+            animator);
     }
 
     Matrix4f root()
@@ -149,6 +145,7 @@ public class Human implements UpdatedDrawing
             @Override
             public HumanState walk()
             {
+                var walk = animator.animation("walk");
                 var drawing = withSwordOnBack(
                     UpdatedDrawing.ofModel(model, walk, time, Human.this::root),
                     walk,
@@ -163,6 +160,7 @@ public class Human implements UpdatedDrawing
             @Override
             public HumanState idle()
             {
+                var idle = animator.animation("idle");
                 var drawing = withSwordOnBack(
                     UpdatedDrawing.ofModel(model, idle, time, Human.this::root),
                     idle,
@@ -177,6 +175,7 @@ public class Human implements UpdatedDrawing
             @Override
             public HumanState attackLight()
             {
+                var lightAttack = animator.animation("lightAttack");
                 var time = new LocalTime();
                 var drawing = withSwordInHand(
                     UpdatedDrawing.ofModel(model, lightAttack, time, Human.this::root),
@@ -195,6 +194,7 @@ public class Human implements UpdatedDrawing
             @Override
             public HumanState attackHeavy()
             {
+                var heavyAttack = animator.animation("heavyAttack");
                 var time = new LocalTime();
                 var drawing = withSwordInHand(
                     UpdatedDrawing.ofModel(model, heavyAttack, time, Human.this::root),
@@ -221,6 +221,7 @@ public class Human implements UpdatedDrawing
             @Override
             public HumanState weaponWalk()
             {
+                var weaponWalk = animator.animation("weaponWalk");
                 var time = new LocalTime();
                 var drawing = withSwordInHand(
                     UpdatedDrawing.ofModel(model, weaponWalk, time, Human.this::root),
@@ -238,6 +239,7 @@ public class Human implements UpdatedDrawing
             @Override
             public HumanState weaponIdle()
             {
+                var weaponIdle = animator.animation("weaponIdle");
                 var time = new LocalTime();
                 var drawing = withSwordInHand(
                     UpdatedDrawing.ofModel(model, weaponIdle, time, Human.this::root),
