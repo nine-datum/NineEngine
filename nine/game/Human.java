@@ -202,14 +202,15 @@ public class Human implements UpdatedDrawing
                     time);
                 return HumanState.ofDrawing(drawing, self ->
                 {
-                    float jump = 1.3f;
+                    float jumpStart = 0.3f;
+                    float jumpEnd = 1.2f;
                     float t = time.value();
-                    if(t < jump)
+                    if(t > jumpStart && t < jumpEnd)
                     {
                         var direction = Matrix4f.rotation(rotation).transformVector(Vector3f.forward);
-                        position = position.add(direction.mul(deltaTime.value() * 3f));
+                        position = position.add(direction.mul(deltaTime.value() * 4f));
                     }
-                    if(t > 2.5f)
+                    if(t > 2f)
                     {
                         position = position.withY(0f);
                         return weaponIdle();
