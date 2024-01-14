@@ -1,5 +1,8 @@
 package nine.game;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import nine.input.Keyboard;
 import nine.input.Mouse;
 import nine.main.TransformedDrawing;
@@ -25,7 +28,16 @@ public class Scene implements Drawing
         this.projection = projection;
         this.mouse = mouse;
         this.keyboard = keyboard;
-        player = Human.playerKnight(graphics, keyboard, mouse, () -> cameraRotation, Vector3f.newXYZ(0f, 0f, 0f), 0f);
+
+        var knightTemplate = Human.knight(graphics);
+
+        player = knightTemplate.create(
+            HumanController.player(keyboard, () -> cameraRotation),
+            Vector3f.newXYZ(0f, 0f, 0f),
+            0f);
+
+        npcs.add(knightTemplate.create(HumanController.empty(), Vector3f.newXYZ(0f, 0f, 2f), 3.14f));
+
         scene = graphics.model("resources/models/Scenes/Mountains.dae");
     }
 
@@ -39,6 +51,7 @@ public class Scene implements Drawing
     Mouse mouse;
     Keyboard keyboard;
     Human player;
+    List<Human> npcs = new ArrayList<Human>();
     TransformedDrawing scene;
     Vector2f mouseRotation = Vector2f.zero;
     Vector3f cameraRotation = Vector3f.zero;
@@ -58,6 +71,7 @@ public class Scene implements Drawing
 
         UpdatedDrawing.of(
             player,
+            UpdatedDrawing.of(npcs.toArray(Human[]::new)),
             UpdatedDrawing.ofModel(scene, () -> Matrix4f.scale(Vector3f.newXYZ(10f, 10f, 10f))))
         .update(
             projection.projection(),

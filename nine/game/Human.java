@@ -2,8 +2,6 @@ package nine.game;
 
 import nine.function.Function;
 import nine.geometry.collada.AnimatedSkeleton;
-import nine.input.Keyboard;
-import nine.input.Mouse;
 import nine.main.TransformedDrawing;
 import nine.math.FloatFunc;
 import nine.math.LocalTime;
@@ -53,7 +51,7 @@ public class Human implements UpdatedDrawing
         return human;
     };
 
-    public static Human playerKnight(Graphics graphics, Keyboard keyboard, Mouse mouse, Function<Vector3f> cameraRotation, Vector3f position, float rotation)
+    public static HumanInstance knight(Graphics graphics)
     {
         var model = graphics.animatedModel("resources/models/Knight/LongSword_Idle.dae");
         var idle = graphics.animation("resources/models/Knight/Idle.dae");
@@ -72,8 +70,7 @@ public class Human implements UpdatedDrawing
             weaponIdle,
             weaponWalk,
             lightAttack,
-            heavyAttack)
-        .create(HumanController.player(keyboard, cameraRotation), position, rotation);
+            heavyAttack);
     }
 
     Matrix4f root()

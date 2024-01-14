@@ -13,6 +13,33 @@ public interface HumanController
     boolean lightAttack();
     boolean heavyAttack();
 
+    static HumanController empty()
+    {
+        return new HumanController()
+        {
+            @Override
+            public Vector3f movement()
+            {
+                return Vector3f.zero;
+            }
+            @Override
+            public boolean weapon()
+            {
+                return false;
+            }
+            @Override
+            public boolean lightAttack()
+            {
+                return false;
+            }
+            @Override
+            public boolean heavyAttack()
+            {
+                return false;
+            }
+        };
+    }
+
     static HumanController player(Keyboard keyboard, Function<Vector3f> cameraRotation)
     {
         return new HumanController()
