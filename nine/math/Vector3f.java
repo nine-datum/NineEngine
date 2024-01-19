@@ -42,6 +42,19 @@ public final class Vector3f
         if (length > limit) return normalized().mul(limit);
         return this;
     }
+    public Vector3f clamp(Vector3f min, Vector3f max)
+    {
+        float x = this.x;
+        float y = this.y;
+        float z = this.z;
+        if(x < min.x) x = min.x;
+        if(y < min.y) y = min.y;
+        if(z < min.z) z = min.z;
+        if(x > max.x) x = max.x;
+        if(y > max.y) y = max.y;
+        if(z > max.z) z = max.z;
+        return new Vector3f(x, y, z);
+    }
     public Vector3f cross(Vector3f b)
     {
         return new Vector3f(
