@@ -38,7 +38,8 @@ public interface Volume {
         for(int y = 0; y < sectionsY; y++)
         for(int z = 0; z < sectionsZ; z++)
         for(int[] normal : sideNormals) {
-            
+
         }
+        return vertices;
     }
 }
