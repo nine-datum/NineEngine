@@ -19,6 +19,16 @@ public class Area
     {
         return new Area(Vector3f.newXYZ(minX, minY, minZ), Vector3f.newXYZ(maxX, maxY, maxZ));
     }
+    public static Area centerSize(Vector3f center, Vector3f size)
+    {
+        return minmax(
+            center.x - size.x * 0.5f,
+            center.y - size.y * 0.5f,
+            center.z - size.z * 0.5f,
+            center.x + size.x * 0.5f,
+            center.y + size.y * 0.5f,
+            center.z + size.z * 0.5f);
+    }
     public boolean contains(Vector3f point)
     {
         return
