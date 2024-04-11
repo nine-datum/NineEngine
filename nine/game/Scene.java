@@ -6,7 +6,9 @@ import java.util.List;
 import nine.input.Keyboard;
 import nine.input.Mouse;
 import nine.main.TransformedDrawing;
+import nine.math.FloatFunc;
 import nine.math.Matrix4f;
+import nine.math.Time;
 import nine.math.Vector2f;
 import nine.math.Vector3f;
 import nine.opengl.Drawing;
@@ -29,14 +31,24 @@ public class Scene implements Drawing
         this.mouse = mouse;
         this.keyboard = keyboard;
 
+        var time = new Time();
+        FloatFunc deltaTime = () -> 1f / 60f;
+
         var knightTemplate = Human.knight(graphics);
 
         player = knightTemplate.create(
             HumanController.player(keyboard, () -> cameraRotation),
             Vector3f.newXYZ(0f, 0f, 0f),
-            0f);
+            0f,
+            time,
+            deltaTime);
 
-        npcs.add(knightTemplate.create(HumanController.empty(), Vector3f.newXYZ(0f, 0f, 2f), 3.14f));
+        npcs.add(knightTemplate.create(
+            HumanController.empty(),
+            Vector3f.newXYZ(0f, 0f, 2f),
+            3.14f,
+            time,
+            deltaTime));
 
         scene = graphics.model("resources/models/Scenes/Mountains.dae");
     }

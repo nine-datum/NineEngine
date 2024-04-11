@@ -8,7 +8,6 @@ import nine.main.TransformedDrawing;
 import nine.math.FloatFunc;
 import nine.math.LocalTime;
 import nine.math.Matrix4f;
-import nine.math.Time;
 import nine.math.Vector3f;
 import nine.opengl.Drawing;
 
@@ -16,8 +15,8 @@ public class Human implements UpdatedDrawing
 {
     Vector3f position;
     Vector3f rotation;
-    FloatFunc time = new Time();
-    FloatFunc deltaTime = () -> 1f / 60f;
+    FloatFunc time;
+    FloatFunc deltaTime;
     HumanState state;
 
     AnimatedDrawing model;
@@ -30,7 +29,7 @@ public class Human implements UpdatedDrawing
     {
     }
 
-    public final static HumanCreateFunction human = (model, weapon, animator) -> (controller, position, rotation) ->
+    public final static HumanCreateFunction human = (model, weapon, animator) -> (controller, position, rotation, time, deltaTime) ->
     {
         var human = new Human();
         human.model = model;
@@ -40,6 +39,8 @@ public class Human implements UpdatedDrawing
         human.position = position;
         human.rotation = Vector3f.newY(rotation);
         human.state = human.states().idle();
+        human.time = time;
+        human.deltaTime = deltaTime;
         return human;
     };
 
