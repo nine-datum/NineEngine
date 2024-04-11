@@ -32,6 +32,8 @@ public class Human implements UpdatedDrawing
     public final static HumanCreateFunction human = (model, weapon, animator) -> (controller, position, rotation, time, deltaTime) ->
     {
         var human = new Human();
+        human.time = time;
+        human.deltaTime = deltaTime;
         human.model = model;
         human.weapon = weapon;
         human.animator = animator;
@@ -39,8 +41,6 @@ public class Human implements UpdatedDrawing
         human.position = position;
         human.rotation = Vector3f.newY(rotation);
         human.state = human.states().idle();
-        human.time = time;
-        human.deltaTime = deltaTime;
         return human;
     };
 
