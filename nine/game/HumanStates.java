@@ -7,5 +7,7 @@ public interface HumanStates
     HumanState weaponWalk();
     HumanState weaponIdle();
     HumanState attackLight(); 
-    HumanState attackHeavy(); 
+    HumanState attackHeavy();
+    HumanState damageFlight();
+    HumanState defeated();
 }
