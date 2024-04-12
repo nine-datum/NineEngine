@@ -276,10 +276,13 @@ public class Human implements UpdatedDrawing
                     time);
                 return HumanState.ofDrawing(drawing, self ->
                 {
-                    if(time.value() < 1)
+                    float t = time.value();
+                    float l = 1f;
+                    if(t < l)
                     {
+                        float timeLeft = l - t;
                         var back = gameRoot().transformVector(Vector3f.newZ(-deltaTime.value() * 5f));
-                        position = position.add(back);
+                        position = position.add(back).withY((float)Math.sqrt(timeLeft));
                         return self;
                     }
                     return defeated();
