@@ -171,12 +171,25 @@ public class LWJGL_OpenGL implements OpenGL
 
         }, ErrorPrinter.instance);
 
-		return drawing -> () ->
+		return new Texture()
         {
-            GL13.glActiveTexture(GL13.GL_TEXTURE0);
-		    GL11.glBindTexture(GL11.GL_TEXTURE_2D, id);
-            drawing.draw();
-            GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
+            @Override
+            public Drawing apply(Drawing drawing)
+            {
+                return () ->
+                {
+                    GL13.glActiveTexture(GL13.GL_TEXTURE0);
+                    GL11.glBindTexture(GL11.GL_TEXTURE_2D, id);
+                    drawing.draw();
+                    GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
+                };
+            }
+
+            @Override
+            public void dispose()
+            {
+                GL11.glDeleteTextures(id);
+            }
         };
     }
 }

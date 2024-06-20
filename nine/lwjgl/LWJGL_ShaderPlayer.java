@@ -9,10 +9,14 @@ import nine.opengl.Uniforms;
 public class LWJGL_ShaderPlayer implements ShaderPlayer
 {
     int program;
+    int vert;
+    int frag;
 
-    public LWJGL_ShaderPlayer(int program)
+    public LWJGL_ShaderPlayer(int program, int vertShader, int fragShader)
     {
         this.program = program;
+        vert = vertShader;
+        frag = fragShader;
     }
 
     @Override
@@ -30,5 +34,13 @@ public class LWJGL_ShaderPlayer implements ShaderPlayer
             drawing.draw();
             GL20.glUseProgram(0);
         };
+    }
+
+    @Override
+    public void dispose()
+    {
+        GL20.glDeleteProgram(program);
+        GL20.glDeleteShader(vert);
+        GL20.glDeleteShader(frag);
     }
 }

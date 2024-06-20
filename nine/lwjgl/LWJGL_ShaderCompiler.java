@@ -34,10 +34,12 @@ public class LWJGL_ShaderCompiler implements ShaderCompiler
     public Shader createProgram(ShaderSource vertex, ShaderSource fragment, ShaderAttribute attributes)
     {
         int program = GL20.glCreateProgram();
+        int[] vertShader = { 0 };
+        int[] fragShader = { 0 };
         vertex.accept(vert -> fragment.accept(frag ->
         {
-            GL20.glAttachShader(program, loadShaderSubprogram(vert, GL20.GL_VERTEX_SHADER));
-            GL20.glAttachShader(program, loadShaderSubprogram(frag, GL20.GL_FRAGMENT_SHADER));
+            GL20.glAttachShader(program, vertShader[0] = loadShaderSubprogram(vert, GL20.GL_VERTEX_SHADER));
+            GL20.glAttachShader(program, fragShader[0] = loadShaderSubprogram(frag, GL20.GL_FRAGMENT_SHADER));
         }));
         attributes.accept((index, name) ->
         {
@@ -52,7 +54,7 @@ public class LWJGL_ShaderCompiler implements ShaderCompiler
             @Override
             public ShaderPlayer player()
             {
-                return new LWJGL_ShaderPlayer(program);
+                return new LWJGL_ShaderPlayer(program, vertShader[0], fragShader[0]);
             }
         };
     }

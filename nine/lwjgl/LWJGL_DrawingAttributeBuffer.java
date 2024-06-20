@@ -5,7 +5,6 @@ import org.lwjgl.opengl.GL20;
 
 import nine.buffer.Buffer;
 import nine.buffer.FloatCollector;
-import nine.function.Action;
 import nine.opengl.Drawing;
 import nine.opengl.DrawingAttributeBuffer;
 
@@ -41,10 +40,10 @@ public class LWJGL_DrawingAttributeBuffer implements DrawingAttributeBuffer
         return new LWJGL_DrawingAttributeBuffer(vao, index + 1, stride, data, this);
     }
 
-    private Action activation(LWJGL_VboAllocator vbos)
+    private LWJGL_VboActivation activation(LWJGL_VboAllocator vbos)
     {
         LWJGL_Vbo vbo = vbos.vbo(index);
-        Action last = previous == null ? () -> { } : previous.activation(vbos);
+        LWJGL_VboActivation last = previous == null ? () -> { } : previous.activation(vbos);
         vbo.bind(() ->
         {
             GL15.glBufferData(GL15.GL_ARRAY_BUFFER, floatCollector.collect(data), GL15.GL_STATIC_DRAW);
@@ -52,7 +51,7 @@ public class LWJGL_DrawingAttributeBuffer implements DrawingAttributeBuffer
         });
         return () ->
         {
-            last.call();
+            last.activate();
             GL20.glEnableVertexAttribArray(index);
         };
     }

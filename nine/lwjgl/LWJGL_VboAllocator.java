@@ -1,10 +1,9 @@
 package nine.lwjgl;
 
-import nine.function.Action;
-import nine.opengl.Drawing;
+import nine.opengl.DisposableDrawing;
 
 public interface LWJGL_VboAllocator
 {
     LWJGL_Vbo vbo(int index);
-    Drawing drawing(Action activation);
+    DisposableDrawing drawing(LWJGL_VboActivation activation);
 }

@@ -5,8 +5,7 @@ import org.lwjgl.opengl.GL30;
 
 import nine.buffer.Buffer;
 import nine.buffer.IntegerCollector;
-import nine.function.Action;
-import nine.opengl.Drawing;
+import nine.opengl.DisposableDrawing;
 import nine.opengl.DrawingAttributeBuffer;
 import nine.opengl.DrawingBuffer;
 
@@ -50,15 +49,26 @@ public class LWJGL_DrawingBuffer implements DrawingBuffer
                     }
 
                     @Override
-                    public Drawing drawing(Action activation)
+                    public DisposableDrawing drawing(LWJGL_VboActivation activation)
                     {
-                        return () ->
+                        return new DisposableDrawing()
                         {
-                            GL20.glEnable(GL20.GL_CULL_FACE);
-                            GL30.glBindVertexArray(vao);
-                            activation.call();
-                            GL30.glDrawElements(GL30.GL_TRIANGLES, elements.length, GL30.GL_UNSIGNED_INT, 0);
-                            GL30.glBindVertexArray(0);
+                            @Override
+                            public void draw()
+                            {
+                                GL20.glEnable(GL20.GL_CULL_FACE);
+                                GL30.glBindVertexArray(vao);
+                                activation.activate();
+                                GL30.glDrawElements(GL30.GL_TRIANGLES, elements.length, GL30.GL_UNSIGNED_INT, 0);
+                                GL30.glBindVertexArray(0);
+                            }
+
+                            @Override
+                            public void dispose()
+                            {
+                                GL30.glDeleteVertexArrays(vao);
+                                GL20.glDeleteBuffers(buffers);
+                            }
                         };
                     }
                 };
