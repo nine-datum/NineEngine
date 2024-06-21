@@ -101,7 +101,7 @@ public class LWJGL_OpenGL implements OpenGL
     @Override
     public Texture texture(StorageResource input)
     {
-        int id = GL11.glGenTextures();
+        Texture[] texture = { null };
 
         input.read(flow ->
         {
@@ -116,60 +116,66 @@ public class LWJGL_OpenGL implements OpenGL
                 image = new BufferedImage(1,1,BufferedImage.TYPE_INT_RGB);
                 image.setRGB(0, 0, 255);
             }
-
-            BufferedImage actualImage;
-            ColorModel model;
-            int bands;
-
-            if (image.getColorModel().hasAlpha())
-            {
-                bands = 4;
-                model = rgbaModel;
-            }
-            else
-            {
-                bands = 3;
-                model = rgbModel;
-            }
-
-            int width = image.getWidth();
-            int height = image.getHeight();
-
-            WritableRaster raster = Raster.createInterleavedRaster(DataBuffer.TYPE_BYTE, width, height, bands, null);
-            actualImage = new BufferedImage(model,raster,false,new Hashtable<>());
-    
-            Graphics2D g = (Graphics2D)actualImage.getGraphics();
-            g.setColor(new Color(0f,0f,0f,0f));
-            g.fillRect(0, 0, width, height);
-            g.translate(0, height);
-            g.scale(1f, -1f);
-            g.drawImage(image,0,0,null);
-            image = actualImage;
-        
-            byte[] data = ((DataBufferByte)image.getRaster().getDataBuffer()).getData();
-            ByteBuffer buffer = ByteBuffer.allocateDirect(data.length);
-            buffer.order(ByteOrder.nativeOrder());
-            buffer.put(data);
-            buffer.flip();
-
-            GL11.glBindTexture(GL11.GL_TEXTURE_2D, id);
-            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
-		    GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR_MIPMAP_NEAREST);
-    		GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL11.GL_REPEAT);
-    		GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL11.GL_REPEAT);
-            GL11.glTexImage2D(GL11.GL_TEXTURE_2D,
-                0,
-                GL11.GL_RGBA,
-                image.getWidth(),
-                image.getHeight(),
-                0,
-                image.getColorModel().hasAlpha() ? GL15.GL_RGBA : GL15.GL_RGB,
-                GL11.GL_UNSIGNED_BYTE,
-                buffer);
-            GL30.glGenerateMipmap(GL11.GL_TEXTURE_2D);
-            GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
-
+            texture[0] = texture(image);
         }, ErrorPrinter.instance);
+
+        return texture[0];
+    }
+
+    public static Texture texture(BufferedImage image)
+    {
+        int id = GL11.glGenTextures();
+        BufferedImage actualImage;
+        ColorModel model;
+        int bands;
+
+        if (image.getColorModel().hasAlpha())
+        {
+            bands = 4;
+            model = rgbaModel;
+        }
+        else
+        {
+            bands = 3;
+            model = rgbModel;
+        }
+
+        int width = image.getWidth();
+        int height = image.getHeight();
+
+        WritableRaster raster = Raster.createInterleavedRaster(DataBuffer.TYPE_BYTE, width, height, bands, null);
+        actualImage = new BufferedImage(model,raster,false,new Hashtable<>());
+
+        Graphics2D g = (Graphics2D)actualImage.getGraphics();
+        g.setColor(new Color(0f,0f,0f,0f));
+        g.fillRect(0, 0, width, height);
+        g.translate(0, height);
+        g.scale(1f, -1f);
+        g.drawImage(image,0,0,null);
+        image = actualImage;
+    
+        byte[] data = ((DataBufferByte)image.getRaster().getDataBuffer()).getData();
+        ByteBuffer buffer = ByteBuffer.allocateDirect(data.length);
+        buffer.order(ByteOrder.nativeOrder());
+        buffer.put(data);
+        buffer.flip();
+
+        GL11.glBindTexture(GL11.GL_TEXTURE_2D, id);
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
+	    GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR_MIPMAP_NEAREST);
+		GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL11.GL_REPEAT);
+		GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL11.GL_REPEAT);
+        GL11.glTexImage2D(GL11.GL_TEXTURE_2D,
+            0,
+            GL11.GL_RGBA,
+            image.getWidth(),
+            image.getHeight(),
+            0,
+            image.getColorModel().hasAlpha() ? GL15.GL_RGBA : GL15.GL_RGB,
+            GL11.GL_UNSIGNED_BYTE,
+            buffer);
+        GL30.glGenerateMipmap(GL11.GL_TEXTURE_2D);
+        GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
 
 		return new Texture()
         {
