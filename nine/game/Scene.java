@@ -3,6 +3,8 @@ package nine.game;
 import java.util.ArrayList;
 import java.util.List;
 
+import nine.geometry.collada.AnimatedSkeleton;
+import nine.geometry.collada.Skeleton;
 import nine.input.Keyboard;
 import nine.input.Mouse;
 import nine.main.TransformedDrawing;
@@ -50,7 +52,10 @@ public class Scene implements Drawing
             time,
             deltaTime));
 
-        scene = graphics.model("resources/models/Scenes/Mountains.dae");
+        var mountains = graphics.model("resources/models/Scenes/Mountains.dae");
+        statue = graphics.animatedModel("resources/datum/ninja.dae");
+        statueAnim = graphics.animation("resources/datum/mage.dae");
+        scene = mountains;
     }
 
     public static Scene create(Graphics graphics, Keyboard keyboard, Mouse mouse, Projection projection, Light light)
@@ -65,6 +70,8 @@ public class Scene implements Drawing
     Human player;
     List<Human> npcs = new ArrayList<Human>();
     TransformedDrawing scene;
+    AnimatedDrawing statue;
+    AnimatedSkeleton statueAnim;
     Vector2f mouseRotation = Vector2f.zero;
     Vector3f cameraRotation = Vector3f.zero;
     Vector3f cameraTarget = Vector3f.up;
@@ -84,7 +91,8 @@ public class Scene implements Drawing
         UpdatedDrawing.of(
             player,
             UpdatedDrawing.of(npcs.toArray(Human[]::new)),
-            UpdatedDrawing.ofModel(scene, () -> Matrix4f.scale(Vector3f.newXYZ(10f, 10f, 10f))))
+            UpdatedDrawing.ofModel(scene, () -> Matrix4f.scale(Vector3f.newXYZ(10f, 10f, 10f))),
+            UpdatedDrawing.ofModel(statue, statueAnim, t -> b -> Matrix4f.identity, new Time(), () -> Matrix4f.translation(Vector3f.newXYZ(0f, 1f, 0f))))
         .update(
             projection.projection(),
             cameraPosition,

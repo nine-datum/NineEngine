@@ -69,6 +69,13 @@ public class ColladaSkinnedModel implements SkinnedModelAsset
         {
             return action -> action.call(buffer, rawIndices);
         }
+        static RawMesh many(RawMesh...meshes)
+        {
+        	return a ->
+        	{
+        		for(RawMesh m : meshes) m.accept(a);
+        	};
+        }
     }
 
     @Override
@@ -90,7 +97,12 @@ public class ColladaSkinnedModel implements SkinnedModelAsset
                     .attribute(3, floatBuffers.map("VERTEX").fromRightToLeftHanded())
                     .attribute(2, floatBuffers.map("TEXCOORD"))
                     .attribute(3, floatBuffers.map("NORMAL").fromRightToLeftHanded()));
-            meshes.put(sourceId, RawMesh.of(buffer, intBuffers.map("INDEX_VERTEX")));
+            
+            var mesh = RawMesh.of(buffer, intBuffers.map("INDEX_VERTEX"));
+            var ex = meshes.get(sourceId);
+            if(ex != null) mesh = RawMesh.many(ex, mesh);
+            
+            meshes.put(sourceId, mesh);
         }));
 
         skinParser.read(node, (skinId, sourceId, names, invBind, matrix, weights, joints, weightPerIndex) ->
@@ -117,9 +129,14 @@ public class ColladaSkinnedModel implements SkinnedModelAsset
                 Buffer<Float> ordered_joints = mapBuffer.map(new MapBuffer<>(joints, j -> (float)j));
                 Buffer<Float> ordered_weights = mapBuffer.map(weights);
 
-                skinnedMeshes.put("#" + skinId, RawMesh.of(mesh
-                    .attribute(weightPerIndex, ordered_joints)
-                    .attribute(weightPerIndex, ordered_weights), indices));
+                var meshId = "#" + skinId;
+                var skinnedMesh = RawMesh.of(mesh
+	                .attribute(weightPerIndex, ordered_joints)
+	                .attribute(weightPerIndex, ordered_weights), indices);
+                var ex = skinnedMeshes.get(meshId);
+                if(ex != null) skinnedMesh = RawMesh.many(ex, skinnedMesh);
+                
+                skinnedMeshes.put(meshId, skinnedMesh);
 
                 new RangeFlow(names.length()).read(i -> boneIndices.put(names.at(i), i));
                 invBindPoses.put("#" + skinId, invBind);
