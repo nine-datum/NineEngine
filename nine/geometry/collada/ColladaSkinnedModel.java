@@ -107,6 +107,9 @@ public class ColladaSkinnedModel implements SkinnedModelAsset
 
         skinParser.read(node, (skinId, sourceId, names, invBind, matrix, weights, joints, weightPerIndex) ->
         {
+	        new RangeFlow(names.length()).read(i -> boneIndices.put(names.at(i), i));
+	        invBindPoses.put("#" + skinId, invBind);
+        	
             var rawMesh = meshes.get(sourceId);
             if(rawMesh != null) rawMesh.accept((mesh, indices) ->
             {
@@ -137,9 +140,6 @@ public class ColladaSkinnedModel implements SkinnedModelAsset
                 if(ex != null) skinnedMesh = RawMesh.many(ex, skinnedMesh);
                 
                 skinnedMeshes.put(meshId, skinnedMesh);
-
-                new RangeFlow(names.length()).read(i -> boneIndices.put(names.at(i), i));
-                invBindPoses.put("#" + skinId, invBind);
             });
         });
         
