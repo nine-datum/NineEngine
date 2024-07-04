@@ -18,4 +18,17 @@ public interface FloatFunc
     {
         return new Delta(this, status);
     }
+    default FloatFunc cached(RefreshStatus status)
+    {
+    	var r = status.make();
+    	float[] cache = { value() };
+    	return () ->
+    	{
+    		if(r.mark())
+    		{
+    			cache[0] = value();
+    		}
+    		return cache[0];
+    	};
+    }
 }
