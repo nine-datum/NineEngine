@@ -2,4 +2,5 @@
 build/lib
 build/manifest.txt
 build/sourcelist.txt
+build/src
 deploy
