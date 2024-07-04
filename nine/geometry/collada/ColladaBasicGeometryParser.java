@@ -1,6 +1,7 @@
 package nine.geometry.collada;
 
 import java.util.HashMap;
+import java.util.HashSet;
 
 import nine.buffer.Buffer;
 import nine.buffer.FlowToBuffer;
@@ -59,6 +60,7 @@ public class ColladaBasicGeometryParser implements ColladaGeometryParser
             {
                 MutableBufferMapping<Integer> intBuffers = new MutableBufferMapping<Integer>();
                 MutableBufferMapping<Float> floatBuffers = new MutableBufferMapping<Float>();
+                HashSet<String> visitedSemantic = new HashSet<>();
                 Buffer<Integer> rawIndices = new TextValueBuffer<Integer>(pContent, Integer::parseInt);
                 int indicesCount = rawIndices.length();
                 intBuffers.write("INDEX", new RangeBuffer(indicesCount));
@@ -75,6 +77,7 @@ public class ColladaBasicGeometryParser implements ColladaGeometryParser
                     {
                         int step = Integer.parseInt(offset);
                         IntegerMapping<Flow<Float>> sourceBuffer = sources.get(source.replaceFirst("#", ""));
+                        visitedSemantic.add(semantic);
                         floatBuffers.write(semantic,
                             new FlowToBuffer<>(
                                 new FlatmapFlow<>(
@@ -82,6 +85,11 @@ public class ColladaBasicGeometryParser implements ColladaGeometryParser
                                     i -> sourceBuffer.at(rawIndices.at(i * elementsCount + step)))));
                     })));
                 });
+                
+                if(!visitedSemantic.contains("TEXCOORD"))
+                {
+                	floatBuffers.write("TEXCOORD", Buffer.range(floatBuffers.map("VERTEX").length() / 3 * 2).map(Float::valueOf));
+                }
 
                 reader.read(geomId, material, floatBuffers, intBuffers);
             })));
