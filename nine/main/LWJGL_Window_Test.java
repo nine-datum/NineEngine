@@ -143,7 +143,8 @@ public class LWJGL_Window_Test
 							projection,
 							worldLight,
 							Matrix4f.translation(Vector3f.newXYZ(px, 0f, py)).mul(humanWorld),
-							idle.animate(time.value()));
+							idle.animate(time.value()),
+							n -> Matrix4f.identity);
 
 						idleDrawing.draw();
 					}

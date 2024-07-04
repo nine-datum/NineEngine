@@ -8,6 +8,13 @@ import nine.function.RefreshStatus;
 
 public class ColladaBasicSkeletonParser implements ColladaSkeletonParser
 {
+	String boneType;
+	
+	public ColladaBasicSkeletonParser(String boneType)
+	{
+		this.boneType = boneType;
+	}
+	
     @Override
     public void read(ColladaNode node, Animator animator, RefreshStatus refresh, SkeletonReader reader)
     {
@@ -17,7 +24,7 @@ public class ColladaBasicSkeletonParser implements ColladaSkeletonParser
         {
             List<ColladaNode> controllers = new ArrayList<>();
             HashMap<String, Animation> bones = new HashMap<>();
-            scene.children("node", new ColladaBoneNodeReader(Animation.none, animator, refresh, bones::put, controllers::add));
+            scene.children("node", new ColladaBoneNodeReader(boneType, Animation.none, animator, refresh, bones::put, controllers::add));
             for(ColladaNode controller : controllers)
             {
                 controller.attribute("url", skinId ->

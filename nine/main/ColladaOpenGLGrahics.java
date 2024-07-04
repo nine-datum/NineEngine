@@ -37,9 +37,9 @@ public class ColladaOpenGLGrahics implements Graphics
     }
 
     @Override
-    public AnimatedSkeleton animation(String file)
+    public AnimatedSkeleton animation(String file, String boneType)
     {
-        return AnimatedSkeleton.fromCollada(ColladaNode.fromFile(storage.open(file)), refreshStatus);
+        return AnimatedSkeleton.fromCollada(ColladaNode.fromFile(storage.open(file)), boneType, refreshStatus);
     }
 
     @Override
@@ -52,10 +52,10 @@ public class ColladaOpenGLGrahics implements Graphics
         var lightUniform = uniforms.uniformVector("worldLight");
         var transformUniform = uniforms.uniformMatrix("transform");
         var projectionUniform = uniforms.uniformMatrix("projection");
-        var shadedModel = modelSource.shade(shaderPlayer);
-        return (projection, light, transform, animation) ->
+        var shadedModel = modelSource.shade(shaderPlayer, diffuseShader.player());
+        return (projection, light, transform, animation, objectsAnimation) ->
         {
-            var drawing = shadedModel.instance(animation);
+            var drawing = shadedModel.instance(animation, objectsAnimation);
             Drawing initializedDrawing = () ->
             {
                 lightUniform.load(light);

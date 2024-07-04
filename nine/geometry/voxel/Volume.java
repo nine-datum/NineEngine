@@ -5,7 +5,6 @@ import java.util.List;
 
 import nine.math.Area;
 import nine.math.Vector3f;
-import nine.opengl.Drawing;
 
 public interface Volume {
     boolean active(Vector3f point);

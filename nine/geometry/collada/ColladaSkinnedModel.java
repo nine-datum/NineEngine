@@ -24,7 +24,6 @@ public class ColladaSkinnedModel implements SkinnedModelAsset
     ColladaNode node;
     ColladaGeometryParser geometryParser;
     ColladaSkinParser skinParser;
-    ColladaSkeletonParser skeletonParser;
     ColladaAnimationParser animationParser;
     ColladaMaterialParser materialParser;
 
@@ -32,14 +31,12 @@ public class ColladaSkinnedModel implements SkinnedModelAsset
         ColladaNode node,
         ColladaGeometryParser geometryParser,
         ColladaSkinParser skinParser,
-        ColladaSkeletonParser skeletonParser,
         ColladaAnimationParser animationParser,
         ColladaMaterialParser materialParser)
     {
         this.node = node;
         this.geometryParser = geometryParser;
         this.skinParser = skinParser;
-        this.skeletonParser = skeletonParser;
         this.animationParser = animationParser;
         this.materialParser = materialParser;
     }
@@ -48,7 +45,6 @@ public class ColladaSkinnedModel implements SkinnedModelAsset
         this(node,
             new ColladaBasicGeometryParser(),
             new ColladaBasicSkinParser(),
-            new ColladaBasicSkeletonParser(),
             new ColladaBasicAnimationParser(),
             new ColladaBasicMaterialParser());
     }
@@ -57,7 +53,6 @@ public class ColladaSkinnedModel implements SkinnedModelAsset
         this(node,
             new ColladaBasicGeometryParser(),
             new ColladaBasicSkinParser(),
-            new ColladaBasicSkeletonParser(),
             animationParser,
             new ColladaBasicMaterialParser());
     }
@@ -131,17 +126,50 @@ public class ColladaSkinnedModel implements SkinnedModelAsset
             });
         });
         
-        ArrayList<Drawing> drawings = new ArrayList<>();
-        skinnedMeshes.values().forEach(a -> a.accept((mesh, indices) -> drawings.add(mesh.drawing())));
+        ArrayList<Drawing> simpleDrawings = new ArrayList<Drawing>();
+        ArrayList<Drawing> skinnedDrawings = new ArrayList<Drawing>();
+        HashMap<Drawing, String> objectAnimKeys = new HashMap<>();
         
-        return shader ->
+        class SceneReader implements NodeReader
         {
+			@Override
+			public void read(ColladaNode child) {
+				child.children("instance_geometry",
+					geom -> geom.attribute("url",
+						url ->
+						{
+							meshes.get(url).accept((mesh, indices) ->
+							{
+								var drawing = mesh.drawing();
+								simpleDrawings.add(drawing);
+								child.attribute("name", name -> objectAnimKeys.put(drawing, name));
+							});
+						}));
+				child.children("instance_controller",
+					geom -> geom.attribute("url",
+						url ->
+						{
+							skinnedMeshes.get(url).accept((mesh, indices) -> skinnedDrawings.add(mesh.drawing()));
+						}));
+				child.children("node", this);
+			}
+        }
+        
+        node.children("COLLADA",
+    		root -> root.children("library_visual_scenes",
+    		scenes -> scenes.children("visual_scene",
+			scene -> scene.children("node", new SceneReader()))));
+        
+        return (skinShader, staticShader) ->
+        {	
             int MAX_MATRICES = 100;
 
-            var drawing = new CompositeDrawing(Flow.iterable(drawings));
-            var uniform = shader.uniforms().uniformMatrixArray("jointTransforms", MAX_MATRICES);
+            var skinDrawing = new CompositeDrawing(Flow.iterable(skinnedDrawings));
+            
+            var jointTransformsUniform = skinShader.uniforms().uniformMatrixArray("jointTransforms", MAX_MATRICES);
+            var staticTransformUniform = staticShader.uniforms().uniformMatrix("transform");
 
-            return animation ->
+            return (skinAnimation, objectsAnimation) ->
             {
                 Matrix4f[] bones = new Matrix4f[MAX_MATRICES];
                 for(int i = 0; i < MAX_MATRICES; i++) bones[i] = Matrix4f.identity;
@@ -152,15 +180,28 @@ public class ColladaSkinnedModel implements SkinnedModelAsset
                 {
                     String key = bone.getKey();
                     int index = bone.getValue();
-                    Matrix4f matrix = animation.transform(key).mul(invBind.transform(key));
+                    Matrix4f matrix = skinAnimation.transform(key).mul(invBind.transform(key));
                     bones[index] = matrix;
                 });
 
-                return shader.play(() ->
+                var shadedSkinDrawing = skinShader.play(() ->
                 {
-                    uniform.load(new ArrayBuffer<>(bones));
-                    drawing.draw();
+                    jointTransformsUniform.load(new ArrayBuffer<>(bones));
+                    skinDrawing.draw();
                 });
+                
+                var shadedObjectsDrawing = staticShader.play(() ->
+                {
+                	for(Drawing drawing : simpleDrawings)
+                	{
+                		String animKey = objectAnimKeys.get(drawing);
+                		Matrix4f mat = animKey == null ? Matrix4f.identity : objectsAnimation.transform(animKey);
+                		staticTransformUniform.load(mat);
+                		drawing.draw();
+                	}
+                });
+                
+                return new CompositeDrawing(shadedSkinDrawing, shadedObjectsDrawing);
             };
         };
     }

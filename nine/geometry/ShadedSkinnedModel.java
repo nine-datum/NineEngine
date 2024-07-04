@@ -4,5 +4,5 @@ import nine.opengl.ShaderPlayer;
 
 public interface ShadedSkinnedModel
 {
-    SkinnedModel shade(ShaderPlayer shader);
+    SkinnedModel shade(ShaderPlayer skinShader, ShaderPlayer staticShader);
 }

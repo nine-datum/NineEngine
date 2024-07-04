@@ -10,7 +10,7 @@ import nine.opengl.Shader;
 
 public interface Graphics
 {
-	AnimatedSkeleton animation(String file);
+	AnimatedSkeleton animation(String file, String boneType);
     TransformedDrawing model(String file);
 	AnimatedDrawing animatedModel(String file);
 
@@ -22,5 +22,10 @@ public interface Graphics
         RefreshStatus refreshStatus)
     {
         return new ColladaOpenGLGrahics(gl, diffuseShader, skinShader, storage, refreshStatus);
+    }
+    
+    default AnimatedSkeleton animation(String file)
+    {
+    	return animation(file, "JOINT");
     }
 }

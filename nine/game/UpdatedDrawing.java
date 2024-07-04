@@ -15,13 +15,20 @@ public interface UpdatedDrawing
 {
     Drawing update(Matrix4f projection, Vector3f cameraPosition, Vector3f cameraRotation, Vector3f worldLight);
 
-    static UpdatedDrawing ofModel(AnimatedDrawing model, AnimatedSkeleton animation, FloatFunc time, Function<Matrix4f> root)
+    static UpdatedDrawing ofModel(AnimatedDrawing model, AnimatedSkeleton animation, AnimatedSkeleton objectsAnimation, FloatFunc time, Function<Matrix4f> root)
     {
-        return (projection, cameraPosition, cameraRotation, worldLight) -> model.animate(
-            projection.mul(Matrix4f.firstPersonCamera(cameraPosition, cameraRotation)),
-            worldLight,
-            root.call(),
-            animation.animate(time.value()));
+        return (projection, cameraPosition, cameraRotation, worldLight) ->
+        {
+        	var t = time.value();
+        	var r = root.call();
+    	
+        	return model.animate(
+	            projection.mul(Matrix4f.firstPersonCamera(cameraPosition, cameraRotation)),
+	            worldLight,
+	            r,
+	            animation.animate(t),
+	            objectsAnimation.transform(r).animate(t));
+        };
     }
     static UpdatedDrawing ofModel(TransformedDrawing model, Function<Matrix4f> root)
     {

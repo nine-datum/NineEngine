@@ -7,5 +7,5 @@ import nine.opengl.Drawing;
 
 public interface AnimatedDrawing
 {
-	Drawing animate(Matrix4f projection, Vector3f worldLight, Matrix4f root, Skeleton animation);
+	Drawing animate(Matrix4f projection, Vector3f worldLight, Matrix4f root, Skeleton animation, Skeleton objectsAnimation);
 }

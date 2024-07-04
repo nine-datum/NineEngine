@@ -20,7 +20,6 @@ public class Human implements UpdatedDrawing
     HumanState state;
 
     AnimatedDrawing model;
-    TransformedDrawing weapon;
     HumanAnimator animator;
 
     HumanController controller;
@@ -29,18 +28,17 @@ public class Human implements UpdatedDrawing
     {
     }
 
-    public final static HumanCreateFunction human = (model, weapon, animator) -> (controller, position, rotation, time, deltaTime) ->
+    public final static HumanCreateFunction human = (model, animator) -> (controller, position, rotation, time, deltaTime) ->
     {
         var human = new Human();
         human.time = time;
         human.deltaTime = deltaTime;
         human.model = model;
-        human.weapon = weapon;
         human.animator = animator;
         human.controller = controller;
         human.position = position;
         human.rotation = Vector3f.newY(rotation);
-        human.state = human.states().idle();
+        human.state = human.states().weaponIdle();
         return human;
     };
 
@@ -55,7 +53,15 @@ public class Human implements UpdatedDrawing
         var heavyAttack = graphics.animation("resources/models/Knight/LongSword_Attack_Left.dae");
         var damageFlight = graphics.animation("resources/models/Knight/DamageFlight.dae");
         var defeated = graphics.animation("resources/models/Knight/Defeated.dae");
-        var weapon = graphics.model("resources/models/Weapons/LongSword.dae");
+        
+        var weapon_idle = graphics.animation("resources/models/Knight/Idle.dae", "NODE");
+        var weapon_walk = graphics.animation("resources/models/Knight/Walk.dae", "NODE");
+        var weapon_weaponIdle = graphics.animation("resources/models/Knight/LongSword_Idle.dae", "NODE");
+        var weapon_weaponWalk = graphics.animation("resources/models/Knight/LongSword_Walk.dae", "NODE");
+        var weapon_lightAttack = graphics.animation("resources/models/Knight/LongSword_Attack_Forward.dae", "NODE");
+        var weapon_heavyAttack = graphics.animation("resources/models/Knight/LongSword_Attack_Left.dae", "NODE");
+        var weapon_damageFlight = graphics.animation("resources/models/Knight/DamageFlight.dae", "NODE");
+        var weapon_defeated = graphics.animation("resources/models/Knight/Defeated.dae", "NODE");
         
         var animator = HumanAnimator.of(Map.ofEntries(
             Map.entry("idle", idle),
@@ -65,12 +71,20 @@ public class Human implements UpdatedDrawing
             Map.entry("lightAttack", lightAttack),
             Map.entry("heavyAttack", heavyAttack),
             Map.entry("damageFlight", damageFlight),
-            Map.entry("defeated", defeated)
+            Map.entry("defeated", defeated),
+            
+            Map.entry("weapon_idle", weapon_idle),
+            Map.entry("weapon_walk", weapon_walk),
+            Map.entry("weapon_weaponIdle", weapon_weaponIdle),
+            Map.entry("weapon_weaponWalk", weapon_weaponWalk),
+            Map.entry("weapon_lightAttack", weapon_lightAttack),
+            Map.entry("weapon_heavyAttack", weapon_heavyAttack),
+            Map.entry("weapon_damageFlight", weapon_damageFlight),
+            Map.entry("weapon_defeated", weapon_defeated)
         ));
 
         return human.instance(
             model,
-            weapon,
             animator);
     }
 
@@ -109,21 +123,23 @@ public class Human implements UpdatedDrawing
 
     UpdatedDrawing withSwordOnBack(UpdatedDrawing drawing, AnimatedSkeleton skeleton, FloatFunc time)
     {
-        Matrix4f swordLocation = Matrix4f.transform(Vector3f.newXYZ(0.3f, -0.2f, 0.8f), Vector3f.newXYZ(3.14f * 0.3f, 0f, 3.14f * 0.5f));
-        var swordDrawing = UpdatedDrawing.ofModel(weapon, () ->
-        {
-            return visualRoot().mul(skeleton.animate(time.value()).transform("Body")).mul(swordLocation);
-        });
-        return UpdatedDrawing.of(drawing, swordDrawing);
+    	return drawing;
+//        Matrix4f swordLocation = Matrix4f.transform(Vector3f.newXYZ(0.3f, -0.2f, 0.8f), Vector3f.newXYZ(3.14f * 0.3f, 0f, 3.14f * 0.5f));
+//        var swordDrawing = UpdatedDrawing.ofModel(weapon, () ->
+//        {
+//            return visualRoot().mul(skeleton.animate(time.value()).transform("Body")).mul(swordLocation);
+//        });
+//        return UpdatedDrawing.of(drawing, swordDrawing);
     }
     UpdatedDrawing withSwordInHand(UpdatedDrawing drawing, AnimatedSkeleton skeleton, FloatFunc time)
     {
-        Matrix4f swordLocation = Matrix4f.identity;
-        var swordDrawing = UpdatedDrawing.ofModel(weapon, () ->
-        {
-            return visualRoot().mul(skeleton.animate(time.value()).transform("WeaponR")).mul(swordLocation);
-        });
-        return UpdatedDrawing.of(drawing, swordDrawing);
+    	return drawing;
+//        Matrix4f swordLocation = Matrix4f.identity;
+//        var swordDrawing = UpdatedDrawing.ofModel(weapon, () ->
+//        {
+//            return visualRoot().mul(skeleton.animate(time.value()).transform("WeaponR")).mul(swordLocation);
+//        });
+//        return UpdatedDrawing.of(drawing, swordDrawing);
     }
 
     interface WithSwordDrawing
@@ -131,21 +147,21 @@ public class Human implements UpdatedDrawing
         UpdatedDrawing apply(UpdatedDrawing drawing, AnimatedSkeleton skeleton, FloatFunc time);
     }
 
-    HumanState transitionState(WithSwordDrawing withSwordFunc, FloatFunc startTime, AnimatedSkeleton start, AnimatedSkeleton end, Function<HumanState> destination, float length)
-    {
-        var time = new LocalTime();
-        AnimatedSkeleton skeleton = t ->
-        {
-            var lerp = t / length;
-            return name -> start.animate(startTime.value()).transform(name).lerp(end.animate(0f).transform(name), lerp);
-        };
-        var drawing = withSwordFunc.apply(UpdatedDrawing.ofModel(model, skeleton, time, Human.this::visualRoot), skeleton, time);
-        return HumanState.ofDrawing(drawing, self ->
-        {
-            if(time.value() < length) return self;
-            return destination.call();
-        });
-    }
+//    HumanState transitionState(WithSwordDrawing withSwordFunc, FloatFunc startTime, AnimatedSkeleton start, AnimatedSkeleton end, Function<HumanState> destination, float length)
+//    {
+//        var time = new LocalTime();
+//        AnimatedSkeleton skeleton = t ->
+//        {
+//            var lerp = t / length;
+//            return name -> start.animate(startTime.value()).transform(name).lerp(end.animate(0f).transform(name), lerp);
+//        };
+//        var drawing = withSwordFunc.apply(UpdatedDrawing.ofModel(model, skeleton, weaponObjects, time, Human.this::visualRoot), skeleton, time);
+//        return HumanState.ofDrawing(drawing, self ->
+//        {
+//            if(time.value() < length) return self;
+//            return destination.call();
+//        });
+//    }
 
     HumanStates states()
     {
@@ -155,8 +171,10 @@ public class Human implements UpdatedDrawing
             public HumanState walk()
             {
                 var walk = animator.animation("walk");
+                var weaponObjects = animator.animation("weapon_walk");
+                
                 var drawing = withSwordOnBack(
-                    UpdatedDrawing.ofModel(model, walk, time, Human.this::visualRoot),
+                    UpdatedDrawing.ofModel(model, walk, weaponObjects, time, Human.this::visualRoot),
                     walk,
                     time);
                 return HumanState.ofDrawing(drawing, self ->
@@ -170,8 +188,9 @@ public class Human implements UpdatedDrawing
             public HumanState idle()
             {
                 var idle = animator.animation("idle");
+                var weaponObjects = animator.animation("weapon_idle");
                 var drawing = withSwordOnBack(
-                    UpdatedDrawing.ofModel(model, idle, time, Human.this::visualRoot),
+                    UpdatedDrawing.ofModel(model, idle, weaponObjects, time, Human.this::visualRoot),
                     idle,
                     time);
                 return HumanState.ofDrawing(drawing, self ->
@@ -186,9 +205,10 @@ public class Human implements UpdatedDrawing
             public HumanState attackLight()
             {
                 var lightAttack = animator.animation("lightAttack");
+                var weaponObjects = animator.animation("weapon_lightAttack");
                 var time = new LocalTime();
                 var drawing = withSwordInHand(
-                    UpdatedDrawing.ofModel(model, lightAttack, time, Human.this::visualRoot),
+                    UpdatedDrawing.ofModel(model, lightAttack, weaponObjects, time, Human.this::visualRoot),
                     lightAttack,
                     time);
                 return HumanState.ofDrawing(drawing, self ->
@@ -205,9 +225,10 @@ public class Human implements UpdatedDrawing
             public HumanState attackHeavy()
             {
                 var heavyAttack = animator.animation("heavyAttack");
+                var weaponObjects = animator.animation("weapon_heavyAttack");
                 var time = new LocalTime();
                 var drawing = withSwordInHand(
-                    UpdatedDrawing.ofModel(model, heavyAttack, time, Human.this::visualRoot),
+                    UpdatedDrawing.ofModel(model, heavyAttack, weaponObjects, time, Human.this::visualRoot),
                     heavyAttack,
                     time);
                 return HumanState.ofDrawing(drawing, self ->
@@ -233,9 +254,10 @@ public class Human implements UpdatedDrawing
             public HumanState weaponWalk()
             {
                 var weaponWalk = animator.animation("weaponWalk");
+                var weaponObjects = animator.animation("weapon_weaponWalk");
                 var time = new LocalTime();
                 var drawing = withSwordInHand(
-                    UpdatedDrawing.ofModel(model, weaponWalk, time, Human.this::visualRoot),
+                    UpdatedDrawing.ofModel(model, weaponWalk, weaponObjects, time, Human.this::visualRoot),
                     weaponWalk,
                     time);
                 return HumanState.ofDrawing(drawing, self ->
@@ -251,9 +273,10 @@ public class Human implements UpdatedDrawing
             public HumanState weaponIdle()
             {
                 var weaponIdle = animator.animation("weaponIdle");
+                var weaponObjects = animator.animation("weapon_weaponIdle");
                 var time = new LocalTime();
                 var drawing = withSwordInHand(
-                    UpdatedDrawing.ofModel(model, weaponIdle, time, Human.this::visualRoot),
+                    UpdatedDrawing.ofModel(model, weaponIdle, weaponObjects, time, Human.this::visualRoot),
                     weaponIdle,
                     time);
                 return HumanState.ofDrawing(drawing, self ->
@@ -269,9 +292,11 @@ public class Human implements UpdatedDrawing
             public HumanState damageFlight()
             {
                 var damageFlight = animator.animation("damageFlight");
+                var weaponObjects = animator.animation("weapon_damageFlight");
+                
                 var time = new LocalTime();
                 var drawing = withSwordOnBack(
-                    UpdatedDrawing.ofModel(model, damageFlight, time, Human.this::visualRoot),
+                    UpdatedDrawing.ofModel(model, damageFlight, weaponObjects, time, Human.this::visualRoot),
                     damageFlight,
                     time);
                 return HumanState.ofDrawing(drawing, self ->
@@ -293,9 +318,11 @@ public class Human implements UpdatedDrawing
             public HumanState defeated()
             {
                 var defeated = animator.animation("defeated");
+                var weaponObjects = animator.animation("weapon_defeated");
+                
                 var time = new LocalTime();
                 var drawing = withSwordOnBack(
-                    UpdatedDrawing.ofModel(model, defeated, time, Human.this::visualRoot),
+                    UpdatedDrawing.ofModel(model, defeated, weaponObjects, time, Human.this::visualRoot),
                     defeated,
                     time);
                 return HumanState.ofDrawing(drawing, self -> self);

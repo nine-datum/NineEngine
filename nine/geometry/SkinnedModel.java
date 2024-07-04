@@ -5,5 +5,5 @@ import nine.opengl.Drawing;
 
 public interface SkinnedModel
 {
-    Drawing instance(Skeleton animation);
+    Drawing instance(Skeleton skinAnimation, Skeleton objectsAnimation);
 }

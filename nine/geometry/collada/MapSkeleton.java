@@ -18,7 +18,8 @@ public class MapSkeleton implements AnimatedSkeleton
     {
         return bone ->
         {
-            var m = map.get(bone).animate(time);
+        	var anim = map.get(bone);
+            var m = anim == null ? null : anim.animate(time);
             return m == null ? Matrix4f.identity : m;
         };
     }
