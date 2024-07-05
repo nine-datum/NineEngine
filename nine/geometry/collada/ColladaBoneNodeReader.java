@@ -1,6 +1,7 @@
 package nine.geometry.collada;
 
 import nine.buffer.TextValueBuffer;
+import nine.function.FunctionDouble;
 import nine.function.RefreshStatus;
 import nine.geometry.Animation;
 import nine.geometry.Animator;
@@ -14,8 +15,16 @@ public class ColladaBoneNodeReader implements NodeReader
     NodeReader controllerReader;
     RefreshStatus refresh;
     String boneType;
+    FunctionDouble<String, Animation, Animation> processLocal;
 
-    public ColladaBoneNodeReader(String boneType, Animation parent, Animator animator, RefreshStatus refresh, ColladaBoneReader boneReader, NodeReader controllerReader)
+    public ColladaBoneNodeReader(
+    		String boneType,
+    		Animation parent,
+    		Animator animator,
+    		RefreshStatus refresh,
+    		ColladaBoneReader boneReader,
+    		NodeReader controllerReader,
+    		FunctionDouble<String, Animation, Animation> processLocal)
     {
         this.parent = parent;
         this.reader = boneReader;
@@ -23,6 +32,7 @@ public class ColladaBoneNodeReader implements NodeReader
         this.controllerReader = controllerReader;
         this.refresh = refresh;
         this.boneType = boneType;
+        this.processLocal = processLocal; 
     }
 
     @Override
@@ -36,7 +46,6 @@ public class ColladaBoneNodeReader implements NodeReader
             matrix.content(content ->
             {
                 Animation animation = animator.animation(id);
-                if(animation == null) animation = animator.animation(name);
                 Animation local;
                 
                 if(animation != null)
@@ -48,7 +57,8 @@ public class ColladaBoneNodeReader implements NodeReader
                     Matrix4f contentMatrix = Matrix4f.from_COLLADA_Buffer(new TextValueBuffer<>(content, Float::parseFloat), 0);
                     local = time -> contentMatrix;
                 }
-                Animation transform = time -> parent.animate(time).mul(local.animate(time));
+                
+                Animation transform = time -> parent.animate(time).mul(processLocal.call(name, local).animate(time));
                 transform = transform.refreshable(refresh);
 
                 if(type.equals(boneType))
@@ -56,7 +66,7 @@ public class ColladaBoneNodeReader implements NodeReader
                     reader.read(name, transform);
                 }
                 
-                child.children("node", new ColladaBoneNodeReader(boneType, transform, animator, refresh, reader, controllerReader));
+                child.children("node", new ColladaBoneNodeReader(boneType, transform, animator, refresh, reader, controllerReader, processLocal));
             })));
             child.children("instance_controller", controllerReader);
         }));
