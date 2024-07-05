@@ -75,10 +75,10 @@ public class ColladaOpenGLGrahics implements Graphics
     @Override
     public TransformedDrawing model(String file)
     {
-    	if(true)
-    	{
-    		return new AssimpGraphics(gl, skinShader, diffuseShader, storage, refreshStatus).model(file);
-    	}
+//    	if(true)
+//    	{
+//    		return new AssimpGraphics(gl, skinShader, diffuseShader, storage, refreshStatus).model(file);
+//    	}
         var textureStorage = this.storage.relative(new File(file).getParent());
         var modelSource = new ColladaModel(ColladaNode.fromFile(storage.open(file))).load(gl, textureStorage);
         var shaderPlayer = diffuseShader.player();

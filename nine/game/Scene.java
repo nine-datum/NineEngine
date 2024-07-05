@@ -51,9 +51,9 @@ public class Scene implements Drawing
             time,
             deltaTime));
 
-        var mountains = graphics.model("resources/datum/ninja.fbx");
+        var mountains = graphics.model("resources/models/Scenes/Mountains.dae");
         statue = graphics.animatedModel("resources/datum/ninja.dae");
-        statueAnim = graphics.animation("resources/datum/mage.dae");
+        statueAnim = graphics.animation("resources/datum/ninja.dae");
         scene = mountains;
     }
 

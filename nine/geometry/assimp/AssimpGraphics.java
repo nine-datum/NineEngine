@@ -10,6 +10,7 @@ import nine.game.Graphics;
 import nine.drawing.ColorFloatStruct;
 
 import nine.opengl.Drawing;
+import nine.opengl.DrawingAttributeBuffer;
 import nine.opengl.OpenGL;
 import nine.opengl.Shader;
 import nine.opengl.ShaderPlayer;
