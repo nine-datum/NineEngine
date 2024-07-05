@@ -13,6 +13,7 @@ import nine.io.Storage;
 import nine.opengl.Drawing;
 import nine.opengl.OpenGL;
 import nine.opengl.Shader;
+import nine.opengl.Uniforms;
 
 public class ColladaOpenGLGrahics implements Graphics
 {
@@ -48,22 +49,22 @@ public class ColladaOpenGLGrahics implements Graphics
         var textureStorage = this.storage.relative(new File(file).getParent());
         var modelSource = new ColladaSkinnedModel(ColladaNode.fromFile(storage.open(file))).load(gl, textureStorage);
         var shaderPlayer = skinShader.player();
+        var staticShaderPlayer = diffuseShader.player();
         var uniforms = shaderPlayer.uniforms();
-        var lightUniform = uniforms.uniformVector("worldLight");
+        var combinedUniforms = Uniforms.many(uniforms, staticShaderPlayer.uniforms());
+        var lightUniform = combinedUniforms.uniformVector("worldLight");
         var transformUniform = uniforms.uniformMatrix("transform");
-        var projectionUniform = uniforms.uniformMatrix("projection");
-        var shadedModel = modelSource.shade(shaderPlayer, diffuseShader.player());
+        var projectionUniform = combinedUniforms.uniformMatrix("projection");
+        var shadedModel = modelSource.shade(shaderPlayer, staticShaderPlayer);
         return (projection, light, transform, animation, objectsAnimation) ->
         {
-            var drawing = shadedModel.instance(animation, objectsAnimation);
-            Drawing initializedDrawing = () ->
+            var drawing = shadedModel.instance(animation, objectsAnimation, () ->
             {
-                lightUniform.load(light);
+            	lightUniform.load(light);
                 transformUniform.load(transform);
                 projectionUniform.load(projection);
-                drawing.draw();
-            };
-            return shaderPlayer.play(gl.depthOn(gl.smooth(initializedDrawing)));
+            });
+            return gl.depthOn(gl.smooth(drawing));
         };
     }
 
