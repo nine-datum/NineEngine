@@ -2,6 +2,7 @@ package nine.geometry.assimp;
 
 import nine.geometry.AnimatedSkeleton;
 import nine.geometry.Model;
+import nine.io.Storage;
 import nine.main.TransformedDrawing;
 import nine.function.RefreshStatus;
 import nine.game.AnimatedDrawing;
@@ -12,12 +13,17 @@ import nine.opengl.OpenGL;
 import nine.opengl.Shader;
 import nine.opengl.ShaderPlayer;
 
+import java.io.File;
+import java.nio.IntBuffer;
+import java.nio.file.Path;
 import java.util.stream.IntStream;
 
 import org.lwjgl.assimp.AIFace;
+import org.lwjgl.assimp.AIMaterial;
 import org.lwjgl.assimp.AIMesh;
 import org.lwjgl.assimp.AIVector3D.Buffer;
 import org.lwjgl.assimp.AIScene;
+import org.lwjgl.assimp.AIString;
 import org.lwjgl.assimp.Assimp;
 
 public class AssimpGraphics implements Graphics
@@ -25,17 +31,20 @@ public class AssimpGraphics implements Graphics
 	OpenGL gl;
 	Shader skinShader;
 	Shader diffuseShader;
+	Storage storage;
 	RefreshStatus refreshStatus;
 	
 	public AssimpGraphics(
 		OpenGL gl,
 		Shader skinShader,
 		Shader diffuseShader,
+		Storage storage,
 		RefreshStatus refreshStatus)
 	{
 		this.gl = gl;
 		this.skinShader = skinShader;
 		this.diffuseShader = diffuseShader;
+		this.storage = storage;
 		this.refreshStatus = refreshStatus;
 	}
 	
@@ -77,6 +86,13 @@ public class AssimpGraphics implements Graphics
 				Integer[] indices = new Integer[mesh.mNumFaces() * mesh.mFaces().get(0).mNumIndices()];
 				int i = 0;
 				
+				var material = AIMaterial.create(scene.mMaterials().get(mesh.mMaterialIndex()));
+				AIString mTexPath = AIString.calloc();
+				Assimp.aiGetMaterialTexture(material, 1, 0, mTexPath, (IntBuffer) null, null, null, null, null, null);
+				String textureName = mTexPath.dataString();
+				String textureFileName = Path.of(new File(file).getParent().toString(), textureName).toString();
+				var texture = gl.texture(storage.open(textureFileName));
+				
 				for(int f = 0; f < mesh.mNumFaces(); f++)
 				{
 					AIFace face = mesh.mFaces().get(f);
@@ -86,10 +102,12 @@ public class AssimpGraphics implements Graphics
 					}
 				}
 				
-				return gl.vao(nine.buffer.Buffer.of(indices))
+				var drawing = gl.vao(nine.buffer.Buffer.of(indices))
 					.attribute(3, nine.buffer.Buffer.of(vertices).fromRightToLeftHanded())
 					.attribute(2, nine.buffer.Buffer.of(uvs))
 					.attribute(3, nine.buffer.Buffer.of(normals).fromRightToLeftHanded()).drawing();
+				
+				return texture.apply(drawing);
 			}
 		}).toArray(Drawing[]::new);
 		var compositeDrawing = Drawing.of(drawings);
