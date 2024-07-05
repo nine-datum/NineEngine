@@ -1,6 +1,7 @@
 package nine.geometry.collada;
 
 import nine.buffer.Buffer;
+import nine.geometry.Skeleton;
 import nine.math.Matrix4f;
 
 public interface SkinReader

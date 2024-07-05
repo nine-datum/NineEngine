@@ -11,6 +11,7 @@ import nine.collection.Flow;
 import nine.collection.Mapping;
 import nine.collection.RangeFlow;
 import nine.geometry.ShadedSkinnedModel;
+import nine.geometry.Skeleton;
 import nine.geometry.SkinnedModelAsset;
 import nine.io.Storage;
 import nine.math.Matrix4f;

@@ -2,7 +2,7 @@ package nine.game;
 
 import java.util.Map;
 
-import nine.geometry.collada.AnimatedSkeleton;
+import nine.geometry.AnimatedSkeleton;
 
 public interface HumanAnimator
 {

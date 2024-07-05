@@ -29,8 +29,8 @@ jc = javaClass =>
     .graphics:(jc "nine.game.Graphics"),
     .animatedDrawing:(jc "nine.game.AnimatedDrawing"),
     
-    .skeleton:(jc "nine.geometry.collada.Skeleton"),
-    .animatedSkeleton:(jc "nine.geometry.collada.AnimatedSkeleton"),
+    .skeleton:(jc "nine.geometry.Skeleton"),
+    .animatedSkeleton:(jc "nine.geometry.AnimatedSkeleton"),
     
     .storage:(jc "nine.io.Storage"),
 

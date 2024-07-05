@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import nine.function.Function;
-import nine.geometry.collada.AnimatedSkeleton;
+import nine.geometry.AnimatedSkeleton;
 import nine.main.TransformedDrawing;
 import nine.math.FloatFunc;
 import nine.math.Matrix4f;

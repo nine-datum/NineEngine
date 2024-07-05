@@ -2,6 +2,8 @@ package nine.geometry.collada;
 
 import nine.buffer.TextValueBuffer;
 import nine.function.RefreshStatus;
+import nine.geometry.Animation;
+import nine.geometry.Animator;
 import nine.math.Matrix4f;
 
 public class ColladaBoneNodeReader implements NodeReader

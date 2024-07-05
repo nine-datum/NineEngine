@@ -3,6 +3,7 @@ package nine.geometry.collada;
 import nine.buffer.Buffer;
 import nine.buffer.MatrixBuffer;
 import nine.buffer.TextValueBuffer;
+import nine.geometry.KeyFrameAnimation;
 import nine.math.Matrix4f;
 
 public class ColladaBasicAnimationParser implements ColladaAnimationParser

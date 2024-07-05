@@ -5,6 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 
 import nine.function.RefreshStatus;
+import nine.geometry.Animation;
+import nine.geometry.Animator;
+import nine.geometry.MapSkeleton;
 
 public class ColladaBasicSkeletonParser implements ColladaSkeletonParser
 {

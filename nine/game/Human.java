@@ -3,8 +3,7 @@ package nine.game;
 import java.util.Map;
 
 import nine.function.Function;
-import nine.geometry.collada.AnimatedSkeleton;
-import nine.main.TransformedDrawing;
+import nine.geometry.AnimatedSkeleton;
 import nine.math.FloatFunc;
 import nine.math.LocalTime;
 import nine.math.Matrix4f;

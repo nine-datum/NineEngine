@@ -3,8 +3,7 @@ package nine.game;
 import java.util.ArrayList;
 import java.util.List;
 
-import nine.geometry.collada.AnimatedSkeleton;
-import nine.geometry.collada.Skeleton;
+import nine.geometry.AnimatedSkeleton;
 import nine.input.Keyboard;
 import nine.input.Mouse;
 import nine.main.TransformedDrawing;
@@ -91,7 +90,7 @@ public class Scene implements Drawing
         UpdatedDrawing.of(
             player,
             UpdatedDrawing.of(npcs.toArray(Human[]::new)),
-            //UpdatedDrawing.ofModel(scene, () -> Matrix4f.scale(Vector3f.newXYZ(10f, 10f, 10f))),
+            UpdatedDrawing.ofModel(scene, () -> Matrix4f.scale(Vector3f.newXYZ(10f, 10f, 10f))),
             UpdatedDrawing.ofModel(statue, statueAnim, t -> b -> Matrix4f.identity, new Time(), () -> Matrix4f.translation(Vector3f.newXYZ(0f, 1f, 0f))))
         .update(
             projection.projection(),
