@@ -6,6 +6,7 @@ import nine.function.RefreshStatus;
 import nine.game.AnimatedDrawing;
 import nine.game.Graphics;
 import nine.geometry.AnimatedSkeleton;
+import nine.geometry.assimp.AssimpGraphics;
 import nine.geometry.collada.ColladaModel;
 import nine.geometry.collada.ColladaNode;
 import nine.geometry.collada.ColladaSkinnedModel;
@@ -71,6 +72,10 @@ public class ColladaOpenGLGrahics implements Graphics
     @Override
     public TransformedDrawing model(String file)
     {
+    	if(true)
+    	{
+    		return new AssimpGraphics(gl, skinShader, diffuseShader, refreshStatus).model(file);
+    	}
         var textureStorage = this.storage.relative(new File(file).getParent());
         var modelSource = new ColladaModel(ColladaNode.fromFile(storage.open(file))).load(gl, textureStorage);
         var shaderPlayer = diffuseShader.player();
