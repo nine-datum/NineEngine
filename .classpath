@@ -25,7 +25,6 @@
 	<classpathentry kind="lib" path="lib/jar8.jar"/>
 	<classpathentry kind="lib" path="lib/jar9.jar"/>
 	<classpathentry kind="lib" path="lib/jena.jar"/>
-	<classpathentry kind="lib" path="D:/JavaProjects/NineEngine/lib/lwjgl.jar"/>
 	<classpathentry kind="lib" path="D:/JavaProjects/NineEngine/lib/lwjgl-assimp.jar"/>
 	<classpathentry kind="lib" path="D:/JavaProjects/NineEngine/lib/lwjgl-assimp-natives-linux.jar"/>
 	<classpathentry kind="lib" path="D:/JavaProjects/NineEngine/lib/lwjgl-assimp-natives-linux-arm32.jar"/>
