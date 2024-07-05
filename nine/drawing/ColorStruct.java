@@ -34,4 +34,9 @@ public class ColorStruct implements ColorFloat
             b * byte2float,
             a * byte2float);
     }
+    @Override
+    public String toString()
+    {
+    	return String.format("%d %d %d %d (RGBA)", r, g, b, a);
+    }
 }

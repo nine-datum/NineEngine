@@ -51,7 +51,7 @@ public class Scene implements Drawing
             time,
             deltaTime));
 
-        var mountains = graphics.model("resources/models/Scenes/Mountains.dae");
+        var mountains = graphics.model("resources/datum/ninja.fbx");
         statue = graphics.animatedModel("resources/datum/ninja.dae");
         statueAnim = graphics.animation("resources/datum/mage.dae");
         scene = mountains;
@@ -91,7 +91,7 @@ public class Scene implements Drawing
             player,
             UpdatedDrawing.of(npcs.toArray(Human[]::new)),
             UpdatedDrawing.ofModel(scene, () -> Matrix4f.scale(Vector3f.newXYZ(10f, 10f, 10f))),
-            UpdatedDrawing.ofModel(statue, statueAnim, t -> b -> Matrix4f.identity, new Time(), () -> Matrix4f.translation(Vector3f.newXYZ(0f, 1f, 0f))))
+            UpdatedDrawing.ofModel(statue, statueAnim, t -> b -> Matrix4f.identity, new Time(), () -> Matrix4f.translation(Vector3f.newXYZ(2f, 1f, 0f))))
         .update(
             projection.projection(),
             cameraPosition,

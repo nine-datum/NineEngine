@@ -122,7 +122,8 @@ public class LWJGL_OpenGL implements OpenGL
         return texture[0];
     }
 
-    public static Texture texture(BufferedImage image)
+    @Override
+    public Texture texture(BufferedImage image)
     {
         int id = GL11.glGenTextures();
         BufferedImage actualImage;
