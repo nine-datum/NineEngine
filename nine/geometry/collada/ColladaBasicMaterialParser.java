@@ -2,6 +2,7 @@ package nine.geometry.collada;
 
 import java.util.HashMap;
 
+import nine.drawing.Color;
 import nine.drawing.ColorFloatStruct;
 import nine.geometry.Material;
 
@@ -11,6 +12,7 @@ public class ColladaBasicMaterialParser implements ColladaMaterialParser
     public void read(ColladaNode node, MaterialReader reader)
     {
         HashMap<String, String> effectToParam = new HashMap<>();
+        HashMap<String, String> effectToColor = new HashMap<>();
         HashMap<String, String> paramToSurface = new HashMap<>();
         HashMap<String, String> surfaceToImage = new HashMap<>();
         HashMap<String, String> imageToFile = new HashMap<>();
@@ -73,11 +75,19 @@ public class ColladaBasicMaterialParser implements ColladaMaterialParser
                     tags.read("phong");
                 }, specific_tech ->
                 specific_tech.children("diffuse", diffuse ->
-                diffuse.children("texture", texture ->
-                texture.attribute("texture", image ->
                 {
-                    effectToParam.put("#" + id, image);
-                })))));
+                	var effectId = "#" + id;
+                	
+                	diffuse.children("color", color ->
+                	{
+                		color.content(colorText -> effectToColor.put(effectId, colorText));
+                	});
+	                diffuse.children("texture", texture ->
+	                texture.attribute("texture", image ->
+	                {
+	                    effectToParam.put(effectId, image);
+	                }));
+                })));
             }))));
 
             root.children("library_materials", lib ->
@@ -118,14 +128,20 @@ public class ColladaBasicMaterialParser implements ColladaMaterialParser
 
         reader.call(name ->
         {
+        	String effect =
+    			materialToEffect.get(
+					sceneToMaterial.get(name));
             String tex = imageToFile.get(
                 surfaceToImage.get(
                     paramToSurface.get(
                         effectToParam.get(
-                            materialToEffect.get(
-                                sceneToMaterial.get(name))))));
-            if(tex == null) return new Material("default.png", new ColorFloatStruct(1, 1, 1, 1));
-            return new Material(tex, new ColorFloatStruct(1, 1, 1, 1));
+                            effect))));
+            String colorText = effectToColor.get(effect);
+            Color color;
+            
+            if(tex == null) tex = "default.png";
+            color = colorText == null ? new ColorFloatStruct(1, 1, 1, 1) : Color.parse(colorText);
+            return new Material(tex, color);
         });
     }
 }
