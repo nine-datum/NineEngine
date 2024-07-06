@@ -81,18 +81,26 @@ public class AssimpGraphics implements Graphics
 
 	@Override
 	public AnimatedSkeleton animation(String file, String boneType) {
-		// TODO Auto-generated method stub
+		// not implemented
 		return null;
 	}
 
 	@Override
 	public TransformedDrawing model(String file) {
+		// not implemented
+		return null;
+	}
+
+	@Override
+	public AnimatedDrawing animatedModel(String file) {
 		AIScene scene = Assimp.aiImportFile(file,
 			Assimp.aiProcess_Triangulate |	
 			Assimp.aiProcess_LimitBoneWeights);
 		var meshes = scene.mMeshes();
 		var diffuseShader = this.diffuseShader.player();
-		var uniforms = diffuseShader.uniforms();
+		var skinShader = this.skinShader.player();
+		
+		var uniforms = skinShader.uniforms();
 		var colorUniform = uniforms.uniformColor("color");
 		
 		var drawings = IntStream.range(0, scene.mNumMeshes()).boxed().map(meshIndex ->
@@ -163,7 +171,7 @@ public class AssimpGraphics implements Graphics
         var transformUniform = uniforms.uniformMatrix("transform");
         var projectionUniform = uniforms.uniformMatrix("projection");
 		
-        return (projection, light, transform) ->
+        return (projection, light, transform, animation, objectsAnimation) ->
         {
             Drawing initializedDrawing = () ->
             {
@@ -172,13 +180,7 @@ public class AssimpGraphics implements Graphics
                 projectionUniform.load(projection);
                 compositeDrawing.draw();
             };
-            return diffuseShader.play(gl.depthOn(gl.smooth(initializedDrawing)));
+            return skinShader.play(gl.depthOn(gl.smooth(initializedDrawing)));
         };
-	}
-
-	@Override
-	public AnimatedDrawing animatedModel(String file) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 }

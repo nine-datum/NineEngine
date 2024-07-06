@@ -2,8 +2,8 @@ package nine.game;
 
 import nine.function.RefreshStatus;
 import nine.geometry.AnimatedSkeleton;
+import nine.geometry.collada.ColladaOpenGLGrahics;
 import nine.io.Storage;
-import nine.main.ColladaOpenGLGrahics;
 import nine.main.TransformedDrawing;
 import nine.opengl.OpenGL;
 import nine.opengl.Shader;

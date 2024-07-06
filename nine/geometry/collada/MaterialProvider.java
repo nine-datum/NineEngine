@@ -1,6 +1,8 @@
 package nine.geometry.collada;
 
+import nine.geometry.Material;
+
 public interface MaterialProvider
 {
-    String textureFile(String materialName);
+    Material properties(String materialName);
 }

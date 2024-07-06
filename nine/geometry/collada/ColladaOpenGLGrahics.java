@@ -1,4 +1,4 @@
-package nine.main;
+package nine.geometry.collada;
 
 import java.io.File;
 
@@ -8,10 +8,8 @@ import nine.game.AnimatedDrawing;
 import nine.game.Graphics;
 import nine.geometry.AnimatedSkeleton;
 import nine.geometry.assimp.AssimpGraphics;
-import nine.geometry.collada.ColladaModel;
-import nine.geometry.collada.ColladaNode;
-import nine.geometry.collada.ColladaSkinnedModel;
 import nine.io.Storage;
+import nine.main.TransformedDrawing;
 import nine.opengl.Drawing;
 import nine.opengl.OpenGL;
 import nine.opengl.Shader;
@@ -24,6 +22,11 @@ public class ColladaOpenGLGrahics implements Graphics
     Shader skinShader;
     Storage storage;
     RefreshStatus refreshStatus;
+    
+    ColladaGeometryParser geometryParser;
+    ColladaSkinParser skinParser;
+    ColladaAnimationParser animationParser;
+    ColladaMaterialParser materialParser;
 
     public ColladaOpenGLGrahics(
         OpenGL gl,
@@ -37,6 +40,34 @@ public class ColladaOpenGLGrahics implements Graphics
         this.skinShader = skinShader;
         this.storage = storage;
         this.refreshStatus = refreshStatus;
+        
+        this.geometryParser = new ColladaBasicGeometryParser();
+        this.skinParser = new ColladaBasicSkinParser();
+        this.animationParser = new ColladaBasicAnimationParser();
+        this.materialParser = new ColladaBasicMaterialParser();
+    }
+    
+    public ColladaOpenGLGrahics(
+        OpenGL gl,
+        Shader diffuseShader,
+        Shader skinShader,
+        Storage storage,
+        RefreshStatus refreshStatus,
+        ColladaGeometryParser geometryParser,
+	    ColladaSkinParser skinParser,
+	    ColladaAnimationParser animationParser,
+	    ColladaMaterialParser materialParser)
+    {
+        this.gl = gl;
+        this.diffuseShader = diffuseShader;
+        this.skinShader = skinShader;
+        this.storage = storage;
+        this.refreshStatus = refreshStatus;
+        
+        this.geometryParser = geometryParser;
+        this.skinParser = skinParser;
+        this.animationParser = animationParser;
+        this.materialParser = materialParser;
     }
 
     @Override
@@ -49,7 +80,14 @@ public class ColladaOpenGLGrahics implements Graphics
     public AnimatedDrawing animatedModel(String file)
     {
         var textureStorage = this.storage.relative(new File(file).getParent());
-        var modelSource = new ColladaSkinnedModel(ColladaNode.fromFile(storage.open(file))).load(gl, textureStorage);
+        var modelSource = new ColladaSkinnedModel(
+        		ColladaNode.fromFile(storage.open(file)),
+        		geometryParser,
+        		skinParser,
+        		animationParser,
+        		materialParser
+    		)
+    		.load(gl, textureStorage);
         var shaderPlayer = skinShader.player();
         var staticShaderPlayer = diffuseShader.player();
         var uniforms = shaderPlayer.uniforms();
@@ -80,7 +118,12 @@ public class ColladaOpenGLGrahics implements Graphics
 //    		return new AssimpGraphics(gl, skinShader, diffuseShader, storage, refreshStatus).model(file);
 //    	}
         var textureStorage = this.storage.relative(new File(file).getParent());
-        var modelSource = new ColladaModel(ColladaNode.fromFile(storage.open(file))).load(gl, textureStorage);
+        var modelSource = new ColladaModel(
+        		ColladaNode.fromFile(storage.open(file)),
+        		geometryParser,
+        		materialParser
+    		)
+    		.load(gl, textureStorage);
         var shaderPlayer = diffuseShader.player();
         var uniforms = shaderPlayer.uniforms();
         var lightUniform = uniforms.uniformVector("worldLight");

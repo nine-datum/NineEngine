@@ -37,13 +37,15 @@ public class ColladaModel implements ModelAsset
         materialParser.read(node, materials ->
         geometryParser.read(node, (source, material, floatBuffers, intBuffers) ->
         {
+        	var mat = materials.properties(material);
             DrawingAttributeBuffer buffer = new TexturedDrawingAttributeBuffer(
-                gl.texture(storage.open(materials.textureFile(material))),
+                gl.texture(storage.open(mat.textureFile)),
                 gl.vao(intBuffers.map("INDEX"))
                     .attribute(3, floatBuffers.map("VERTEX").fromRightToLeftHanded())
                     .attribute(2, floatBuffers.map("TEXCOORD"))
                     .attribute(3, floatBuffers.map("NORMAL").fromRightToLeftHanded()));
-            drawings.add(buffer.drawing());
+            var drawing = buffer.drawing();
+            drawings.add(drawing);
         }));
 
         return shader -> shader.play(new CompositeDrawing(new IterableFlow<Drawing>(drawings)));

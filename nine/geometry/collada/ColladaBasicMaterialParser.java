@@ -2,6 +2,9 @@ package nine.geometry.collada;
 
 import java.util.HashMap;
 
+import nine.drawing.ColorFloatStruct;
+import nine.geometry.Material;
+
 public class ColladaBasicMaterialParser implements ColladaMaterialParser
 {
     @Override
@@ -121,8 +124,8 @@ public class ColladaBasicMaterialParser implements ColladaMaterialParser
                         effectToParam.get(
                             materialToEffect.get(
                                 sceneToMaterial.get(name))))));
-            if(tex == null) return "default.png";
-            return tex;
+            if(tex == null) return new Material("default.png", new ColorFloatStruct(1, 1, 1, 1));
+            return new Material(tex, new ColorFloatStruct(1, 1, 1, 1));
         });
     }
 }

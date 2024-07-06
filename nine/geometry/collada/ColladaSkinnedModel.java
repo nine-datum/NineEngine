@@ -10,6 +10,10 @@ import nine.buffer.RangeBuffer;
 import nine.collection.Flow;
 import nine.collection.Mapping;
 import nine.collection.RangeFlow;
+import nine.drawing.Color;
+import nine.drawing.ColorFloatStruct;
+import nine.geometry.Material;
+import nine.geometry.Model;
 import nine.geometry.ShadedSkinnedModel;
 import nine.geometry.Skeleton;
 import nine.geometry.SkinnedModelAsset;
@@ -19,6 +23,7 @@ import nine.opengl.CompositeDrawing;
 import nine.opengl.Drawing;
 import nine.opengl.DrawingAttributeBuffer;
 import nine.opengl.OpenGL;
+import nine.opengl.Shader;
 
 public class ColladaSkinnedModel implements SkinnedModelAsset
 {
@@ -60,15 +65,15 @@ public class ColladaSkinnedModel implements SkinnedModelAsset
 
     interface RawMeshAction
     {
-        void call(DrawingAttributeBuffer buffer, Buffer<Integer> rawIndices);
+        void call(DrawingAttributeBuffer buffer, Buffer<Integer> rawIndices, Material material);
     }
     interface RawMesh
     {
         void accept(RawMeshAction action);
 
-        static RawMesh of(DrawingAttributeBuffer buffer, Buffer<Integer> rawIndices)
+        static RawMesh of(DrawingAttributeBuffer buffer, Buffer<Integer> rawIndices, Material material)
         {
-            return action -> action.call(buffer, rawIndices);
+            return action -> action.call(buffer, rawIndices, material);
         }
         static RawMesh many(RawMesh...meshes)
         {
@@ -77,6 +82,19 @@ public class ColladaSkinnedModel implements SkinnedModelAsset
         		for(RawMesh m : meshes) m.accept(a);
         	};
         }
+    }
+    
+    static Model makeModel(Material material, Drawing drawing)
+    {
+    	return shader ->
+    	{
+    		var colorUniform = shader.uniforms().uniformColor("color");
+    		return () ->
+    		{
+    			colorUniform.load(material.color);
+    			drawing.draw();
+    		};
+    	};
     }
 
     @Override
@@ -91,15 +109,17 @@ public class ColladaSkinnedModel implements SkinnedModelAsset
         materialParser.read(node, materials ->
         geometryParser.read(node, (source, material, floatBuffers, intBuffers) ->
         {
+        	var mat = materials.properties(material);
+        	
             String sourceId = "#" + source;
             DrawingAttributeBuffer buffer = new TexturedDrawingAttributeBuffer(
-                gl.texture(storage.open(materials.textureFile(material))),
+                gl.texture(storage.open(mat.textureFile)),
                 gl.vao(intBuffers.map("INDEX"))
                     .attribute(3, floatBuffers.map("VERTEX").fromRightToLeftHanded())
                     .attribute(2, floatBuffers.map("TEXCOORD"))
                     .attribute(3, floatBuffers.map("NORMAL").fromRightToLeftHanded()));
             
-            var mesh = RawMesh.of(buffer, intBuffers.map("INDEX_VERTEX"));
+            var mesh = RawMesh.of(buffer, intBuffers.map("INDEX_VERTEX"), mat);
             var ex = meshes.get(sourceId);
             if(ex != null) mesh = RawMesh.many(ex, mesh);
             
@@ -112,7 +132,7 @@ public class ColladaSkinnedModel implements SkinnedModelAsset
 	        invBindPoses.put("#" + skinId, invBind);
         	
             var rawMesh = meshes.get(sourceId);
-            if(rawMesh != null) rawMesh.accept((mesh, indices) ->
+            if(rawMesh != null) rawMesh.accept((mesh, indices, material) ->
             {
                 Mapping<Buffer<Float>, Buffer<Float>> mapBuffer = buffer ->
                     new MapBuffer<>(new RangeBuffer(indices.length() * weightPerIndex), i ->
@@ -136,7 +156,7 @@ public class ColladaSkinnedModel implements SkinnedModelAsset
                 var meshId = "#" + skinId;
                 var skinnedMesh = RawMesh.of(mesh
 	                .attribute(weightPerIndex, ordered_joints)
-	                .attribute(weightPerIndex, ordered_weights), indices);
+	                .attribute(weightPerIndex, ordered_weights), indices, material);
                 var ex = skinnedMeshes.get(meshId);
                 if(ex != null) skinnedMesh = RawMesh.many(ex, skinnedMesh);
                 
@@ -144,9 +164,9 @@ public class ColladaSkinnedModel implements SkinnedModelAsset
             });
         });
         
-        ArrayList<Drawing> simpleDrawings = new ArrayList<Drawing>();
-        ArrayList<Drawing> skinnedDrawings = new ArrayList<Drawing>();
-        HashMap<Drawing, String> objectAnimKeys = new HashMap<>();
+        ArrayList<Model> simpleModels = new ArrayList<>();
+        ArrayList<Model> skinnedModels = new ArrayList<>();
+        HashMap<Model, String> objectModelAnimKeys = new HashMap<>();
         
         class SceneReader implements NodeReader
         {
@@ -154,21 +174,20 @@ public class ColladaSkinnedModel implements SkinnedModelAsset
 			public void read(ColladaNode child) {
 				child.children("instance_geometry",
 					geom -> geom.attribute("url",
-						url ->
-						{
-							meshes.get(url).accept((mesh, indices) ->
-							{
-								var drawing = mesh.drawing();
-								simpleDrawings.add(drawing);
-								child.attribute("name", name -> objectAnimKeys.put(drawing, name));
-							});
-						}));
+					url -> meshes.get(url).accept(
+					(mesh, indices, material) ->
+					{
+						var model = makeModel(material, mesh.drawing());
+						simpleModels.add(model);
+						child.attribute("name", name -> objectModelAnimKeys.put(model, name));
+					}
+				)));
 				child.children("instance_controller",
 					geom -> geom.attribute("url",
-						url ->
-						{
-							skinnedMeshes.get(url).accept((mesh, indices) -> skinnedDrawings.add(mesh.drawing()));
-						}));
+					url -> skinnedMeshes.get(url).accept(
+					(mesh, indices, material) -> skinnedModels.add(
+							makeModel(material, mesh.drawing())
+				))));
 				child.children("node", this);
 			}
         }
@@ -182,7 +201,11 @@ public class ColladaSkinnedModel implements SkinnedModelAsset
         {	
             int MAX_MATRICES = 100;
 
-            var skinDrawing = new CompositeDrawing(Flow.iterable(skinnedDrawings));
+            var skinDrawing = new CompositeDrawing(
+        		skinnedModels
+        			.stream()
+        			.map(m -> m.instance(skinShader))
+        			.toArray(Drawing[]::new));
             
             var jointTransformsUniform = skinShader.uniforms().uniformMatrixArray("jointTransforms", MAX_MATRICES);
             var staticTransformUniform = staticShader.uniforms().uniformMatrix("transform");
@@ -212,12 +235,12 @@ public class ColladaSkinnedModel implements SkinnedModelAsset
                 var shadedObjectsDrawing = staticShader.play(() ->
                 {
                 	shaderInitializer.draw();
-                	for(Drawing drawing : simpleDrawings)
+                	for(Model model : simpleModels)
                 	{
-                		String animKey = objectAnimKeys.get(drawing);
+                		String animKey = objectModelAnimKeys.get(model);
                 		Matrix4f mat = animKey == null ? Matrix4f.identity : objectsAnimation.transform(animKey);
                 		staticTransformUniform.load(mat);
-                		drawing.draw();
+                		model.instance(staticShader).draw();
                 	}
                 });
                 
