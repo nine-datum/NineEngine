@@ -54,6 +54,7 @@ public class Scene implements Drawing
         var mountains = graphics.model("resources/models/Scenes/Mountains.dae");
         statue = graphics.animatedModel("resources/datum/ninja.dae");
         statueAnim = graphics.animation("resources/datum/ninja.dae");
+        statueObjectAnim = graphics.animation("resources/datum/ninja.dae", "NODE");
         scene = mountains;
     }
 
@@ -71,6 +72,8 @@ public class Scene implements Drawing
     TransformedDrawing scene;
     AnimatedDrawing statue;
     AnimatedSkeleton statueAnim;
+    AnimatedSkeleton statueObjectAnim;
+    
     Vector2f mouseRotation = Vector2f.zero;
     Vector3f cameraRotation = Vector3f.zero;
     Vector3f cameraTarget = Vector3f.up;
@@ -91,7 +94,7 @@ public class Scene implements Drawing
             player,
             UpdatedDrawing.of(npcs.toArray(Human[]::new)),
             UpdatedDrawing.ofModel(scene, () -> Matrix4f.scale(Vector3f.newXYZ(10f, 10f, 10f))),
-            UpdatedDrawing.ofModel(statue, statueAnim, t -> b -> Matrix4f.identity, new Time(), () -> Matrix4f.translation(Vector3f.newXYZ(2f, 1f, 0f))))
+            UpdatedDrawing.ofModel(statue, statueAnim, statueObjectAnim, new Time(), () -> Matrix4f.translation(Vector3f.newXYZ(2f, 1f, 0f))))
         .update(
             projection.projection(),
             cameraPosition,
