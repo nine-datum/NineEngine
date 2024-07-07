@@ -210,7 +210,7 @@ public class ColladaSkinnedModel implements SkinnedModelAsset
             var jointTransformsUniform = skinShader.uniforms().uniformMatrixArray("jointTransforms", MAX_MATRICES);
             var staticTransformUniform = staticShader.uniforms().uniformMatrix("transform");
 
-            return (skinAnimation, objectsAnimation, shaderInitializer) ->
+            return (skinAnimation, objectsAnimation, root, shaderInitializer) ->
             {
                 Matrix4f[] bones = new Matrix4f[MAX_MATRICES];
                 for(int i = 0; i < MAX_MATRICES; i++) bones[i] = Matrix4f.identity;
@@ -239,6 +239,7 @@ public class ColladaSkinnedModel implements SkinnedModelAsset
                 	{
                 		String animKey = objectModelAnimKeys.get(model);
                 		Matrix4f mat = animKey == null ? Matrix4f.identity : objectsAnimation.transform(animKey);
+                		mat = root.mul(mat);
                 		staticTransformUniform.load(mat);
                 		model.instance(staticShader).draw();
                 	}

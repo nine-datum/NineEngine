@@ -27,7 +27,7 @@ public interface UpdatedDrawing
 	            worldLight,
 	            r,
 	            animation.animate(t),
-	            objectsAnimation.transform(r).animate(t));
+	            objectsAnimation.animate(t));
         };
     }
     static UpdatedDrawing ofModel(TransformedDrawing model, Function<Matrix4f> root)

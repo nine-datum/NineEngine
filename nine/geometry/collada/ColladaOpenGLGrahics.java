@@ -93,18 +93,16 @@ public class ColladaOpenGLGrahics implements Graphics
         var uniforms = shaderPlayer.uniforms();
         var combinedUniforms = Uniforms.many(uniforms, staticShaderPlayer.uniforms());
         var lightUniform = combinedUniforms.uniformVector("worldLight");
-        var colorUniform = uniforms.uniformColor("color");
         var transformUniform = uniforms.uniformMatrix("transform");
         var projectionUniform = combinedUniforms.uniformMatrix("projection");
         var shadedModel = modelSource.shade(shaderPlayer, staticShaderPlayer);
         return (projection, light, transform, animation, objectsAnimation) ->
         {
-            var drawing = shadedModel.instance(animation, objectsAnimation, () ->
+            var drawing = shadedModel.instance(animation, objectsAnimation, transform, () ->
             {
             	lightUniform.load(light);
                 transformUniform.load(transform);
                 projectionUniform.load(projection);
-                colorUniform.load(new ColorFloatStruct(1, 1, 1, 1));
             });
             return gl.depthOn(gl.smooth(drawing));
         };
@@ -127,7 +125,6 @@ public class ColladaOpenGLGrahics implements Graphics
         var shaderPlayer = diffuseShader.player();
         var uniforms = shaderPlayer.uniforms();
         var lightUniform = uniforms.uniformVector("worldLight");
-        var colorUniform = uniforms.uniformColor("color");
         var transformUniform = uniforms.uniformMatrix("transform");
         var projectionUniform = uniforms.uniformMatrix("projection");
         var shadedModel = modelSource.instance(shaderPlayer);
@@ -138,7 +135,6 @@ public class ColladaOpenGLGrahics implements Graphics
                 lightUniform.load(light);
                 transformUniform.load(transform);
                 projectionUniform.load(projection);
-                colorUniform.load(new ColorFloatStruct(1, 1, 1, 1));
                 shadedModel.draw();
             };
             return shaderPlayer.play(gl.depthOn(gl.smooth(initializedDrawing)));
