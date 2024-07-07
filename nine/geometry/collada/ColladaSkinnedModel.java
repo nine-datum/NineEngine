@@ -30,20 +30,17 @@ public class ColladaSkinnedModel implements SkinnedModelAsset
     ColladaNode node;
     ColladaGeometryParser geometryParser;
     ColladaSkinParser skinParser;
-    ColladaAnimationParser animationParser;
     ColladaMaterialParser materialParser;
 
     public ColladaSkinnedModel(
         ColladaNode node,
         ColladaGeometryParser geometryParser,
         ColladaSkinParser skinParser,
-        ColladaAnimationParser animationParser,
         ColladaMaterialParser materialParser)
     {
         this.node = node;
         this.geometryParser = geometryParser;
         this.skinParser = skinParser;
-        this.animationParser = animationParser;
         this.materialParser = materialParser;
     }
     public ColladaSkinnedModel(ColladaNode node)
@@ -51,15 +48,6 @@ public class ColladaSkinnedModel implements SkinnedModelAsset
         this(node,
             new ColladaBasicGeometryParser(),
             new ColladaBasicSkinParser(),
-            new ColladaBasicAnimationParser(),
-            new ColladaBasicMaterialParser());
-    }
-    public ColladaSkinnedModel(ColladaNode node, ColladaAnimationParser animationParser)
-    {
-        this(node,
-            new ColladaBasicGeometryParser(),
-            new ColladaBasicSkinParser(),
-            animationParser,
             new ColladaBasicMaterialParser());
     }
 

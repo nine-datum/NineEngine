@@ -2,6 +2,7 @@ package nine.geometry;
 
 import java.util.HashMap;
 
+import nine.function.Condition;
 import nine.function.Function;
 import nine.function.RefreshStatus;
 import nine.geometry.collada.ColladaNode;
@@ -17,10 +18,10 @@ public interface AnimatedSkeleton
 
     static AnimatedSkeleton fromCollada(ColladaNode node, RefreshStatus refresh)
     {
-    	return fromCollada(node, "JOINT", refresh);
+    	return fromCollada(node, Condition.equality("JOINT"), refresh);
     }
     
-    static AnimatedSkeleton fromCollada(ColladaNode node, String boneType, RefreshStatus refresh)
+    static AnimatedSkeleton fromCollada(ColladaNode node, Condition<String> boneType, RefreshStatus refresh)
     {
         return fromCollada(node, new ColladaBasicAnimationParser(), new ColladaBasicSkeletonParser(boneType), refresh);
     }

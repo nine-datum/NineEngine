@@ -54,7 +54,7 @@ public class LWJGL_Window_Test
 			AnimatedSkeleton idle = AnimatedSkeleton.fromCollada(new FileColladaNode(storage.open("resources/models/Knight/LongSword_Idle.dae"), ErrorPrinter.instance), updateStatus);
 			//AnimatedSkeleton walk = AnimatedSkeleton.fromCollada(new FileColladaNode(storage.open("resources/models/Knight/Walk.dae"), ErrorPrinter.instance), updateStatus);
 
-			Graphics graphics = Graphics.collada(gl, diffuseShader, skinShader, storage, updateStatus);
+			Graphics graphics = Graphics.collada(gl, diffuseShader, skinShader, storage);
 
 			var human = graphics.animatedModel(args[0]);
 

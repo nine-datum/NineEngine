@@ -3,6 +3,8 @@ package nine.game;
 import java.util.ArrayList;
 import java.util.List;
 
+import nine.function.Condition;
+import nine.function.UpdateRefreshStatus;
 import nine.geometry.AnimatedSkeleton;
 import nine.input.Keyboard;
 import nine.input.Mouse;
@@ -53,8 +55,8 @@ public class Scene implements Drawing
 
         var mountains = graphics.model("resources/models/Scenes/Mountains.dae");
         statue = graphics.animatedModel("resources/datum/ninja.dae");
-        statueAnim = graphics.animation("resources/datum/ninja.dae");
-        statueObjectAnim = graphics.animation("resources/datum/ninja.dae", "NODE");
+        statueAnim = graphics.animation("resources/datum/ninja.dae").instance(refreshStatus);
+        statueObjectAnim = graphics.animation("resources/datum/ninja.dae", Condition.equality("NODE")).instance(refreshStatus);
         scene = mountains;
     }
 
@@ -73,6 +75,7 @@ public class Scene implements Drawing
     AnimatedDrawing statue;
     AnimatedSkeleton statueAnim;
     AnimatedSkeleton statueObjectAnim;
+    UpdateRefreshStatus refreshStatus = new UpdateRefreshStatus();
     
     Vector2f mouseRotation = Vector2f.zero;
     Vector3f cameraRotation = Vector3f.zero;

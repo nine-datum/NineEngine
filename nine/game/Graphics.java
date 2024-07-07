@@ -1,7 +1,7 @@
 package nine.game;
 
-import nine.function.RefreshStatus;
-import nine.geometry.AnimatedSkeleton;
+import nine.function.Condition;
+import nine.geometry.AnimatedSkeletonSource;
 import nine.geometry.collada.ColladaAnimationParser;
 import nine.geometry.collada.ColladaGeometryParser;
 import nine.geometry.collada.ColladaMaterialParser;
@@ -14,7 +14,7 @@ import nine.opengl.Shader;
 
 public interface Graphics
 {
-	AnimatedSkeleton animation(String file, String boneType);
+	AnimatedSkeletonSource animation(String file, Condition<String> boneType);
     TransformedDrawing model(String file);
 	AnimatedDrawing animatedModel(String file);
 
@@ -22,31 +22,29 @@ public interface Graphics
         OpenGL gl,
         Shader diffuseShader,
         Shader skinShader,
-        Storage storage,
-        RefreshStatus refreshStatus)
+        Storage storage)
     {
-        return new ColladaOpenGLGrahics(gl, diffuseShader, skinShader, storage, refreshStatus);
+        return new ColladaOpenGLGrahics(gl, diffuseShader, skinShader, storage);
     }
     static Graphics collada(
         OpenGL gl,
         Shader diffuseShader,
         Shader skinShader,
         Storage storage,
-        RefreshStatus refreshStatus,
         ColladaGeometryParser geometryParser,
 	    ColladaSkinParser skinParser,
 	    ColladaAnimationParser animationParser,
 	    ColladaMaterialParser materialParser)
     {
-        return new ColladaOpenGLGrahics(gl, diffuseShader, skinShader, storage, refreshStatus,
+        return new ColladaOpenGLGrahics(gl, diffuseShader, skinShader, storage,
     		geometryParser,
     		skinParser,
     		animationParser,
     		materialParser);
     }
     
-    default AnimatedSkeleton animation(String file)
+    default AnimatedSkeletonSource animation(String file)
     {
-    	return animation(file, "JOINT");
+    	return animation(file, Condition.equality("JOINT"));
     }
 }

@@ -3,10 +3,12 @@ package nine.geometry.collada;
 import java.io.File;
 
 import nine.drawing.ColorFloatStruct;
+import nine.function.Condition;
 import nine.function.RefreshStatus;
 import nine.game.AnimatedDrawing;
 import nine.game.Graphics;
 import nine.geometry.AnimatedSkeleton;
+import nine.geometry.AnimatedSkeletonSource;
 import nine.geometry.assimp.AssimpGraphics;
 import nine.io.Storage;
 import nine.main.TransformedDrawing;
@@ -21,7 +23,6 @@ public class ColladaOpenGLGrahics implements Graphics
     Shader diffuseShader;
     Shader skinShader;
     Storage storage;
-    RefreshStatus refreshStatus;
     
     ColladaGeometryParser geometryParser;
     ColladaSkinParser skinParser;
@@ -32,14 +33,12 @@ public class ColladaOpenGLGrahics implements Graphics
         OpenGL gl,
         Shader diffuseShader,
         Shader skinShader,
-        Storage storage,
-        RefreshStatus refreshStatus)
+        Storage storage)
     {
         this.gl = gl;
         this.diffuseShader = diffuseShader;
         this.skinShader = skinShader;
         this.storage = storage;
-        this.refreshStatus = refreshStatus;
         
         this.geometryParser = new ColladaBasicGeometryParser();
         this.skinParser = new ColladaBasicSkinParser();
@@ -52,7 +51,6 @@ public class ColladaOpenGLGrahics implements Graphics
         Shader diffuseShader,
         Shader skinShader,
         Storage storage,
-        RefreshStatus refreshStatus,
         ColladaGeometryParser geometryParser,
 	    ColladaSkinParser skinParser,
 	    ColladaAnimationParser animationParser,
@@ -62,7 +60,6 @@ public class ColladaOpenGLGrahics implements Graphics
         this.diffuseShader = diffuseShader;
         this.skinShader = skinShader;
         this.storage = storage;
-        this.refreshStatus = refreshStatus;
         
         this.geometryParser = geometryParser;
         this.skinParser = skinParser;
@@ -71,9 +68,9 @@ public class ColladaOpenGLGrahics implements Graphics
     }
 
     @Override
-    public AnimatedSkeleton animation(String file, String boneType)
+    public AnimatedSkeletonSource animation(String file, Condition<String> boneType)
     {
-        return AnimatedSkeleton.fromCollada(ColladaNode.fromFile(storage.open(file)), boneType, refreshStatus);
+        return refreshStatus -> AnimatedSkeleton.fromCollada(ColladaNode.fromFile(storage.open(file)), boneType, refreshStatus);
     }
 
     @Override
@@ -84,7 +81,6 @@ public class ColladaOpenGLGrahics implements Graphics
         		ColladaNode.fromFile(storage.open(file)),
         		geometryParser,
         		skinParser,
-        		animationParser,
         		materialParser
     		)
     		.load(gl, textureStorage);

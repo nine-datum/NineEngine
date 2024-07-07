@@ -25,14 +25,12 @@ windowStart =
             import.opengl,
             import.shader,
             import.shader,
-            import.storage,
-            import.updateStatus
+            import.storage
         ][
             gl,
             diffuseShader,
             skinShader,
-            storage,
-            status
+            storage
         ] =>
         in =
         {

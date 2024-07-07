@@ -2,7 +2,10 @@ package nine.game;
 
 import java.util.Map;
 
+import nine.function.Condition;
 import nine.function.Function;
+import nine.function.RefreshStatus;
+import nine.function.UpdateRefreshStatus;
 import nine.geometry.AnimatedSkeleton;
 import nine.math.FloatFunc;
 import nine.math.LocalTime;
@@ -22,6 +25,8 @@ public class Human implements UpdatedDrawing
     HumanAnimator animator;
 
     HumanController controller;
+    
+    UpdateRefreshStatus refreshStatus = new UpdateRefreshStatus();
 
     private Human()
     {
@@ -53,14 +58,14 @@ public class Human implements UpdatedDrawing
         var damageFlight = graphics.animation("resources/models/Knight/DamageFlight.dae");
         var defeated = graphics.animation("resources/models/Knight/Defeated.dae");
         
-        var weapon_idle = graphics.animation("resources/models/Knight/Idle.dae", "NODE");
-        var weapon_walk = graphics.animation("resources/models/Knight/Walk.dae", "NODE");
-        var weapon_weaponIdle = graphics.animation("resources/models/Knight/LongSword_Idle.dae", "NODE");
-        var weapon_weaponWalk = graphics.animation("resources/models/Knight/LongSword_Walk.dae", "NODE");
-        var weapon_lightAttack = graphics.animation("resources/models/Knight/LongSword_Attack_Forward.dae", "NODE");
-        var weapon_heavyAttack = graphics.animation("resources/models/Knight/LongSword_Attack_Left.dae", "NODE");
-        var weapon_damageFlight = graphics.animation("resources/models/Knight/DamageFlight.dae", "NODE");
-        var weapon_defeated = graphics.animation("resources/models/Knight/Defeated.dae", "NODE");
+        var weapon_idle = graphics.animation("resources/models/Knight/Idle.dae", Condition.equality("NODE"));
+        var weapon_walk = graphics.animation("resources/models/Knight/Walk.dae", Condition.equality("NODE"));
+        var weapon_weaponIdle = graphics.animation("resources/models/Knight/LongSword_Idle.dae", Condition.equality("NODE"));
+        var weapon_weaponWalk = graphics.animation("resources/models/Knight/LongSword_Walk.dae", Condition.equality("NODE"));
+        var weapon_lightAttack = graphics.animation("resources/models/Knight/LongSword_Attack_Forward.dae", Condition.equality("NODE"));
+        var weapon_heavyAttack = graphics.animation("resources/models/Knight/LongSword_Attack_Left.dae", Condition.equality("NODE"));
+        var weapon_damageFlight = graphics.animation("resources/models/Knight/DamageFlight.dae", Condition.equality("NODE"));
+        var weapon_defeated = graphics.animation("resources/models/Knight/Defeated.dae", Condition.equality("NODE"));
         
         var animator = HumanAnimator.of(Map.ofEntries(
             Map.entry("idle", idle),
@@ -100,6 +105,7 @@ public class Human implements UpdatedDrawing
     public Drawing update(Matrix4f projection, Vector3f cameraPosition, Vector3f cameraRotation, Vector3f worldLight)
     {
         state = state.next();
+        refreshStatus.update();
         return state.update(projection, cameraPosition, cameraRotation, worldLight);
     }
 
@@ -169,8 +175,8 @@ public class Human implements UpdatedDrawing
             @Override
             public HumanState walk()
             {
-                var walk = animator.animation("walk");
-                var weaponObjects = animator.animation("weapon_walk");
+                var walk = animator.animation("walk", refreshStatus);
+                var weaponObjects = animator.animation("weapon_walk", refreshStatus);
                 
                 var drawing = withSwordOnBack(
                     UpdatedDrawing.ofModel(model, walk, weaponObjects, time, Human.this::visualRoot),
@@ -186,8 +192,8 @@ public class Human implements UpdatedDrawing
             @Override
             public HumanState idle()
             {
-                var idle = animator.animation("idle");
-                var weaponObjects = animator.animation("weapon_idle");
+                var idle = animator.animation("idle", refreshStatus);
+                var weaponObjects = animator.animation("weapon_idle", refreshStatus);
                 var drawing = withSwordOnBack(
                     UpdatedDrawing.ofModel(model, idle, weaponObjects, time, Human.this::visualRoot),
                     idle,
@@ -203,8 +209,8 @@ public class Human implements UpdatedDrawing
             @Override
             public HumanState attackLight()
             {
-                var lightAttack = animator.animation("lightAttack");
-                var weaponObjects = animator.animation("weapon_lightAttack");
+                var lightAttack = animator.animation("lightAttack", refreshStatus);
+                var weaponObjects = animator.animation("weapon_lightAttack", refreshStatus);
                 var time = new LocalTime();
                 var drawing = withSwordInHand(
                     UpdatedDrawing.ofModel(model, lightAttack, weaponObjects, time, Human.this::visualRoot),
@@ -223,8 +229,8 @@ public class Human implements UpdatedDrawing
             @Override
             public HumanState attackHeavy()
             {
-                var heavyAttack = animator.animation("heavyAttack");
-                var weaponObjects = animator.animation("weapon_heavyAttack");
+                var heavyAttack = animator.animation("heavyAttack", refreshStatus);
+                var weaponObjects = animator.animation("weapon_heavyAttack", refreshStatus);
                 var time = new LocalTime();
                 var drawing = withSwordInHand(
                     UpdatedDrawing.ofModel(model, heavyAttack, weaponObjects, time, Human.this::visualRoot),
@@ -252,8 +258,8 @@ public class Human implements UpdatedDrawing
             @Override
             public HumanState weaponWalk()
             {
-                var weaponWalk = animator.animation("weaponWalk");
-                var weaponObjects = animator.animation("weapon_weaponWalk");
+                var weaponWalk = animator.animation("weaponWalk", refreshStatus);
+                var weaponObjects = animator.animation("weapon_weaponWalk", refreshStatus);
                 var time = new LocalTime();
                 var drawing = withSwordInHand(
                     UpdatedDrawing.ofModel(model, weaponWalk, weaponObjects, time, Human.this::visualRoot),
@@ -271,8 +277,8 @@ public class Human implements UpdatedDrawing
             @Override
             public HumanState weaponIdle()
             {
-                var weaponIdle = animator.animation("weaponIdle");
-                var weaponObjects = animator.animation("weapon_weaponIdle");
+                var weaponIdle = animator.animation("weaponIdle", refreshStatus);
+                var weaponObjects = animator.animation("weapon_weaponIdle", refreshStatus);
                 var time = new LocalTime();
                 var drawing = withSwordInHand(
                     UpdatedDrawing.ofModel(model, weaponIdle, weaponObjects, time, Human.this::visualRoot),
@@ -290,8 +296,8 @@ public class Human implements UpdatedDrawing
             @Override
             public HumanState damageFlight()
             {
-                var damageFlight = animator.animation("damageFlight");
-                var weaponObjects = animator.animation("weapon_damageFlight");
+                var damageFlight = animator.animation("damageFlight", refreshStatus);
+                var weaponObjects = animator.animation("weapon_damageFlight", refreshStatus);
                 
                 var time = new LocalTime();
                 var drawing = withSwordOnBack(
@@ -316,8 +322,8 @@ public class Human implements UpdatedDrawing
             @Override
             public HumanState defeated()
             {
-                var defeated = animator.animation("defeated");
-                var weaponObjects = animator.animation("weapon_defeated");
+                var defeated = animator.animation("defeated", refreshStatus);
+                var weaponObjects = animator.animation("weapon_defeated", refreshStatus);
                 
                 var time = new LocalTime();
                 var drawing = withSwordOnBack(

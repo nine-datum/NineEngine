@@ -20,12 +20,11 @@ public interface UpdatedDrawing
         return (projection, cameraPosition, cameraRotation, worldLight) ->
         {
         	var t = time.value();
-        	var r = root.call();
     	
         	return model.animate(
 	            projection.mul(Matrix4f.firstPersonCamera(cameraPosition, cameraRotation)),
 	            worldLight,
-	            r,
+	            root.call(),
 	            animation.animate(t),
 	            objectsAnimation.animate(t));
         };

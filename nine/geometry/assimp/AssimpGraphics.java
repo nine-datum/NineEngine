@@ -1,9 +1,11 @@
 package nine.geometry.assimp;
 
 import nine.geometry.AnimatedSkeleton;
+import nine.geometry.AnimatedSkeletonSource;
 import nine.geometry.Model;
 import nine.io.Storage;
 import nine.main.TransformedDrawing;
+import nine.function.Condition;
 import nine.function.RefreshStatus;
 import nine.game.AnimatedDrawing;
 import nine.game.Graphics;
@@ -80,7 +82,7 @@ public class AssimpGraphics implements Graphics
 	}
 
 	@Override
-	public AnimatedSkeleton animation(String file, String boneType) {
+	public AnimatedSkeletonSource animation(String file, Condition<String> boneType) {
 		// not implemented
 		return null;
 	}

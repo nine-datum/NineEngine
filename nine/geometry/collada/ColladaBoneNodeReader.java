@@ -1,6 +1,7 @@
 package nine.geometry.collada;
 
 import nine.buffer.TextValueBuffer;
+import nine.function.Condition;
 import nine.function.FunctionDouble;
 import nine.function.RefreshStatus;
 import nine.geometry.Animation;
@@ -14,11 +15,11 @@ public class ColladaBoneNodeReader implements NodeReader
     Animator animator;
     NodeReader controllerReader;
     RefreshStatus refresh;
-    String boneType;
+    Condition<String> boneType;
     FunctionDouble<String, Animation, Animation> processLocal;
 
     public ColladaBoneNodeReader(
-    		String boneType,
+    		Condition<String> boneType,
     		Animation parent,
     		Animator animator,
     		RefreshStatus refresh,
@@ -61,7 +62,7 @@ public class ColladaBoneNodeReader implements NodeReader
                 Animation transform = time -> parent.animate(time).mul(processLocal.call(name, local).animate(time));
                 transform = transform.refreshable(refresh);
 
-                if(type.equals(boneType))
+                if(boneType.match(type))
                 {
                     reader.read(name, transform);
                 }

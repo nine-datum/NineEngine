@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import nine.function.Condition;
 import nine.function.FunctionDouble;
 import nine.function.RefreshStatus;
 import nine.geometry.Animation;
@@ -12,15 +13,15 @@ import nine.geometry.MapSkeleton;
 
 public class ColladaBasicSkeletonParser implements ColladaSkeletonParser
 {
-	String boneType;
+	Condition<String> boneType;
 	FunctionDouble<String, Animation, Animation> processLocal;
 	
-	public ColladaBasicSkeletonParser(String boneType)
+	public ColladaBasicSkeletonParser(Condition<String> boneType)
 	{
 		this.boneType = boneType;
 		this.processLocal = (b, a) -> a;
 	}
-	public ColladaBasicSkeletonParser(String boneType, FunctionDouble<String, Animation, Animation> processLocal)
+	public ColladaBasicSkeletonParser(Condition<String> boneType, FunctionDouble<String, Animation, Animation> processLocal)
 	{
 		this.boneType = boneType;
 		this.processLocal = processLocal;
