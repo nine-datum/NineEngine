@@ -70,7 +70,7 @@ public class ColladaOpenGLGrahics implements Graphics
     @Override
     public AnimatedSkeletonSource animation(String file, Condition<String> boneType)
     {
-        return refreshStatus -> AnimatedSkeleton.fromCollada(ColladaNode.fromFile(storage.open(file)), boneType, refreshStatus);
+        return AnimatedSkeleton.fromCollada(ColladaNode.fromFile(storage.open(file)), boneType);
     }
 
     @Override

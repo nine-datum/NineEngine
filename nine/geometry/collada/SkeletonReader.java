@@ -1,8 +1,8 @@
 package nine.geometry.collada;
 
-import nine.geometry.AnimatedSkeleton;
+import nine.geometry.AnimatedSkeletonSource;
 
 public interface SkeletonReader
 {
-    void read(String skinId, AnimatedSkeleton skeleton);
+    void read(String skinId, AnimatedSkeletonSource skeleton);
 }

@@ -1,9 +1,11 @@
 package nine.geometry;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import nine.function.Condition;
 import nine.function.Function;
+import nine.function.FunctionSingle;
 import nine.function.RefreshStatus;
 import nine.geometry.collada.ColladaNode;
 import nine.geometry.collada.ColladaBasicAnimationParser;
@@ -16,21 +18,22 @@ public interface AnimatedSkeleton
 {
     Skeleton animate(float time);
 
-    static AnimatedSkeleton fromCollada(ColladaNode node, RefreshStatus refresh)
+    static AnimatedSkeletonSource fromCollada(ColladaNode node)
     {
-    	return fromCollada(node, Condition.equality("JOINT"), refresh);
+    	return fromCollada(node, Condition.equality("JOINT"));
     }
     
-    static AnimatedSkeleton fromCollada(ColladaNode node, Condition<String> boneType, RefreshStatus refresh)
+    static AnimatedSkeletonSource fromCollada(ColladaNode node, Condition<String> boneType)
     {
-        return fromCollada(node, new ColladaBasicAnimationParser(), new ColladaBasicSkeletonParser(boneType), refresh);
+        return fromCollada(node, new ColladaBasicAnimationParser(), new ColladaBasicSkeletonParser(boneType));
     }
-    static AnimatedSkeleton fromCollada(ColladaNode node, ColladaAnimationParser animationParser, ColladaSkeletonParser skeletonParser, RefreshStatus refresh)
+    static AnimatedSkeletonSource fromCollada(ColladaNode node, ColladaAnimationParser animationParser, ColladaSkeletonParser skeletonParser)
     {
-        HashMap<String, Animation> animations = new HashMap<>();
-        AnimatedSkeleton[] skeletonBox = { null };
-        animationParser.read(node, animations::put);
-        skeletonParser.read(node, animations::get, refresh, (id, skeleton) ->
+        AnimatedSkeletonSource[] skeletonBox = { null };
+        ArrayList<FunctionSingle<String, Animation>> animBox = new ArrayList<>();
+        animationParser.read(node, animBox::add);
+        System.out.println(1);
+        skeletonParser.read(node, s -> animBox.size() == 0 ? null : animBox.get(0).call(s), (id, skeleton) ->
         {
             skeletonBox[0] = skeleton;
         });

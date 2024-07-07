@@ -1,8 +1,9 @@
 package nine.geometry.collada;
 
+import nine.function.FunctionSingle;
 import nine.geometry.Animation;
 
 public interface ColladaAnimationReader
 {
-    void read(String bone, Animation animation);
+    void read(FunctionSingle<String, Animation> animations);
 }

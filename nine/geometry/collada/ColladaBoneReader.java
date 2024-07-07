@@ -1,8 +1,8 @@
 package nine.geometry.collada;
 
-import nine.geometry.Animation;
+import nine.geometry.AnimationSource;
 
 public interface ColladaBoneReader
 {
-    void read(String name, Animation transform);
+    void read(String name, AnimationSource transform);
 }

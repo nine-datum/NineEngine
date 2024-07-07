@@ -1,8 +1,12 @@
 package nine.geometry.collada;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import nine.buffer.Buffer;
 import nine.buffer.MatrixBuffer;
 import nine.buffer.TextValueBuffer;
+import nine.geometry.Animation;
 import nine.geometry.KeyFrameAnimation;
 import nine.math.Matrix4f;
 
@@ -27,6 +31,7 @@ public class ColladaBasicAnimationParser implements ColladaAnimationParser
                 reader.read(child);
             }
         }
+        HashMap<String, Animation> animations = new HashMap<>();
 
         node.children("COLLADA", root ->
         root.children("library_animations", lib ->
@@ -57,8 +62,9 @@ public class ColladaBasicAnimationParser implements ColladaAnimationParser
             channel.attribute("target", target ->
             {
                 String boneName = target.split("/")[0];
-                reader.read(boneName, new KeyFrameAnimation(input, matrixBuffer));
+                animations.put(boneName, new KeyFrameAnimation(input, matrixBuffer));
             }));
         }))));
+        reader.read(animations::get);
     }   
 }

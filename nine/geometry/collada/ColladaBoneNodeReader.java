@@ -2,38 +2,31 @@ package nine.geometry.collada;
 
 import nine.buffer.TextValueBuffer;
 import nine.function.Condition;
-import nine.function.FunctionDouble;
-import nine.function.RefreshStatus;
 import nine.geometry.Animation;
+import nine.geometry.AnimationSource;
 import nine.geometry.Animator;
 import nine.math.Matrix4f;
 
 public class ColladaBoneNodeReader implements NodeReader
 {
-    Animation parent;
+    AnimationSource parent;
     ColladaBoneReader reader;
     Animator animator;
     NodeReader controllerReader;
-    RefreshStatus refresh;
     Condition<String> boneType;
-    FunctionDouble<String, Animation, Animation> processLocal;
 
     public ColladaBoneNodeReader(
     		Condition<String> boneType,
-    		Animation parent,
+    		AnimationSource parent,
     		Animator animator,
-    		RefreshStatus refresh,
     		ColladaBoneReader boneReader,
-    		NodeReader controllerReader,
-    		FunctionDouble<String, Animation, Animation> processLocal)
+    		NodeReader controllerReader)
     {
         this.parent = parent;
         this.reader = boneReader;
         this.animator = animator;
         this.controllerReader = controllerReader;
-        this.refresh = refresh;
         this.boneType = boneType;
-        this.processLocal = processLocal; 
     }
 
     @Override
@@ -59,15 +52,17 @@ public class ColladaBoneNodeReader implements NodeReader
                     local = time -> contentMatrix;
                 }
                 
-                Animation transform = time -> parent.animate(time).mul(processLocal.call(name, local).animate(time));
-                transform = transform.refreshable(refresh);
-
+                AnimationSource transform = refresh ->
+                {
+                	var p = parent.instance(refresh);
+                	return time -> p.animate(time).mul(local.animate(time));
+                };
                 if(boneType.match(type))
                 {
                     reader.read(name, transform);
                 }
                 
-                child.children("node", new ColladaBoneNodeReader(boneType, transform, animator, refresh, reader, controllerReader, processLocal));
+                child.children("node", new ColladaBoneNodeReader(boneType, transform, animator, reader, controllerReader));
             })));
             child.children("instance_controller", controllerReader);
         }));
