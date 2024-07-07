@@ -227,7 +227,7 @@ public class ColladaSkinnedModel implements SkinnedModelAsset
                 	{
                 		String animKey = objectModelAnimKeys.get(model);
                 		Matrix4f mat = animKey == null ? Matrix4f.identity : objectsAnimation.transform(animKey);
-                		Matrix4f armature = skinAnimation.transform("Armature");
+                		Matrix4f armature = objectsAnimation.transform("Armature");
                 		Matrix4f r = root;
                 		if(armature != null) r = root.mul(armature);
                 		mat = r.mul(mat);
