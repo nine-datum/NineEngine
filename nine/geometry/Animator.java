@@ -2,7 +2,7 @@ package nine.geometry;
 
 public interface Animator
 {
-    Animation animation(String bone);
+    Animation animation(String id, String name);
 
-    static final Animator none = bone -> null;
+    static final Animator none = (id, name) -> null;
 }

@@ -30,10 +30,10 @@ public interface AnimatedSkeleton
     static AnimatedSkeletonSource fromCollada(ColladaNode node, ColladaAnimationParser animationParser, ColladaSkeletonParser skeletonParser)
     {
         AnimatedSkeletonSource[] skeletonBox = { null };
-        ArrayList<FunctionSingle<String, Animation>> animBox = new ArrayList<>();
+        ArrayList<Animator> animBox = new ArrayList<>();
         animationParser.read(node, animBox::add);
-        System.out.println(1);
-        skeletonParser.read(node, s -> animBox.size() == 0 ? null : animBox.get(0).call(s), (id, skeleton) ->
+        Animator animator = (boneId, boneName) -> animBox.size() == 0 ? null : animBox.get(0).animation(boneId, boneName);
+        skeletonParser.read(node, animator, (id, skeleton) ->
         {
             skeletonBox[0] = skeleton;
         });

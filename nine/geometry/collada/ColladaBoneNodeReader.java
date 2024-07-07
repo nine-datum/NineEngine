@@ -39,7 +39,7 @@ public class ColladaBoneNodeReader implements NodeReader
             child.children("matrix", matrix ->
             matrix.content(content ->
             {
-                Animation animation = animator.animation(id);
+                Animation animation = animator.animation(id, name);
                 Animation local;
                 
                 if(animation != null)

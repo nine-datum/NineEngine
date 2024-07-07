@@ -4,11 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import nine.function.Condition;
-import nine.function.FunctionDouble;
-import nine.function.RefreshStatus;
 import nine.geometry.Animation;
 import nine.geometry.AnimationSource;
 import nine.geometry.Animator;

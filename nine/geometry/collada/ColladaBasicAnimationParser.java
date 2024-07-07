@@ -65,6 +65,6 @@ public class ColladaBasicAnimationParser implements ColladaAnimationParser
                 animations.put(boneName, new KeyFrameAnimation(input, matrixBuffer));
             }));
         }))));
-        reader.read(animations::get);
+        reader.read((id, name) -> animations.get(id));
     }   
 }
