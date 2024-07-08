@@ -1,7 +1,9 @@
 package nine.geometry.collada;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 
 import nine.buffer.ArrayBuffer;
 import nine.buffer.Buffer;
@@ -202,14 +204,19 @@ public class ColladaSkinnedModel implements SkinnedModelAsset
             {
                 Matrix4f[] bones = new Matrix4f[MAX_MATRICES];
                 for(int i = 0; i < MAX_MATRICES; i++) bones[i] = Matrix4f.identity;
-
-                Skeleton invBind = invBindPoses.entrySet().iterator().next().getValue();
+                
+                Skeleton invBind = Skeleton.someOf(invBindPoses.values());
 
                 Flow.iterable(boneIndices.entrySet()).read(bone ->
                 {
                     String key = bone.getKey();
                     int index = bone.getValue();
-                    Matrix4f matrix = skinAnimation.transform(key).mul(invBind.transform(key));
+                    var invBindMat = invBind.transform(key);
+                    if(invBindMat == null)
+                	{
+                    	throw new RuntimeException("%s inv bind pose is missing!".formatted(key));
+                	}
+                    Matrix4f matrix = skinAnimation.transform(key).mul(invBindMat);
                     bones[index] = matrix;
                 });
 

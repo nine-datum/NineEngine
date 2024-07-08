@@ -10,4 +10,17 @@ public interface Skeleton
     {
     	return b -> transform(b).mul(other.transform(b));
     }
+    
+    public static Skeleton someOf(Iterable<Skeleton> skeletons)
+    {
+    	return b ->
+    	{
+    		for(var s : skeletons)
+    		{
+    			var m = s.transform(b);
+    			if(m != null) return m;
+    		}
+    		return null;
+    	};
+    }
 }
