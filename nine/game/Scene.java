@@ -54,9 +54,9 @@ public class Scene implements Drawing
             deltaTime));
 
         var mountains = graphics.model("resources/models/Scenes/Mountains.dae");
-        statue = graphics.animatedModel("resources/datum/mage.dae");
-        statueAnim = graphics.animation("resources/datum/mage.dae").instance(refreshStatus);
-        statueObjectAnim = graphics.animation("resources/datum/mage.dae", Condition.equality("NODE")).instance(refreshStatus);
+        statue = graphics.animatedModel("resources/datum/archer.dae");
+        statueAnim = graphics.animation("resources/datum/archer.dae").instance(refreshStatus);
+        statueObjectAnim = graphics.animation("resources/datum/archer.dae", Condition.equality("NODE")).instance(refreshStatus);
         scene = mountains;
     }
 
@@ -96,8 +96,9 @@ public class Scene implements Drawing
         UpdatedDrawing.of(
             player,
             UpdatedDrawing.of(npcs.toArray(Human[]::new)),
-            UpdatedDrawing.ofModel(scene, () -> Matrix4f.scale(Vector3f.newXYZ(10f, 10f, 10f))),
-            UpdatedDrawing.ofModel(statue, statueAnim, statueObjectAnim, new Time(), () -> Matrix4f.translation(Vector3f.newXYZ(2f, 1f, 0f))))
+            UpdatedDrawing.ofModel(statue, statueAnim, statueObjectAnim, new Time(), () -> Matrix4f.translation(Vector3f.newXYZ(0f, 2f, 0f))),
+            UpdatedDrawing.ofModel(scene, () -> Matrix4f.scale(Vector3f.newXYZ(10f, 10f, 10f)))
+        )
         .update(
             projection.projection(),
             cameraPosition,

@@ -5,8 +5,8 @@
       <author>Blender User</author>
       <authoring_tool>Blender 4.0.1 commit date:2023-11-16, commit time:16:40, hash:d0dd92834a08</authoring_tool>
     </contributor>
-    <created>2024-07-08T12:55:44</created>
-    <modified>2024-07-08T12:55:44</modified>
+    <created>2024-07-08T13:54:24</created>
+    <modified>2024-07-08T13:54:24</modified>
     <unit name="meter" meter="1"/>
     <up_axis>Z_UP</up_axis>
   </asset>
@@ -334,45 +334,6 @@
         </vertex_weights>
       </skin>
     </controller>
-    <controller id="Armature_001_Cylinder-skin" name="Armature.001">
-      <skin source="#Cylinder-mesh">
-        <bind_shape_matrix>5.96046e-8 -0.9999998 1.01494e-9 -4.76837e-7 8.31804e-8 -9.49824e-9 -0.9999996 4.17233e-7 0.9999999 0 5.86389e-8 -8.34465e-7 0 0 0 1</bind_shape_matrix>
-        <source id="Armature_001_Cylinder-skin-joints">
-          <Name_array id="Armature_001_Cylinder-skin-joints-array" count="4">Bow Rope Bow_1 Bow_2</Name_array>
-          <technique_common>
-            <accessor source="#Armature_001_Cylinder-skin-joints-array" count="4" stride="1">
-              <param name="JOINT" type="name"/>
-            </accessor>
-          </technique_common>
-        </source>
-        <source id="Armature_001_Cylinder-skin-bind_poses">
-          <float_array id="Armature_001_Cylinder-skin-bind_poses-array" count="64">6.71209 2.52791e-7 -2.443001 6.57234 -2.443001 9.86533e-7 -6.71209 5.317922 0 7.142857 1.0135e-6 -0.2284034 0 0 0 1 -2.08822e-7 -7.142857 -3.99961e-7 0.2284028 -2.443001 4.47262e-7 -6.71209 5.950609 6.71209 0 -2.443001 6.57234 0 0 0 1 -6.712093 1.61217e-6 2.442992 -6.572332 0.4823598 7.002243 1.325273 -1.764064 -2.394911 1.410341 -6.579992 5.069445 0 0 0 1 6.71209 6.36381e-7 -2.442999 6.572337 0.4823623 -7.002239 1.325279 -1.316256 -2.394905 -1.410333 -6.579954 5.159606 0 0 0 1</float_array>
-          <technique_common>
-            <accessor source="#Armature_001_Cylinder-skin-bind_poses-array" count="4" stride="16">
-              <param name="TRANSFORM" type="float4x4"/>
-            </accessor>
-          </technique_common>
-        </source>
-        <source id="Armature_001_Cylinder-skin-weights">
-          <float_array id="Armature_001_Cylinder-skin-weights-array" count="50">1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</float_array>
-          <technique_common>
-            <accessor source="#Armature_001_Cylinder-skin-weights-array" count="50" stride="1">
-              <param name="WEIGHT" type="float"/>
-            </accessor>
-          </technique_common>
-        </source>
-        <joints>
-          <input semantic="JOINT" source="#Armature_001_Cylinder-skin-joints"/>
-          <input semantic="INV_BIND_MATRIX" source="#Armature_001_Cylinder-skin-bind_poses"/>
-        </joints>
-        <vertex_weights count="50">
-          <input semantic="JOINT" source="#Armature_001_Cylinder-skin-joints" offset="0"/>
-          <input semantic="WEIGHT" source="#Armature_001_Cylinder-skin-weights" offset="1"/>
-          <vcount>1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 </vcount>
-          <v>3 0 2 1 3 2 2 3 3 4 2 5 3 6 2 7 3 8 2 9 3 10 2 11 3 12 3 13 2 14 2 15 3 16 2 17 3 18 2 19 3 20 2 21 3 22 2 23 3 24 3 25 2 26 2 27 3 28 2 29 3 30 2 31 3 32 2 33 3 34 2 35 0 36 0 37 0 38 0 39 0 40 0 41 2 42 2 43 3 44 3 45 1 46 1 47 1 48 1 49</v>
-        </vertex_weights>
-      </skin>
-    </controller>
   </library_controllers>
   <library_visual_scenes>
     <visual_scene id="Scene" name="Scene">
@@ -604,125 +565,15 @@
           </bind_material>
         </instance_geometry>
       </node>
-      <node id="Armature_001" name="Armature.001" type="NODE">
-        <matrix sid="transform">0.131557 -1.95742e-9 -0.04788282 -0.61 4.9547e-9 -0.14 1.9336e-8 0.03197634 -0.04788282 -1.98646e-8 -0.131557 1.014312 0 0 0 1</matrix>
-        <node id="Armature_001_Bow" name="Bow" sid="Bow" type="JOINT">
-          <matrix sid="transform">1 2.98023e-8 1.42109e-14 -4.66341e-7 1.42109e-14 5.61527e-15 -1 1.21205e-8 -2.98023e-8 1 -8.88178e-16 5.07505e-7 0 0 0 1</matrix>
-          <node id="Armature_001_Rope" name="Rope" sid="Rope" type="JOINT">
-            <matrix sid="transform">-4.37114e-8 2.14939e-13 1 2.48914e-7 -7.5498e-8 0.9999999 -2.20268e-13 -0.6326877 -1 -7.5498e-8 -4.37114e-8 1.47336e-7 0 0 0 1</matrix>
-            <node id="Armature_001_Rope_end" name="Rope_end" sid="Rope_end" type="JOINT">
-              <matrix sid="transform">1 -2.84217e-14 -2.98024e-8 2.21393e-8 2.84217e-14 1 2.13163e-13 0.1326878 2.98024e-8 -2.14939e-13 1 -2.10679e-7 0 0 0 1</matrix>
-              <node id="Armature_001_Rope_end_end" name="Rope_end_end" sid="Rope_end_end" type="JOINT">
-                <matrix sid="transform">1 0 1.36184e-15 7.10543e-15 0 1 -2.84217e-14 0.1326884 -2.19088e-15 2.66454e-14 1 2.84217e-14 0 0 0 1</matrix>
-                <extra>
-                  <technique profile="blender">
-                    <connect sid="connect" type="bool">1</connect>
-                    <roll sid="roll" type="float">1.570796</roll>
-                    <tip_x sid="tip_x" type="float">0</tip_x>
-                    <tip_y sid="tip_y" type="float">0</tip_y>
-                    <tip_z sid="tip_z" type="float">0.1326884</tip_z>
-                  </technique>
-                </extra>
-              </node>
-              <extra>
-                <technique profile="blender">
-                  <roll sid="roll" type="float">1.570796</roll>
-                </technique>
-              </extra>
-            </node>
-            <extra>
-              <technique profile="blender">
-                <roll sid="roll" type="float">1.570796</roll>
-                <tip_x sid="tip_x" type="float">0</tip_x>
-                <tip_y sid="tip_y" type="float">0</tip_y>
-                <tip_z sid="tip_z" type="float">0.1326878</tip_z>
-              </technique>
-            </extra>
-          </node>
-          <extra>
-            <technique profile="blender">
-              <roll sid="roll" type="float">0</roll>
-              <tip_x sid="tip_x" type="float">0</tip_x>
-              <tip_y sid="tip_y" type="float">0</tip_y>
-              <tip_z sid="tip_z" type="float">0.6326878</tip_z>
-            </technique>
-          </extra>
-        </node>
-        <node id="Armature_001_Bow_1" name="Bow_1" sid="Bow_1" type="JOINT">
-          <matrix sid="transform">-1 3.45324e-10 1.33962e-6 -4.43365e-7 -2.64843e-7 -0.9803134 -0.1974445 -0.5000001 1.31318e-6 -0.1974465 0.9803086 5.7464e-7 0 0 0 1</matrix>
-          <node id="Armature_001_Bow_1_end" name="Bow_1_end" sid="Bow_1_end" type="JOINT">
-            <matrix sid="transform">1 1.25897e-9 -1.26273e-8 -7.39343e-7 -1.25905e-9 1 1.49012e-8 2.550204 1.26273e-8 -1.49012e-8 1 1.19209e-7 0 0 0 1</matrix>
-            <node id="Armature_001_Bow_1_end_end" name="Bow_1_end_end" sid="Bow_1_end_end" type="JOINT">
-              <matrix sid="transform">1 0 2.27374e-13 0 -2.84217e-14 1 -1.49012e-8 2.550205 -2.27374e-13 1.49012e-8 1 0 0 0 0 1</matrix>
-              <extra>
-                <technique profile="blender">
-                  <connect sid="connect" type="bool">1</connect>
-                  <roll sid="roll" type="float">3.141591</roll>
-                  <tip_x sid="tip_x" type="float">0</tip_x>
-                  <tip_y sid="tip_y" type="float">-2.5</tip_y>
-                  <tip_z sid="tip_z" type="float">-0.5035291</tip_z>
-                </technique>
-              </extra>
-            </node>
-            <extra>
-              <technique profile="blender">
-                <roll sid="roll" type="float">3.141591</roll>
-              </technique>
-            </extra>
-          </node>
-          <extra>
-            <technique profile="blender">
-              <roll sid="roll" type="float">3.141591</roll>
-              <tip_x sid="tip_x" type="float">0</tip_x>
-              <tip_y sid="tip_y" type="float">-2.5</tip_y>
-              <tip_z sid="tip_z" type="float">-0.503529</tip_z>
-            </technique>
-          </extra>
-        </node>
-        <node id="Armature_001_Bow_2" name="Bow_2" sid="Bow_2" type="JOINT">
-          <matrix sid="transform">1 -7.79588e-9 2.80593e-7 -4.89318e-7 -4.77597e-8 0.9803136 0.1974467 0.5 -2.76608e-7 -0.1974467 0.9803136 4.4037e-7 0 0 0 1</matrix>
-          <node id="Armature_001_Bow_2_end" name="Bow_2_end" sid="Bow_2_end" type="JOINT">
-            <matrix sid="transform">1 -1.22107e-9 2.98597e-8 4.59027e-7 1.22107e-9 1 -2.98023e-8 2.550205 -2.98597e-8 2.98023e-8 1 -5.36442e-7 0 0 0 1</matrix>
-            <node id="Armature_001_Bow_2_end_end" name="Bow_2_end_end" sid="Bow_2_end_end" type="JOINT">
-              <matrix sid="transform">1 -1.42109e-14 -2.84217e-14 0 7.10543e-15 1 -2.98023e-8 2.550205 2.84217e-14 2.98023e-8 1 1.19209e-7 0 0 0 1</matrix>
-              <extra>
-                <technique profile="blender">
-                  <connect sid="connect" type="bool">1</connect>
-                  <roll sid="roll" type="float">3.11351e-7</roll>
-                  <tip_x sid="tip_x" type="float">0</tip_x>
-                  <tip_y sid="tip_y" type="float">2.5</tip_y>
-                  <tip_z sid="tip_z" type="float">-0.5035296</tip_z>
-                </technique>
-              </extra>
-            </node>
-            <extra>
-              <technique profile="blender">
-                <roll sid="roll" type="float">3.11351e-7</roll>
-              </technique>
-            </extra>
-          </node>
-          <extra>
-            <technique profile="blender">
-              <roll sid="roll" type="float">2.8137e-7</roll>
-              <tip_x sid="tip_x" type="float">0</tip_x>
-              <tip_y sid="tip_y" type="float">2.5</tip_y>
-              <tip_z sid="tip_z" type="float">-0.5035296</tip_z>
-            </technique>
-          </extra>
-        </node>
-        <node id="Cylinder" name="Cylinder" type="NODE">
-          <matrix sid="transform">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</matrix>
-          <instance_controller url="#Armature_001_Cylinder-skin">
-            <skeleton>#Armature_001_Bow</skeleton>
-            <skeleton>#Armature_001_Bow_1</skeleton>
-            <skeleton>#Armature_001_Bow_2</skeleton>
-            <bind_material>
-              <technique_common>
-                <instance_material symbol="Bow-material" target="#Bow-material"/>
-              </technique_common>
-            </bind_material>
-          </instance_controller>
-        </node>
+      <node id="Cylinder" name="Cylinder" type="NODE">
+        <matrix sid="transform">-0.1285575 0.1532089 -4.39987e-8 -0.6 4.74567e-8 -1.76153e-8 -0.2 -0.005469133 -0.1532089 -0.1285575 -2.50311e-8 1.039839 0 0 0 1</matrix>
+        <instance_geometry url="#Cylinder-mesh" name="Cylinder">
+          <bind_material>
+            <technique_common>
+              <instance_material symbol="Bow-material" target="#Bow-material"/>
+            </technique_common>
+          </bind_material>
+        </instance_geometry>
       </node>
     </visual_scene>
   </library_visual_scenes>

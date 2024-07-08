@@ -88,18 +88,34 @@ public class ColladaBasicSkinParser implements ColladaSkinParser
                     {
                         int count = counts.at(countIndex++);
 
+                        int[] data_j = new int[count];
+                        float[] data_w = new float[count];
+                        
+                        float w_sum = 0;
+                        
+                        for(int i = 0; i < count; i++)
+                        {
+                        	float w;
+                        	int ri = (rawIndex + i) * 2;
+                                data_j[i] = indices.at(ri);
+                                data_w[i] = w = rawWeights.at(indices.at(ri + 1));
+                            
+                            if(i < weightsPerVertex) w_sum += w;
+                        }
+                        
+                        if(w_sum == 0) w_sum = 1;
+                        
                         for(int i = 0; i < weightsPerVertex; i++)
                         {
-                            if(i < count)
-                            {
-                                int ri = (rawIndex + i) * 2;
-                                jointArray[index + i] = indices.at(ri);
-                                weightArray[index + i] = rawWeights.at(indices.at(ri + 1));
-                            }
-                            else
-                            {
-                                jointArray[index + i] = -1;
-                            }
+                        	if(i < count)
+                        	{
+	                        	weightArray[index + i] = data_w[i] / w_sum;
+	                        	jointArray[index + i] = data_j[i];
+                        	}
+                        	else
+                        	{
+                        		jointArray[index + i] = -1;
+                        	}
                         }
 
                         index += weightsPerVertex;

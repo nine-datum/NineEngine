@@ -3,6 +3,7 @@ package nine.geometry.collada;
 import java.util.ArrayList;
 import java.util.List;
 
+import nine.collection.Flow;
 import nine.collection.IterableFlow;
 import nine.geometry.Model;
 import nine.geometry.ModelAsset;
@@ -32,7 +33,7 @@ public class ColladaModel implements ModelAsset
     @Override
     public Model load(OpenGL gl, Storage storage)
     {
-        List<Drawing> drawings = new ArrayList<Drawing>();
+        List<Model> models = new ArrayList<>();
 
         materialParser.read(node, materials ->
         geometryParser.read(node, (source, material, floatBuffers, intBuffers) ->
@@ -45,9 +46,17 @@ public class ColladaModel implements ModelAsset
                     .attribute(2, floatBuffers.map("TEXCOORD"))
                     .attribute(3, floatBuffers.map("NORMAL").fromRightToLeftHanded()));
             var drawing = buffer.drawing();
-            drawings.add(drawing);
+            models.add(shader ->
+            {
+            	var colorUniform = shader.uniforms().uniformColor("color");
+            	return () ->
+            	{
+            		colorUniform.load(mat.color);
+            		drawing.draw();
+            	};
+            });
         }));
 
-        return shader -> shader.play(new CompositeDrawing(new IterableFlow<Drawing>(drawings)));
+        return shader -> shader.play(Drawing.of(Flow.iterable(models.stream().map(m -> m.instance(shader)).toList())));
     }
 }
