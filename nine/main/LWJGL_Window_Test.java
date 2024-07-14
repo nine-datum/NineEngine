@@ -1,11 +1,18 @@
 package nine.main;
 
+import java.util.HashMap;
+
 import nine.buffer.Buffer;
+import nine.drawing.Color;
+import nine.function.ErrorHandler;
 import nine.function.ErrorPrinter;
 import nine.function.FunctionSingle;
 import nine.function.UpdateRefreshStatus;
 import nine.game.Graphics;
 import nine.geometry.AnimatedSkeleton;
+import nine.geometry.Material;
+import nine.geometry.MaterialProvider;
+import nine.geometry.collada.ColladaBasicMaterialParser;
 import nine.geometry.collada.FileColladaNode;
 import nine.geometry.procedural.Geometry;
 import nine.geometry.procedural.MaterialPoint;
@@ -25,6 +32,7 @@ import nine.opengl.OpenGL;
 import nine.opengl.Shader;
 import nine.opengl.ShaderLoader;
 import nine.opengl.ShaderPlayer;
+import nine.opengl.Texture;
 
 public class LWJGL_Window_Test
 {
@@ -51,7 +59,16 @@ public class LWJGL_Window_Test
 			Shader skinShader = shaderLoader.load("resources/shaders/diffuse_skin_vertex.glsl","resources/shaders/diffuse_fragment.glsl");
 			Shader diffuseShader = shaderLoader.load("resources/shaders/diffuse_vertex.glsl", "resources/shaders/diffuse_fragment.glsl");
 
-			AnimatedSkeleton idle = AnimatedSkeleton.fromCollada(new FileColladaNode(storage.open("resources/models/Knight/LongSword_Idle.dae"), ErrorPrinter.instance))
+			var idleColladaNode = new FileColladaNode(storage.open("resources/models/Knight/LongSword_Idle.dae"), ErrorPrinter.instance);
+			
+			var materialsMap = new HashMap<String, Material>();
+			new ColladaBasicMaterialParser().read(idleColladaNode, (name, texture, color) ->
+			{
+				materialsMap.put(name, Material.textureAndColor(gl.texture(storage.open(texture)), color));
+			});
+			var materials = MaterialProvider.ofMap(materialsMap, Material.blank(gl));
+			
+			AnimatedSkeleton idle = AnimatedSkeleton.fromCollada(idleColladaNode)
 					.instance(updateStatus);
 			//AnimatedSkeleton walk = AnimatedSkeleton.fromCollada(new FileColladaNode(storage.open("resources/models/Knight/Walk.dae"), ErrorPrinter.instance), updateStatus);
 
@@ -145,7 +162,8 @@ public class LWJGL_Window_Test
 							worldLight,
 							Matrix4f.translation(Vector3f.newXYZ(px, 0f, py)).mul(humanWorld),
 							idle.animate(time.value()),
-							n -> Matrix4f.identity);
+							n -> Matrix4f.identity,
+							materials);
 
 						idleDrawing.draw();
 					}

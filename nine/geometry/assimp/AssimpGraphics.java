@@ -1,8 +1,7 @@
 package nine.geometry.assimp;
 
-import nine.geometry.AnimatedSkeleton;
 import nine.geometry.AnimatedSkeletonSource;
-import nine.geometry.Model;
+import nine.geometry.MaterialProvider;
 import nine.io.Storage;
 import nine.main.TransformedDrawing;
 import nine.function.Condition;
@@ -12,10 +11,8 @@ import nine.game.Graphics;
 import nine.drawing.ColorFloatStruct;
 
 import nine.opengl.Drawing;
-import nine.opengl.DrawingAttributeBuffer;
 import nine.opengl.OpenGL;
 import nine.opengl.Shader;
-import nine.opengl.ShaderPlayer;
 import nine.opengl.Texture;
 
 import java.awt.image.BufferedImage;
@@ -173,7 +170,7 @@ public class AssimpGraphics implements Graphics
         var transformUniform = uniforms.uniformMatrix("transform");
         var projectionUniform = uniforms.uniformMatrix("projection");
 		
-        return (projection, light, transform, animation, objectsAnimation) ->
+        return (projection, light, transform, animation, objectsAnimation, materials) ->
         {
             Drawing initializedDrawing = () ->
             {
@@ -184,5 +181,11 @@ public class AssimpGraphics implements Graphics
             };
             return skinShader.play(gl.depthOn(gl.smooth(initializedDrawing)));
         };
+	}
+
+	@Override
+	public MaterialProvider materials(String file) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

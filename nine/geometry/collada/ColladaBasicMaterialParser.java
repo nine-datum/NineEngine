@@ -126,7 +126,7 @@ public class ColladaBasicMaterialParser implements ColladaMaterialParser
             }));
         });
 
-        reader.call(name ->
+        for(var name : sceneToMaterial.keySet())
         {
         	String effect =
     			materialToEffect.get(
@@ -141,7 +141,8 @@ public class ColladaBasicMaterialParser implements ColladaMaterialParser
             
             if(tex == null) tex = "default.png";
             color = colorText == null ? new ColorFloatStruct(1, 1, 1, 1) : Color.parse(colorText);
-            return new Material(tex, color);
-        });
+            
+            reader.call(name, tex, color);
+        }
     }
 }

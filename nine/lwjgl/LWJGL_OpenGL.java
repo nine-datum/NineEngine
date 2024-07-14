@@ -122,8 +122,6 @@ public class LWJGL_OpenGL implements OpenGL
         return texture[0];
     }
 
-    ThreadLocal<ByteBuffer> pixelsBuffer = new ThreadLocal<>();
-
     @Override
     public Texture texture(BufferedImage image)
     {
@@ -159,7 +157,6 @@ public class LWJGL_OpenGL implements OpenGL
     
         byte[] data = ((DataBufferByte)image.getRaster().getDataBuffer()).getData();
         ByteBuffer buffer = ByteBuffer.allocateDirect(data.length);
-        pixelsBuffer.set(buffer);
         buffer.order(ByteOrder.nativeOrder());
         buffer.put(data);
         buffer.flip();
@@ -180,8 +177,6 @@ public class LWJGL_OpenGL implements OpenGL
             buffer);
         GL30.glGenerateMipmap(GL11.GL_TEXTURE_2D);
         GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
-
-        pixelsBuffer.set(null);
 
 		return new Texture()
         {

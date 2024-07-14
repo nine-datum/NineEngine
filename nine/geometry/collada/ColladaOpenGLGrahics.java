@@ -1,15 +1,15 @@
 package nine.geometry.collada;
 
-import java.io.File;
+import java.nio.file.Path;
+import java.util.HashMap;
 
-import nine.drawing.ColorFloatStruct;
 import nine.function.Condition;
-import nine.function.RefreshStatus;
 import nine.game.AnimatedDrawing;
 import nine.game.Graphics;
 import nine.geometry.AnimatedSkeleton;
 import nine.geometry.AnimatedSkeletonSource;
-import nine.geometry.assimp.AssimpGraphics;
+import nine.geometry.Material;
+import nine.geometry.MaterialProvider;
 import nine.io.Storage;
 import nine.main.TransformedDrawing;
 import nine.opengl.Drawing;
@@ -76,14 +76,13 @@ public class ColladaOpenGLGrahics implements Graphics
     @Override
     public AnimatedDrawing animatedModel(String file)
     {
-        var textureStorage = this.storage.relative(new File(file).getParent());
         var modelSource = new ColladaSkinnedModel(
         		ColladaNode.fromFile(storage.open(file)),
         		geometryParser,
         		skinParser,
         		materialParser
     		)
-    		.load(gl, textureStorage);
+    		.load(gl);
         var shaderPlayer = skinShader.player();
         var staticShaderPlayer = diffuseShader.player();
         var uniforms = shaderPlayer.uniforms();
@@ -92,9 +91,9 @@ public class ColladaOpenGLGrahics implements Graphics
         var transformUniform = uniforms.uniformMatrix("transform");
         var projectionUniform = combinedUniforms.uniformMatrix("projection");
         var shadedModel = modelSource.shade(shaderPlayer, staticShaderPlayer);
-        return (projection, light, transform, animation, objectsAnimation) ->
+        return (projection, light, transform, animation, objectsAnimation, materials) ->
         {
-            var drawing = shadedModel.instance(animation, objectsAnimation, transform, () ->
+            var drawing = shadedModel.instance(animation, objectsAnimation, transform, materials, () ->
             {
             	lightUniform.load(light);
                 transformUniform.load(transform);
@@ -111,29 +110,42 @@ public class ColladaOpenGLGrahics implements Graphics
 //    	{
 //    		return new AssimpGraphics(gl, skinShader, diffuseShader, storage, refreshStatus).model(file);
 //    	}
-        var textureStorage = this.storage.relative(new File(file).getParent());
         var modelSource = new ColladaModel(
         		ColladaNode.fromFile(storage.open(file)),
-        		geometryParser,
-        		materialParser
+        		geometryParser
     		)
-    		.load(gl, textureStorage);
+    		.load(gl);
         var shaderPlayer = diffuseShader.player();
         var uniforms = shaderPlayer.uniforms();
         var lightUniform = uniforms.uniformVector("worldLight");
         var transformUniform = uniforms.uniformMatrix("transform");
         var projectionUniform = uniforms.uniformMatrix("projection");
         var shadedModel = modelSource.instance(shaderPlayer);
-        return (projection, light, transform) ->
+        return (projection, light, transform, materials) ->
         {
+        	var mmodel = shadedModel.materialize(materials);
             Drawing initializedDrawing = () ->
             {
                 lightUniform.load(light);
                 transformUniform.load(transform);
                 projectionUniform.load(projection);
-                shadedModel.draw();
+                mmodel.draw();
             };
             return shaderPlayer.play(gl.depthOn(gl.smooth(initializedDrawing)));
         };
     }
+
+	@Override
+	public MaterialProvider materials(String file)
+	{
+		var dir = Path.of(file).getParent().toString();
+		var node = ColladaNode.fromFile(storage.open(file));
+		var materialsMap = new HashMap<String, Material>();
+		new ColladaBasicMaterialParser().read(node, (name, texture, color) ->
+		{
+			texture = Path.of(dir, texture).toString();
+			materialsMap.put(name, Material.textureAndColor(gl.texture(storage.open(texture)), color));
+		});
+		return MaterialProvider.ofMap(materialsMap);			
+	}
 }

@@ -11,4 +11,8 @@ public interface Color
     	var floats = Arrays.stream(text.split(" ")).map(Float::parseFloat).toArray(Float[]::new);
     	return new ColorFloatStruct(floats[0], floats[1], floats[2], floats[3]);
     }
+    static Color floats(float r, float g, float b, float a)
+    {
+    	return new ColorFloatStruct(r, g, b, a);
+    }
 }

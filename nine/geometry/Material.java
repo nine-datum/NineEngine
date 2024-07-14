@@ -1,15 +1,31 @@
 package nine.geometry;
 
 import nine.drawing.Color;
+import nine.opengl.Drawing;
+import nine.opengl.OpenGL;
+import nine.opengl.ShaderPlayer;
+import nine.opengl.Texture;
 
-public class Material
+public interface Material
 {
-	public final String textureFile;
-	public final Color color;
+	Drawing apply(ShaderPlayer shader, Drawing drawing);
 	
-	public Material(String textureFile, Color color)
+	static Material blank(OpenGL gl)
 	{
-		this.textureFile = textureFile;
-		this.color = color;
+		return Material.textureAndColor(Texture.blank(gl), Color.floats(1, 0, 1, 1));
+	}
+	
+	static Material textureAndColor(Texture texture, Color color)
+	{
+		return (shader, drawing) ->
+		{
+			var colorUniform = shader.uniforms().uniformColor("color");
+			var textured = texture.apply(drawing);
+			return () ->
+			{
+				colorUniform.load(color);
+				textured.draw();
+			};
+		};
 	}
 }

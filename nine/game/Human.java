@@ -7,6 +7,7 @@ import nine.function.Function;
 import nine.function.RefreshStatus;
 import nine.function.UpdateRefreshStatus;
 import nine.geometry.AnimatedSkeleton;
+import nine.geometry.MaterialProvider;
 import nine.math.FloatFunc;
 import nine.math.LocalTime;
 import nine.math.Matrix4f;
@@ -102,11 +103,11 @@ public class Human implements UpdatedDrawing
     }
 
     @Override
-    public Drawing update(Matrix4f projection, Vector3f cameraPosition, Vector3f cameraRotation, Vector3f worldLight)
+    public Drawing update(Matrix4f projection, Vector3f cameraPosition, Vector3f cameraRotation, Vector3f worldLight, MaterialProvider materials)
     {
         state = state.next();
         refreshStatus.update();
-        return state.update(projection, cameraPosition, cameraRotation, worldLight);
+        return state.update(projection, cameraPosition, cameraRotation, worldLight, materials);
     }
 
     HumanState updateWalk(float movementSpeed, HumanState self, Function<HumanState> idle)

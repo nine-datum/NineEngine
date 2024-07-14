@@ -2,6 +2,7 @@ package nine.game;
 
 import nine.function.Condition;
 import nine.geometry.AnimatedSkeletonSource;
+import nine.geometry.MaterialProvider;
 import nine.geometry.collada.ColladaAnimationParser;
 import nine.geometry.collada.ColladaGeometryParser;
 import nine.geometry.collada.ColladaMaterialParser;
@@ -17,6 +18,7 @@ public interface Graphics
 	AnimatedSkeletonSource animation(String file, Condition<String> boneType);
     TransformedDrawing model(String file);
 	AnimatedDrawing animatedModel(String file);
+	MaterialProvider materials(String file);
 
     static Graphics collada(
         OpenGL gl,

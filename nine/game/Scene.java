@@ -6,6 +6,7 @@ import java.util.List;
 import nine.function.Condition;
 import nine.function.UpdateRefreshStatus;
 import nine.geometry.AnimatedSkeleton;
+import nine.geometry.MaterialProvider;
 import nine.input.Keyboard;
 import nine.input.Mouse;
 import nine.main.TransformedDrawing;
@@ -52,11 +53,24 @@ public class Scene implements Drawing
             3.14f,
             time,
             deltaTime));
+        
+        var mountainsFile = "resources/models/Scenes/Mountains.dae";
+        var statueFile = "resources/datum/ninja.dae";
+        var knightFile = "resources/models/Knight/LongSword_Idle.dae";
+        
+        materials = MaterialProvider.some(
+    		List.of(
+        		graphics.materials(mountainsFile),
+        		graphics.materials(statueFile),
+        		graphics.materials(knightFile)
+    		),
+    		null
+		);
 
-        var mountains = graphics.model("resources/models/Scenes/Mountains.dae");
-        statue = graphics.animatedModel("resources/datum/ninja.dae");
-        statueAnim = graphics.animation("resources/datum/ninja.dae").instance(refreshStatus);
-        statueObjectAnim = graphics.animation("resources/datum/ninja.dae", Condition.equality("NODE")).instance(refreshStatus);
+        var mountains = graphics.model(mountainsFile);
+        statue = graphics.animatedModel(statueFile);
+        statueAnim = graphics.animation(statueFile).instance(refreshStatus);
+        statueObjectAnim = graphics.animation(statueFile, Condition.equality("NODE")).instance(refreshStatus);
         scene = mountains;
     }
 
@@ -76,6 +90,7 @@ public class Scene implements Drawing
     AnimatedSkeleton statueAnim;
     AnimatedSkeleton statueObjectAnim;
     UpdateRefreshStatus refreshStatus = new UpdateRefreshStatus();
+    MaterialProvider materials;
     
     Vector2f mouseRotation = Vector2f.zero;
     Vector3f cameraRotation = Vector3f.zero;
@@ -103,7 +118,8 @@ public class Scene implements Drawing
             projection.projection(),
             cameraPosition,
             cameraRotation,
-            light.light()).draw();
+            light.light(),
+            materials).draw();
 
             
         keyboard.update();

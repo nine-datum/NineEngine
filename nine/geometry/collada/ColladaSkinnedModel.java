@@ -55,13 +55,13 @@ public class ColladaSkinnedModel implements SkinnedModelAsset
 
     interface RawMeshAction
     {
-        void call(DrawingAttributeBuffer buffer, Buffer<Integer> rawIndices, Material material);
+        void call(DrawingAttributeBuffer buffer, Buffer<Integer> rawIndices, String material);
     }
     interface RawMesh
     {
         void accept(RawMeshAction action);
 
-        static RawMesh of(DrawingAttributeBuffer buffer, Buffer<Integer> rawIndices, Material material)
+        static RawMesh of(DrawingAttributeBuffer buffer, Buffer<Integer> rawIndices, String material)
         {
             return action -> action.call(buffer, rawIndices, material);
         }
@@ -74,47 +74,37 @@ public class ColladaSkinnedModel implements SkinnedModelAsset
         }
     }
     
-    static Model makeModel(Material material, Drawing drawing)
+    static Model makeModel(String material, Drawing drawing)
     {
-    	return shader ->
+    	return shader -> materials ->
     	{
-    		var colorUniform = shader.uniforms().uniformColor("color");
-    		return () ->
-    		{
-    			colorUniform.load(material.color);
-    			drawing.draw();
-    		};
+    		return materials.material(material).apply(shader, drawing);
     	};
     }
 
     @Override
-    public ShadedSkinnedModel load(OpenGL gl, Storage storage)
+    public ShadedSkinnedModel load(OpenGL gl)
     {
         HashMap<String, RawMesh> meshes = new HashMap<>();
         HashMap<String, RawMesh> skinnedMeshes = new HashMap<>();
 
         HashMap<String, Skeleton> invBindPoses = new HashMap<>();
         HashMap<String, Integer> boneIndices = new HashMap<>();
-
-        materialParser.read(node, materials ->
+        
         geometryParser.read(node, (source, material, floatBuffers, intBuffers) ->
-        {
-        	var mat = materials.properties(material);
-        	
+        {	
             String sourceId = "#" + source;
-            DrawingAttributeBuffer buffer = new TexturedDrawingAttributeBuffer(
-                gl.texture(storage.open(mat.textureFile)),
-                gl.vao(intBuffers.map("INDEX"))
-                    .attribute(3, floatBuffers.map("VERTEX").fromRightToLeftHanded())
-                    .attribute(2, floatBuffers.map("TEXCOORD"))
-                    .attribute(3, floatBuffers.map("NORMAL").fromRightToLeftHanded()));
+            DrawingAttributeBuffer buffer = gl.vao(intBuffers.map("INDEX"))
+                .attribute(3, floatBuffers.map("VERTEX").fromRightToLeftHanded())
+                .attribute(2, floatBuffers.map("TEXCOORD"))
+                .attribute(3, floatBuffers.map("NORMAL").fromRightToLeftHanded());
             
-            var mesh = RawMesh.of(buffer, intBuffers.map("INDEX_VERTEX"), mat);
+            var mesh = RawMesh.of(buffer, intBuffers.map("INDEX_VERTEX"), material);
             var ex = meshes.get(sourceId);
             if(ex != null) mesh = RawMesh.many(ex, mesh);
             
             meshes.put(sourceId, mesh);
-        }));
+        });
 
         skinParser.read(node, (skinId, sourceId, names, invBind, matrix, weights, joints, weightPerIndex) ->
         {
@@ -188,20 +178,20 @@ public class ColladaSkinnedModel implements SkinnedModelAsset
 			scene -> scene.children("node", new SceneReader()))));
         
         return (skinShader, staticShader) ->
-        {	
+        {
             int MAX_MATRICES = 100;
-
-            var skinDrawing = new CompositeDrawing(
-        		skinnedModels
-        			.stream()
-        			.map(m -> m.instance(skinShader))
-        			.toArray(Drawing[]::new));
             
             var jointTransformsUniform = skinShader.uniforms().uniformMatrixArray("jointTransforms", MAX_MATRICES);
             var staticTransformUniform = staticShader.uniforms().uniformMatrix("transform");
 
-            return (skinAnimation, objectsAnimation, root, shaderInitializer) ->
+            return (skinAnimation, objectsAnimation, root, materials, shaderInitializer) ->
             {
+            	var skinDrawing = new CompositeDrawing(
+	        		skinnedModels
+	        			.stream()
+	        			.map(m -> m.instance(skinShader).materialize(materials))
+	        			.toArray(Drawing[]::new));
+            
                 Matrix4f[] bones = new Matrix4f[MAX_MATRICES];
                 for(int i = 0; i < MAX_MATRICES; i++) bones[i] = Matrix4f.identity;
                 
@@ -236,7 +226,7 @@ public class ColladaSkinnedModel implements SkinnedModelAsset
                 		Matrix4f mat = animKey == null ? Matrix4f.identity : objectsAnimation.transform(animKey);
                 		mat = root.mul(mat);
                 		staticTransformUniform.load(mat);
-                		model.instance(staticShader).draw();
+                		model.instance(staticShader).materialize(materials).draw();
                 	}
                 });
                 
