@@ -1,13 +1,23 @@
 package nine.game;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 
+import nine.buffer.Buffer;
+import nine.collection.Flow;
 import nine.function.Condition;
 import nine.function.Function;
 import nine.function.RefreshStatus;
 import nine.function.UpdateRefreshStatus;
 import nine.geometry.AnimatedSkeleton;
+import nine.geometry.Animator;
 import nine.geometry.MaterialProvider;
+import nine.geometry.collada.ColladaBasicSkeletonParser;
+import nine.geometry.collada.ColladaBasicSkinParser;
+import nine.geometry.collada.ColladaNode;
+import nine.io.FileStorage;
 import nine.math.FloatFunc;
 import nine.math.LocalTime;
 import nine.math.Matrix4f;
@@ -68,6 +78,15 @@ public class Human implements UpdatedDrawing
         var weapon_damageFlight = graphics.animation("resources/models/Knight/DamageFlight.dae", Condition.equality("NODE"));
         var weapon_defeated = graphics.animation("resources/models/Knight/Defeated.dae", Condition.equality("NODE"));
         
+        HashSet<String> boneNames = new HashSet<>();
+        
+        new ColladaBasicSkeletonParser(b -> true).read(ColladaNode.fromFile(new FileStorage().open("resources/models/Knight/LongSword_Idle.dae")),
+        		Animator.none,
+        		(skinId, bones, source) ->
+        {
+        	boneNames.addAll(Flow.iterable(bones).collect().toList());
+        });
+        
         var animator = HumanAnimator.of(Map.ofEntries(
             Map.entry("idle", idle),
             Map.entry("walk", walk),
@@ -90,7 +109,7 @@ public class Human implements UpdatedDrawing
 
         return human.instance(
             model,
-            animator);
+            (s, r) -> AnimatedSkeleton.cached(animator.animation(s, r), boneNames, 30, 1));
     }
 
     Matrix4f visualRoot()

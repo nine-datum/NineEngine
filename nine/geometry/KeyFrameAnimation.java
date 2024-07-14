@@ -29,22 +29,15 @@ public class KeyFrameAnimation implements Animation
         float last = keys.at(keysLength - 1);
         float frac = time - (last * (int)(time / last));
         
-        int next = 1;
-        int current = 0;
-        float k = 0f;
+        float dist = keys.at(1) - keys.at(0);
         
-        for(int i = keysLength - 1; i >= 0; i--)
-        {
-            k = keys.at(i);
-            if(frac > k)
-            {
-                current = i;
-                next = (i + 1) % keysLength;
-                break;
-            }
-        }
+        int current = (int)(frac / dist);
+        int next = current + 1;
+        if(next >= keysLength) next = 0;
+        
+        float k = keys.at(current);
 
-        lerp = (frac - k) / (keys.at(1) - keys.at(0));
+        lerp = (frac - k) / dist;
         a = frames.at(current);
         b = frames.at(next);
         

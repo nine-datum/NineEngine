@@ -34,7 +34,7 @@ public class ColladaBasicSkeletonParser implements ColladaSkeletonParser
             {
                 controller.attribute("url", skinId ->
                 {
-                    reader.read(skinId, refresh -> new MapSkeleton(Map.ofEntries(
+                    reader.read(skinId, bones.keySet(), refresh -> new MapSkeleton(Map.ofEntries(
                 		bones
                 			.entrySet()
                 			.stream()

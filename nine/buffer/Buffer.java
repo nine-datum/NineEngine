@@ -3,6 +3,7 @@ package nine.buffer;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.IntFunction;
 
 import nine.collection.BufferToFlow;
 import nine.collection.Flow;
@@ -12,6 +13,21 @@ import nine.function.IntegerMapping;
 public interface Buffer<T> extends IntegerMapping<T>
 {
     int length();
+    
+    default T[] toArray(IntFunction<T[]> func)
+    {
+    	int l = length();
+    	var a = func.apply(l);
+    	for(int i = 0; i < l; i++) a[i] = at(i);
+    	return a;
+    }
+    default List<T> toList()
+    {
+    	int l = length();
+    	var a = new ArrayList<T>(l);
+    	for(int i = 0; i < l; i++) a.add(at(i));
+    	return a;
+    }
 
     static<T> Buffer<T> empty()
     {
