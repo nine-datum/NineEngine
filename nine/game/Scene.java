@@ -54,9 +54,9 @@ public class Scene implements Drawing
             deltaTime));
 
         var mountains = graphics.model("resources/models/Scenes/Mountains.dae");
-        statue = graphics.animatedModel("resources/datum/archer.dae");
-        statueAnim = graphics.animation("resources/datum/archer.dae").instance(refreshStatus);
-        statueObjectAnim = graphics.animation("resources/datum/archer.dae", Condition.equality("NODE")).instance(refreshStatus);
+        statue = graphics.animatedModel("resources/datum/ninja.dae");
+        statueAnim = graphics.animation("resources/datum/ninja.dae").instance(refreshStatus);
+        statueObjectAnim = graphics.animation("resources/datum/ninja.dae", Condition.equality("NODE")).instance(refreshStatus);
         scene = mountains;
     }
 
