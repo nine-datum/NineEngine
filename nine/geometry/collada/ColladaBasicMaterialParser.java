@@ -139,7 +139,6 @@ public class ColladaBasicMaterialParser implements ColladaMaterialParser
             String colorText = effectToColor.get(effect);
             Color color;
             
-            if(tex == null) tex = "default.png";
             color = colorText == null ? new ColorFloatStruct(1, 1, 1, 1) : Color.parse(colorText);
             
             reader.call(name, tex, color);

@@ -15,6 +15,7 @@ import nine.main.TransformedDrawing;
 import nine.opengl.Drawing;
 import nine.opengl.OpenGL;
 import nine.opengl.Shader;
+import nine.opengl.Texture;
 import nine.opengl.Uniforms;
 
 public class ColladaOpenGLGrahics implements Graphics
@@ -143,8 +144,16 @@ public class ColladaOpenGLGrahics implements Graphics
 		var materialsMap = new HashMap<String, Material>();
 		new ColladaBasicMaterialParser().read(node, (name, texture, color) ->
 		{
-			texture = Path.of(dir, texture).toString();
-			materialsMap.put(name, Material.textureAndColor(gl.texture(storage.open(texture)), color));
+			Texture tex;
+			if(texture == null)
+			{
+				tex = Texture.blank(gl);
+			}
+			else
+			{
+				tex = gl.texture(storage.open(Path.of(dir, texture).toString()));
+			}
+			materialsMap.put(name, Material.textureAndColor(tex, color));
 		});
 		return MaterialProvider.ofMap(materialsMap);			
 	}
