@@ -35,6 +35,8 @@ echo build : compressing archive...
 
 cd ..
 jar cvfm nine.jar manifest.txt -C src/ . -C lib/ .
+rd /s /q lib
+rd /s /q src
 cd ..
 
 echo build : done

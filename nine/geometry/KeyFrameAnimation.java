@@ -22,10 +22,13 @@ public class KeyFrameAnimation implements Animation
             return Matrix4f.identity;
         }
         float lerp = 0;
-        Matrix4f a = Matrix4f.identity;
-        Matrix4f b = Matrix4f.identity;
+        Matrix4f a;
+        Matrix4f b;
 
         int keysLength = keys.length();
+        
+        if(keysLength == 1) return frames.at(0);
+        
         float last = keys.at(keysLength - 1);
         float frac = time - (last * (int)(time / last));
         

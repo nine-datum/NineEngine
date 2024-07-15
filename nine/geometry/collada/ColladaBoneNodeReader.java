@@ -55,7 +55,8 @@ public class ColladaBoneNodeReader implements NodeReader
                 AnimationSource transform = refresh ->
                 {
                 	var p = parent.instance(refresh);
-                	return time -> p.animate(time).mul(local.animate(time));
+                	Animation anim = time -> p.animate(time).mul(local.animate(time));
+                	return anim.refreshable(refresh);
                 };
                 if(boneType.match(type))
                 {

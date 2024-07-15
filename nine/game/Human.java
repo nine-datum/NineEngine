@@ -109,7 +109,7 @@ public class Human implements UpdatedDrawing
 
         return human.instance(
             model,
-            (s, r) -> AnimatedSkeleton.cached(animator.animation(s, r), boneNames, 30, 1));
+            (s, r) -> AnimatedSkeleton.cached(animator.animation(s, RefreshStatus.always), boneNames, 30, 1));
     }
 
     Matrix4f visualRoot()
