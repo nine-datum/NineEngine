@@ -272,6 +272,22 @@ public class Matrix4f
         for(int i = 0; i < 16; i++) newElements[i] = elements[i];
         return new Matrix4f(newElements);
     }
+    public static Matrix4f fromArray_unsafe(float[] elements)
+    {
+        if(elements.length != 16) throw new RuntimeException("Wrong elements length");
+        return new Matrix4f(elements);
+    }
+    public static Matrix4f fromIterable(Iterable<Float> iterable)
+    {
+        float[] elements = new float[16];
+        var i = iterable.iterator();
+        int c = 0;
+        while(c < 16 && i.hasNext())
+        {
+            elements[c++] = i.next();
+        }
+        return new Matrix4f(elements);
+    }
     public Matrix4f apply(ActionSingle<float[]> function)
     {
         float[] elements = this.elements.clone();
