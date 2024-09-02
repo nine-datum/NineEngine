@@ -101,7 +101,7 @@ public class Scene implements Drawing
     {
         var mouseInput = mouse.delta().mul(0.01f);
         mouseRotation = mouseRotation.add(mouseInput).clampY(-3.14f * 0.5f, 3.14f * 0.5f);
-        cameraRotation = Vector3f.newXY(-mouseRotation.y, mouseRotation.x);
+        cameraRotation = Vector3f.newXY(mouseRotation.y, mouseRotation.x);
 
         var cameraForward = Matrix4f.rotation(cameraRotation).transformVector(Vector3f.forward);
         var target = player.position;

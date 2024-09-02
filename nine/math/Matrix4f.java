@@ -83,8 +83,8 @@ public class Matrix4f
     }
     public static Matrix4f rotationX(float angle)
     {
-        var sin = (float)Math.sin(-angle);
-        var cos = (float)Math.cos(-angle);
+        var sin = (float)Math.sin(angle);
+        var cos = (float)Math.cos(angle);
         var elements = newElements();
         elements[5] = cos;
         elements[6] = sin;
