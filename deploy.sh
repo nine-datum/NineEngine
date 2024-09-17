@@ -11,6 +11,7 @@ mkdir -p $path
 cp build/nine.jar $path/$vn.jar
 cp pom.xml $path/$vn.pom
 cd $path
+sed -i "s/<version>[^<]*<\/version>/<version>$ver<\/version>/" $vn.pom
 
 mkdir empty
 jar -cf $vn-javadoc.jar -C empty .
