@@ -11,6 +11,7 @@ public interface OpenGL
     ShaderCompiler compiler();
     Texture texture(StorageResource input);
     Texture texture(BufferedImage image);
+    Texture blankTexture();
 
     Drawing depthOn(Drawing drawing);
     Drawing smooth(Drawing drawing);

@@ -37,6 +37,12 @@ public class LWJGL_OpenGL implements OpenGL
 {
     static ColorModel rgbaModel;
     static ColorModel rgbModel;
+    final Texture blank;
+
+    public LWJGL_OpenGL()
+    {
+        blank = Texture.blank(this);
+    }
 
     static
     {
@@ -198,5 +204,10 @@ public class LWJGL_OpenGL implements OpenGL
                 GL11.glDeleteTextures(id);
             }
         };
+    }
+    @Override
+    public Texture blankTexture()
+    {
+        return this.blank;
     }
 }
