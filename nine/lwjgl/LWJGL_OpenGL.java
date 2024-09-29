@@ -18,6 +18,7 @@ import nine.io.StorageResource;
 import nine.opengl.Drawing;
 import nine.opengl.DrawingBuffer;
 import nine.opengl.OpenGL;
+import nine.opengl.Profiler;
 import nine.opengl.ShaderCompiler;
 import nine.opengl.Texture;
 
@@ -38,10 +39,17 @@ public class LWJGL_OpenGL implements OpenGL
     static ColorModel rgbaModel;
     static ColorModel rgbModel;
     final Texture blank;
+    Profiler profiler;
 
     public LWJGL_OpenGL()
     {
         blank = Texture.blank(this);
+        profiler = Profiler.none;
+    }
+    public LWJGL_OpenGL(Profiler profiler)
+    {
+    	this();
+    	this.profiler = profiler;
     }
 
     static
@@ -210,4 +218,9 @@ public class LWJGL_OpenGL implements OpenGL
     {
         return this.blank;
     }
+	@Override
+	public Profiler profiler()
+	{
+		return profiler;
+	}
 }

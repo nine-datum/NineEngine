@@ -16,4 +16,6 @@ public interface OpenGL
     Drawing depthOn(Drawing drawing);
     Drawing smooth(Drawing drawing);
     Drawing clockwise(Drawing drawing);
+
+    Profiler profiler();
 }
