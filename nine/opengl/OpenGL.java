@@ -9,8 +9,8 @@ public interface OpenGL
 {
     DrawingBuffer vao(Buffer<Integer> elements);
     ShaderCompiler compiler();
-    Texture texture(StorageResource input);
-    Texture texture(BufferedImage image);
+    Texture texture(StorageResource input, boolean mipmaps);
+    Texture texture(BufferedImage image, boolean mipmaps);
     Texture blankTexture();
 
     Drawing depthOn(Drawing drawing);
@@ -18,4 +18,13 @@ public interface OpenGL
     Drawing clockwise(Drawing drawing);
 
     Profiler profiler();
+
+    default Texture texture(StorageResource input)
+    {
+        return texture(input, true);
+    }
+    default Texture texture(BufferedImage image)
+    {
+        return texture(image, true);
+    }
 }

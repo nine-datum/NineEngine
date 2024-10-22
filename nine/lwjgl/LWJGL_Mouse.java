@@ -27,9 +27,17 @@ public class LWJGL_Mouse implements Mouse
 
     void update()
     {
+        update(false);
+    }
+
+    void update(boolean lockCursor)
+    {
         if(refresh.mark())
         {
-            GLFW.glfwSetInputMode(windowHandle, GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_DISABLED);
+            if (lockCursor)
+            {
+                GLFW.glfwSetInputMode(windowHandle, GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_DISABLED);
+            }
             GLFW.glfwGetCursorPos(windowHandle, posXBuffer, posYBuffer);
             lastPosX = posX;
             lastPosY = posY;
