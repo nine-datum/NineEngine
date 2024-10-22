@@ -4,6 +4,7 @@ import org.lwjgl.glfw.GLFW;
 
 import nine.function.RefreshStatus;
 import nine.function.Refreshable;
+import nine.input.Key;
 import nine.input.Mouse;
 import nine.math.Vector2f;
 
@@ -64,5 +65,39 @@ public class LWJGL_Mouse implements Mouse
     {
         update();
         return Vector2f.newXY(posX - lastPosX, posY - lastPosY);
+    }
+
+    Key mouseKey(int code)
+    {
+        return new Key()
+        {
+            @Override
+            public boolean isDown()
+            {
+                return GLFW.glfwGetMouseButton(windowHandle, code) == GLFW.GLFW_PRESS;
+            }
+
+            @Override
+            public boolean isUp()
+            {
+                return GLFW.glfwGetMouseButton(windowHandle, code) == GLFW.GLFW_RELEASE;
+            }
+        };
+    }
+
+    @Override
+    public Key left()
+    {
+        return mouseKey(GLFW.GLFW_MOUSE_BUTTON_LEFT);
+    }
+    @Override
+    public Key right()
+    {
+        return mouseKey(GLFW.GLFW_MOUSE_BUTTON_RIGHT);
+    }
+    @Override
+    public Key middle()
+    {
+        return mouseKey(GLFW.GLFW_MOUSE_BUTTON_MIDDLE);
     }
 }
