@@ -12,7 +12,7 @@ find . -name "*.java" > build/sourcelist.txt
 echo "build : compiling classes"
 
 # Компиляция .java файлов
-javac -target 11 -source 11 -classpath lib/* -d build/src @build/sourcelist.txt
+javac -target 11 -source 11 -classpath "lib/*" -d build/src @build/sourcelist.txt
 
 # Удаление списка исходников
 rm build/sourcelist.txt
@@ -39,7 +39,7 @@ echo "build : compressing archive..."
 
 cd ..
 # Создание jar-архива с манифестом
-jar cvfm nine.jar manifest.txt -C lib/ .
+jar cvfm nine.jar manifest.txt -C src/ . -C lib/ .
 echo "current dir : $(pwd)"
 
 # Удаление временных папок
