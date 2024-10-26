@@ -46,10 +46,11 @@ public class LWJGL_Window implements Window
 {
 	// The window handle
 	private long window;
-    int width;
-    int height;
+  int width;
+  int height;
 
-	public static void close(int window)
+	@Override
+	public void close()
 	{
 		glfwSetWindowShouldClose(window, true);
 	}
