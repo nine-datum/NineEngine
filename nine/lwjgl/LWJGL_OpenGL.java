@@ -223,4 +223,15 @@ public class LWJGL_OpenGL implements OpenGL
 	{
 		return profiler;
 	}
+    @Override
+    public void clearDepth()
+    {
+        GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT);
+    }
+    @Override
+    public void clearColor(float r, float g, float b, float a)
+    {
+        GL11.glClearColor(r, g, b, a);
+        GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);
+    }
 }

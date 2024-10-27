@@ -56,9 +56,9 @@ public class LWJGL_Window implements Window
 	}
 
 	public void run(int width, int height, WindowStartAction start)
-    {
-        this.width = width;
-        this.height = height;
+	{
+		this.width = width;
+		this.height = height;
 
 		init(width, height);
 		loop(start);
@@ -92,7 +92,8 @@ public class LWJGL_Window implements Window
 			throw new RuntimeException("Failed to create the GLFW window");
 
 		// Get the thread stack and push a new frame
-		try ( MemoryStack stack = stackPush() ) {
+		try ( MemoryStack stack = stackPush() )
+		{
 			IntBuffer pWidth = stack.mallocInt(1); // int*
 			IntBuffer pHeight = stack.mallocInt(1); // int*
 
@@ -133,19 +134,14 @@ public class LWJGL_Window implements Window
 		// bindings available for use.
 		GL.createCapabilities();
 
-        var loop = start.start(window);
-
-		// Set the clear color
-		glClearColor(0.5f, 0.5f, 0.7f, 0f);
-		
+		var loop = start.start(window);
 		
 
 		// Run the rendering loop until the user has attempted to close
 		// the window or has pressed the ESCAPE key.
-		while ( !glfwWindowShouldClose(window) ) {
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
-			
-            loop.call(width, height);
+		while ( !glfwWindowShouldClose(window) )
+		{
+			loop.call(width, height);
 
 			glfwSwapBuffers(window); // swap the color buffers
 

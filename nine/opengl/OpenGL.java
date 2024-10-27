@@ -17,6 +17,9 @@ public interface OpenGL
     Drawing smooth(Drawing drawing);
     Drawing clockwise(Drawing drawing);
 
+    void clearDepth();
+    void clearColor(float r, float g, float b, float a);
+
     Profiler profiler();
 
     default Texture texture(StorageResource input)

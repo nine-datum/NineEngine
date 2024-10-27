@@ -14,16 +14,15 @@ public class LWJGL_Keyboard implements Keyboard
 
     public LWJGL_Keyboard(long window)
     {
-        keys = new int[256];
+        keys = new int[512];
         GLFW.glfwSetKeyCallback(window, this::callback);
     }
 
     void callback(long window, int codepoint, int scancode, int action, int mods)
     {
-        if (codepoint == GLFW.GLFW_KEY_ESCAPE && action == GLFW.GLFW_RELEASE) GLFW.glfwSetWindowShouldClose(window, true);
-        codepoint = Character.getNumericValue(Character.toUpperCase(Character.toChars(codepoint)[0]));
-        if(codepoint < 256 && codepoint >= 0)
+        if(codepoint >= 0 && codepoint < 512)
         {
+            if(codepoint >= 'a' && codepoint <= 'z') codepoint = Character.toUpperCase((char)codepoint);
             switch(action)
             {
                 case GLFW.GLFW_PRESS:
@@ -33,10 +32,8 @@ public class LWJGL_Keyboard implements Keyboard
         }
     }
 
-    @Override
-    public Key keyOf(char symbol)
+    public Key keyOfIndex(int index)
     {
-        int index = Character.getNumericValue(Character.toUpperCase(symbol));
         return new Key()
         {
             @Override
@@ -50,6 +47,38 @@ public class LWJGL_Keyboard implements Keyboard
                 return keys[index] == UP;
             }
         };
+    }
+
+    public Key escape()
+    {
+        return keyOfIndex(GLFW.GLFW_KEY_ESCAPE);
+    }
+    public Key space()
+    {
+        return keyOfIndex(GLFW.GLFW_KEY_SPACE);
+    }
+    public Key leftCtrl()
+    {
+        return keyOfIndex(GLFW.GLFW_KEY_LEFT_CONTROL);
+    }
+    public Key leftShift()
+    {
+        return keyOfIndex(GLFW.GLFW_KEY_LEFT_SHIFT);
+    }
+    public Key leftAlt()
+    {
+        return keyOfIndex(GLFW.GLFW_KEY_LEFT_ALT);
+    }
+    public Key backspace()
+    {
+        return keyOfIndex(GLFW.GLFW_KEY_BACKSPACE);
+    }
+
+    @Override
+    public Key keyOf(char symbol)
+    {
+        if(symbol >= 'a' && symbol <= 'z') symbol = Character.toUpperCase(symbol);
+        return keyOfIndex((int)symbol);
     }
 
     @Override

@@ -18,7 +18,9 @@ projection = () -> import.matrix4.perspective
         [import.graphics, import.keyboard, import.mouse, import.sceneProjection, import.sceneLight]
         [in.graphics, in.keyboard, in.mouse, projection, light]),
     .update:init ->
-    (
+    [
+        in.gl.clearDepth[](),
+        in.gl.clearColor(4.times.map () -> import.float)[0.5, 0.5, 0.7, 0],
         init.draw[]()
-    )
+    ]
 }

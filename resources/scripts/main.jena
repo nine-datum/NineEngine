@@ -39,6 +39,7 @@ windowStart =
         } =>
         scene = source "resources/scripts/scene.jena" import
         {
+            .gl:gl,
             .graphics:graphics,
             .keyboard:(in.keyboard),
             .mouse:(in.mouse),
