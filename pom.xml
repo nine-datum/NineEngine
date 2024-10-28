@@ -5,7 +5,7 @@
 
     <groupId>io.github.taqmuraz</groupId>
     <artifactId>nine</artifactId>
-    <version>1.2.33</version>
+    <version>1.2.34</version>
     <packaging>jar</packaging>
 
     <name>nine</name>
@@ -50,7 +50,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>1.2.33</version>
+                <version>1.2.34</version>
                 <executions>
                     <execution>
                         <id>attach-javadocs</id>
@@ -66,7 +66,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>
-                <version>1.2.33</version>
+                <version>1.2.34</version>
                 <configuration>
                   <reportPlugins>
                     <plugin>
@@ -82,7 +82,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
-                <version>1.2.33</version>
+                <version>1.2.34</version>
                 <executions>
                     <execution>
                         <id>attach-sources</id>
@@ -95,7 +95,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>1.2.33</version>
+                <version>1.2.34</version>
                 <executions>
                     <execution>
                         <id>attach-javadocs</id>
@@ -108,7 +108,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>
-                <version>1.2.33</version>
+                <version>1.2.34</version>
                 <executions>
                     <execution>
                         <id>sign-artifacts</id>
@@ -130,7 +130,7 @@
                     <plugin>
                         <groupId>org.sonatype.plugins</groupId>
                         <artifactId>nexus-staging-maven-plugin</artifactId>
-                        <version>1.2.33</version>
+                        <version>1.2.34</version>
                         <extensions>true</extensions>
                         <configuration>
                             <serverId>ossrh</serverId>
