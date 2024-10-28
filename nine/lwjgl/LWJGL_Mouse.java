@@ -19,6 +19,13 @@ public class LWJGL_Mouse implements Mouse
     float lastPosY;
     boolean initialized;
     Refreshable refresh;
+    final int NONE = 0, DOWN = 1, UP = 2;
+    int[] buttons = { NONE, NONE, NONE };
+    final int[] buttonCodes = {
+        GLFW.GLFW_MOUSE_BUTTON_LEFT,
+        GLFW.GLFW_MOUSE_BUTTON_RIGHT,
+        GLFW.GLFW_MOUSE_BUTTON_MIDDLE,
+    };
 
     public LWJGL_Mouse(long windowHandle, RefreshStatus refreshStatus)
     {
@@ -50,6 +57,22 @@ public class LWJGL_Mouse implements Mouse
                 lastPosY = posY;
                 initialized = true;
             }
+            for(int i = 0; i < buttons.length; i++)
+            {
+                boolean pressed = GLFW.glfwGetMouseButton(windowHandle, buttonCodes[i]) == GLFW.GLFW_PRESS;
+                switch(buttons[i])
+                {
+                    case NONE:
+                        if (pressed) buttons[i] = DOWN;
+                        break;
+                    case DOWN:
+                        if (!pressed) buttons[i] = UP;
+                        break;
+                    case UP:
+                        buttons[i] = pressed? DOWN : NONE;
+                        break;
+                }
+            }
         }
     }
 
@@ -74,13 +97,13 @@ public class LWJGL_Mouse implements Mouse
             @Override
             public boolean isDown()
             {
-                return GLFW.glfwGetMouseButton(windowHandle, code) == GLFW.GLFW_PRESS;
+                return buttons[code] == DOWN;
             }
 
             @Override
             public boolean isUp()
             {
-                return GLFW.glfwGetMouseButton(windowHandle, code) == GLFW.GLFW_RELEASE;
+                return buttons[code] == UP;
             }
         };
     }
@@ -88,16 +111,16 @@ public class LWJGL_Mouse implements Mouse
     @Override
     public Key left()
     {
-        return mouseKey(GLFW.GLFW_MOUSE_BUTTON_LEFT);
+        return mouseKey(0);
     }
     @Override
     public Key right()
     {
-        return mouseKey(GLFW.GLFW_MOUSE_BUTTON_RIGHT);
+        return mouseKey(1);
     }
     @Override
     public Key middle()
     {
-        return mouseKey(GLFW.GLFW_MOUSE_BUTTON_MIDDLE);
+        return mouseKey(2);
     }
 }
