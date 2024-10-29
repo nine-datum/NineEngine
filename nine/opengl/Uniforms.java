@@ -14,6 +14,7 @@ public interface Uniforms
     Uniform<Buffer<Matrix4f>> uniformMatrixArray(String name, int capacity);
     Uniform<Vector3f> uniformVector(String name);
     Uniform<Color> uniformColor(String name);
+		Uniform<Texture> uniformTexture(String name, int slot);
     
     static Uniforms many(Uniforms... uniforms) {
     	return new Uniforms() {
@@ -35,6 +36,11 @@ public interface Uniforms
 			@Override
 			public Uniform<Color> uniformColor(String name) {
 				return Uniform.many(Arrays.stream(uniforms).map(u -> u.uniformColor(name)).collect(Collectors.toList()));
+			}
+
+			@Override
+			public Uniform<Texture> uniformTexture(String name, int slot) {
+				return Uniform.many(Arrays.stream(uniforms).map(u -> u.uniformTexture(name, slot)).collect(Collectors.toList()));
 			}
 		};
     }

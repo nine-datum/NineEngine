@@ -1,5 +1,7 @@
 package nine.lwjgl;
 
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
 
 import nine.buffer.Buffer;
@@ -7,6 +9,7 @@ import nine.drawing.Color;
 import nine.drawing.ColorFloatStruct;
 import nine.math.Matrix4f;
 import nine.math.Vector3f;
+import nine.opengl.Texture;
 import nine.opengl.Uniform;
 import nine.opengl.Uniforms;
 
@@ -67,5 +70,27 @@ public class LWJGL_Uniforms implements Uniforms
         {
             GL20.glUniform4f(location, r, g, b, a);
         });
+    }
+
+    @Override
+    public Uniform<Texture> uniformTexture(String name, int slot)
+    {
+        int location = GL20.glGetUniformLocation(program, name);
+        return tex ->
+        {
+            int[] last = {0};
+            int[] cur = {0};
+            GL20.glGetIntegerv(GL20.GL_TEXTURE_BINDING_2D, last);
+            tex.apply(() ->
+            {
+                GL20.glGetIntegerv(GL20.GL_TEXTURE_BINDING_2D, cur);
+                GL13.glActiveTexture(GL13.GL_TEXTURE0 + slot);
+                GL11.glBindTexture(GL11.GL_TEXTURE_2D, cur[0]);
+                GL20.glUniform1i(location, slot);
+                GL13.glActiveTexture(GL13.GL_TEXTURE0);
+            }).draw();
+            GL13.glActiveTexture(GL13.GL_TEXTURE0);
+            GL11.glBindTexture(GL11.GL_TEXTURE_2D, last[0]);
+        };
     }
 }

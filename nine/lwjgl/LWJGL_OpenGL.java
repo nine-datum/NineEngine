@@ -94,12 +94,7 @@ public class LWJGL_OpenGL implements OpenGL
     @Override
     public Drawing smooth(Drawing drawing)
     {
-        return () ->
-        {
-            GL20.glShadeModel(GL20.GL_SMOOTH);
-            drawing.draw();
-            GL20.glShadeModel(GL20.GL_FLAT);
-        };
+        return drawing;
     }
     @Override
     public Drawing clockwise(Drawing drawing)
