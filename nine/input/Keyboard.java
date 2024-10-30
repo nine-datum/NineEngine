@@ -11,4 +11,9 @@ public interface Keyboard
     Key leftAlt();
     Key leftCtrl();
     Key space();
+    Key tab();
+    Key arrowLeft();
+    Key arrowRight();
+    Key arrowUp();
+    Key arrowDown();
 }

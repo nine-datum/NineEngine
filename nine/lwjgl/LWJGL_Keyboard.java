@@ -89,4 +89,29 @@ public class LWJGL_Keyboard implements Keyboard
             if(keys[i] == UP) keys[i] = NONE;
         }
     }
+
+    @Override
+    public Key tab() {
+        return keyOfIndex(GLFW.GLFW_KEY_TAB);
+    }
+
+    @Override
+    public Key arrowLeft() {
+        return keyOfIndex(GLFW.GLFW_KEY_LEFT);
+    }
+
+    @Override
+    public Key arrowRight() {
+        return keyOfIndex(GLFW.GLFW_KEY_RIGHT);
+    }
+
+    @Override
+    public Key arrowUp() {
+        return keyOfIndex(GLFW.GLFW_KEY_UP);
+    }
+
+    @Override
+    public Key arrowDown() {
+        return keyOfIndex(GLFW.GLFW_KEY_DOWN);
+    }
 }
