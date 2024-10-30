@@ -154,17 +154,19 @@ public class LWJGL_OpenGL implements OpenGL
         int height = image.getHeight();
 
         WritableRaster raster = Raster.createInterleavedRaster(DataBuffer.TYPE_BYTE, width, height, bands, null);
+        int[] pixel = new int[4];
+        var imageRaster = image.getRaster();
+        for(int x = 0; x < width; x++)
+        {
+            for(int y = 0; y < height; y++)
+            {
+                imageRaster.getPixel(x, y, pixel);
+                raster.setPixel(x, height - y - 1, pixel);
+            }
+        }
         actualImage = new BufferedImage(model,raster,false,new Hashtable<>());
-
-        Graphics2D g = (Graphics2D)actualImage.getGraphics();
-        g.setColor(new Color(0f,0f,0f,0f));
-        g.fillRect(0, 0, width, height);
-        g.translate(0, height);
-        g.scale(1f, -1f);
-        g.drawImage(image,0,0,null);
-        image = actualImage;
     
-        byte[] data = ((DataBufferByte)image.getRaster().getDataBuffer()).getData();
+        byte[] data = ((DataBufferByte)actualImage.getRaster().getDataBuffer()).getData();
         ByteBuffer buffer = ByteBuffer.allocateDirect(data.length);
         buffer.order(ByteOrder.nativeOrder());
         buffer.put(data);
@@ -178,8 +180,8 @@ public class LWJGL_OpenGL implements OpenGL
         GL11.glTexImage2D(GL11.GL_TEXTURE_2D,
             0,
             GL11.GL_RGBA,
-            image.getWidth(),
-            image.getHeight(),
+            width,
+            height,
             0,
             image.getColorModel().hasAlpha() ? GL15.GL_RGBA : GL15.GL_RGB,
             GL11.GL_UNSIGNED_BYTE,
