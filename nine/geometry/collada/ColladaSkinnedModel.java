@@ -15,6 +15,7 @@ import nine.collection.RangeFlow;
 import nine.drawing.Color;
 import nine.drawing.ColorFloatStruct;
 import nine.geometry.Material;
+import nine.geometry.MaterializedDrawing;
 import nine.geometry.Model;
 import nine.geometry.ShadedSkinnedModel;
 import nine.geometry.Skeleton;
@@ -27,6 +28,7 @@ import nine.opengl.DrawingAttributeBuffer;
 import nine.opengl.OpenGL;
 import nine.opengl.Profiler;
 import nine.opengl.Shader;
+import nine.opengl.ShaderPlayer;
 
 public class ColladaSkinnedModel implements SkinnedModelAsset
 {
@@ -74,8 +76,12 @@ public class ColladaSkinnedModel implements SkinnedModelAsset
         	};
         }
     }
+    interface RawModel
+    {
+        MaterializedDrawing instance(ShaderPlayer shader);
+    }
     
-    static Model makeModel(String material, Drawing drawing, Profiler profiler)
+    static RawModel makeModel(String material, Drawing drawing, Profiler profiler)
     {
     	return shader -> materials ->
     	{
@@ -148,9 +154,9 @@ public class ColladaSkinnedModel implements SkinnedModelAsset
             });
         });
         
-        ArrayList<Model> simpleModels = new ArrayList<>();
-        ArrayList<Model> skinnedModels = new ArrayList<>();
-        HashMap<Model, String> objectModelAnimKeys = new HashMap<>();
+        ArrayList<RawModel> simpleModels = new ArrayList<>();
+        ArrayList<RawModel> skinnedModels = new ArrayList<>();
+        HashMap<RawModel, String> objectModelAnimKeys = new HashMap<>();
         
         class SceneReader implements NodeReader
         {
@@ -240,7 +246,7 @@ public class ColladaSkinnedModel implements SkinnedModelAsset
                 	profiler.profile("drawing simple models", () ->
                 	{
 	                	shaderInitializer.draw();
-	                	for(Model model : simpleModels)
+	                	for(RawModel model : simpleModels)
 	                	{
 	                		String animKey = objectModelAnimKeys.get(model);
 	                		Matrix4f mat = animKey == null ? Matrix4f.identity : objectsAnimation.transform(animKey);

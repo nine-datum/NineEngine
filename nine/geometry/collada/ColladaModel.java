@@ -1,6 +1,7 @@
 package nine.geometry.collada;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import nine.collection.Flow;
@@ -17,21 +18,29 @@ public class ColladaModel implements ModelAsset
 {
     ColladaNode node;
     ColladaGeometryParser geometryParser;
+    ColladaVisualSceneParser sceneParser;
 
     public ColladaModel(ColladaNode node, ColladaGeometryParser geometryParser)
     {
         this.node = node;
         this.geometryParser = geometryParser;
+        this.sceneParser = new ColladaBasicVisualSceneParser();
+    }
+    public ColladaModel(ColladaNode node, ColladaGeometryParser geometryParser, ColladaVisualSceneParser sceneParser)
+    {
+        this.node = node;
+        this.geometryParser = geometryParser;
+        this.sceneParser = sceneParser;
     }
     public ColladaModel(ColladaNode node)
     {
-        this(node, new ColladaBasicGeometryParser());
+        this(node, new ColladaBasicGeometryParser(), new ColladaBasicVisualSceneParser());
     }
 
     @Override
     public Model load(OpenGL gl)
     {
-        List<Model> models = new ArrayList<>();
+        HashMap<String, Model> models = new HashMap<>();
         
         geometryParser.read(node, (source, material, floatBuffers, intBuffers) ->
         {
@@ -40,12 +49,32 @@ public class ColladaModel implements ModelAsset
 	            .attribute(2, floatBuffers.map("TEXCOORD"))
 	            .attribute(3, floatBuffers.map("NORMAL").fromRightToLeftHanded());
             var bufferDrawing = buffer.drawing();
-            models.add(shader -> materials ->
+            models.put("#" + source, (transform, shader) -> materials ->
             {
             	return materials.material(material).apply(shader, bufferDrawing);
             });
         });
+        List<Model> sceneModels = new ArrayList<>();
+        sceneParser.read(node, (id, root) ->
+        {
+            Model model = models.get(id);
+            if(model != null)
+            {
+                sceneModels.add((transform, shader) -> materials ->
+                {
+                    Drawing transformLoad = () -> transform.load(root);
+                    return Drawing.of(transformLoad, model.instance(transform, shader).materialize(materials));
+                });
+            }
+        });
 
-        return shader -> materials -> shader.play(Drawing.of(Flow.iterable(models.stream().map(m -> m.instance(shader).materialize(materials)).toList())));
+        return (transform, shader) -> materials ->
+        {
+            var drawings = Drawing.of(Flow.iterable(sceneModels.stream().map(m ->
+            {
+                return m.instance(transform, shader).materialize(materials);
+            }).toList()));
+            return shader.play(drawings);
+        };
     }
 }

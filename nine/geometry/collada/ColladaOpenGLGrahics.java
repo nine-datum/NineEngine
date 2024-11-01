@@ -12,10 +12,12 @@ import nine.geometry.Material;
 import nine.geometry.MaterialProvider;
 import nine.io.Storage;
 import nine.main.TransformedDrawing;
+import nine.math.Matrix4f;
 import nine.opengl.Drawing;
 import nine.opengl.OpenGL;
 import nine.opengl.Shader;
 import nine.opengl.Texture;
+import nine.opengl.Uniform;
 import nine.opengl.Uniforms;
 
 public class ColladaOpenGLGrahics implements Graphics
@@ -121,14 +123,17 @@ public class ColladaOpenGLGrahics implements Graphics
         var lightUniform = uniforms.uniformVector("worldLight");
         var transformUniform = uniforms.uniformMatrix("transform");
         var projectionUniform = uniforms.uniformMatrix("projection");
-        var shadedModel = modelSource.instance(shaderPlayer);
         return (projection, light, transform, materials) ->
         {
+            Uniform<Matrix4f> loadLocal = local ->
+            {
+                transformUniform.load(transform.mul(local));
+            };
+            var shadedModel = modelSource.instance(loadLocal, shaderPlayer);
         	var mmodel = shadedModel.materialize(materials);
             Drawing initializedDrawing = () ->
             {
                 lightUniform.load(light);
-                transformUniform.load(transform);
                 projectionUniform.load(projection);
                 mmodel.draw();
             };
