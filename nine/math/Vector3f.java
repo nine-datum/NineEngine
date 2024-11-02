@@ -6,9 +6,9 @@ import nine.input.Keyboard;
 
 public final class Vector3f
 {
-    public final float x, y, z;
+    public final double x, y, z;
 
-    private Vector3f(float x, float y, float z)
+    private Vector3f(double x, double y, double z)
     {
         this.x = x;
         this.y = y;
@@ -17,7 +17,7 @@ public final class Vector3f
 
     public interface XYZAction
     {
-        void call(float x, float y, float z);
+        void call(double x, double y, double z);
     }
 
     public void accept(XYZAction acceptor)
@@ -36,17 +36,17 @@ public final class Vector3f
         return String.format("%f, %f, %f", x, y, z);
     }
 
-    public Vector3f clampLength(float limit)
+    public Vector3f clampLength(double limit)
     {
-        float length = length();
+        double length = length();
         if (length > limit) return normalized().mul(limit);
         return this;
     }
     public Vector3f clamp(Vector3f min, Vector3f max)
     {
-        float x = this.x;
-        float y = this.y;
-        float z = this.z;
+        double x = this.x;
+        double y = this.y;
+        double z = this.z;
         if(x < min.x) x = min.x;
         if(y < min.y) y = min.y;
         if(z < min.z) z = min.z;
@@ -62,19 +62,19 @@ public final class Vector3f
             z * b.x - x * b.z,
             x * b.y - y * b.x);
     }
-    public float length()
+    public double length()
     {
-        return (float)Math.sqrt(x * x + y * y + z * z);
+        return Math.sqrt(x * x + y * y + z * z);
     }
     public Vector3f normalized()
     {
-        float len = length();
+        double len = length();
         if (len != 0)
             return new Vector3f(x / len, y / len, z / len);
         else
             return new Vector3f(0f, 0f, 0f);
     }
-    public float dot(Vector3f b)
+    public double dot(Vector3f b)
     {
         return x * b.x + y * b.y + z * b.z;
     }
@@ -90,11 +90,11 @@ public final class Vector3f
     {
         return new Vector3f(x / b.x, y / b.y, z / b.z);
     }
-    public Vector3f mul(float f)
+    public Vector3f mul(double f)
     {
         return new Vector3f(x * f, y * f, z * f);
     }
-    public Vector3f div(float f)
+    public Vector3f div(double f)
     {
         if(f == 0) return new Vector3f(0f, 0f, 0f);
         return new Vector3f(x / f, y / f, z / f);
@@ -115,38 +115,38 @@ public final class Vector3f
     {
         return Vector2f.newXY(x, z);
     }
-    public Vector3f withX(float x)
+    public Vector3f withX(double x)
     {
         return new Vector3f(x, y, z);
     }
-    public Vector3f withY(float y)
+    public Vector3f withY(double y)
     {
         return new Vector3f(x, y, z);
     }
-    public Vector3f withZ(float z)
+    public Vector3f withZ(double z)
     {
         return new Vector3f(x, y, z);
     }
-    public Vector3f lerp(Vector3f b, float t)
+    public Vector3f lerp(Vector3f b, double t)
     {
-        float dx = b.x - x;
-        float dy = b.y - y;
-        float dz = b.z - z;
+        double dx = b.x - x;
+        double dy = b.y - y;
+        double dz = b.z - z;
         return new Vector3f(x + dx * t, y + dy * t, z + dz * t);
     }
-    public static Vector3f newX(float x)
+    public static Vector3f newX(double x)
     {
         return new Vector3f(x, 0f, 0f);
     }
-    public static Vector3f newY(float y)
+    public static Vector3f newY(double y)
     {
         return new Vector3f(0f, y, 0f);
     }
-    public static Vector3f newZ(float z)
+    public static Vector3f newZ(double z)
     {
         return new Vector3f(0f, 0f, z);
     }
-    public static Vector3f newXY(float x, float y)
+    public static Vector3f newXY(double x, double y)
     {
         return new Vector3f(x, y, 0f);
     }
@@ -158,7 +158,7 @@ public final class Vector3f
     {
         return new Vector3f(yx.y, yx.x, 0f);
     }
-    public static Vector3f newXZ(float x, float z)
+    public static Vector3f newXZ(double x, double z)
     {
         return new Vector3f(x, 0f, z);
     }
@@ -166,7 +166,7 @@ public final class Vector3f
     {
         return new Vector3f(xz.x, 0f, xz.y);
     }
-    public static Vector3f newXYZ(float x, float y, float z)
+    public static Vector3f newXYZ(double x, double y, double z)
     {
         return new Vector3f(x, y, z);
     }
@@ -182,9 +182,9 @@ public final class Vector3f
         Key d = keyboard.keyOf('d');
         Key e = keyboard.keyOf('e');
         Key q = keyboard.keyOf('q');
-        float x = 0f;
-        float y = 0f;
-        float z = 0f;
+        double x = 0f;
+        double y = 0f;
+        double z = 0f;
         if(w.isDown()) y++;
         if(s.isDown()) y--;
         if(d.isDown()) x++;

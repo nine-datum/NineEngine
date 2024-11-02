@@ -15,7 +15,7 @@ public class Area
     {
         return new Area(min, max);
     }
-    public static Area minmax(float minX, float minY, float minZ, float maxX, float maxY, float maxZ)
+    public static Area minmax(double minX, double minY, double minZ, double maxX, double maxY, double maxZ)
     {
         return new Area(Vector3f.newXYZ(minX, minY, minZ), Vector3f.newXYZ(maxX, maxY, maxZ));
     }

@@ -49,10 +49,18 @@ public class ColladaModel implements ModelAsset
 	            .attribute(2, floatBuffers.map("TEXCOORD"))
 	            .attribute(3, floatBuffers.map("NORMAL").fromRightToLeftHanded());
             var bufferDrawing = buffer.drawing();
-            models.put("#" + source, (transform, shader) -> materials ->
+            Model ex = models.get("#" + source);
+            Model model = (transform, shader) -> materials ->
             {
             	return materials.material(material).apply(shader, bufferDrawing);
-            });
+            };
+            Model res = ex == null ? model : (transform, shader) -> materials ->
+            {
+                return Drawing.of(
+                    ex.instance(transform, shader).materialize(materials),
+                    model.instance(transform, shader).materialize(materials));
+            };
+            models.put("#" + source, res);
         });
         List<Model> sceneModels = new ArrayList<>();
         sceneParser.read(node, (id, root) ->

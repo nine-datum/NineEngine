@@ -2,5 +2,5 @@ package nine.math;
 
 public interface RectfAcceptor
 {
-    void call(float x, float y, float width, float height);
+    void call(double x, double y, double width, double height);
 }

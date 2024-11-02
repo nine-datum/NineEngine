@@ -35,9 +35,9 @@ public class NormalsFlow implements Flow<Float>
     {
         normals.read(n -> n.accept((x, y, z) ->
         {
-            action.call(x);
-            action.call(y);
-            action.call(z);
+            action.call((float)x);
+            action.call((float)y);
+            action.call((float)z);
         }));
     }
 }

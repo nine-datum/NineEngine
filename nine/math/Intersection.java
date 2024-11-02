@@ -10,9 +10,9 @@ public class Intersection
     {
         Vector2f ab = b.b.sub(b.a);
         Vector2f ao = a.center.sub(b.a);
-        float aoM = ao.length();
-        float acM = ao.dot(ab) * aoM;
-        float oc = (float)Math.sqrt(aoM * aoM - acM * acM);
+        double aoM = ao.length();
+        double acM = ao.dot(ab) * aoM;
+        double oc = Math.sqrt(aoM * aoM - acM * acM);
         return oc <= a.radius;
     }
 }

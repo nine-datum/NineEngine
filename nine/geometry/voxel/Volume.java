@@ -9,9 +9,9 @@ import nine.math.Vector3f;
 public interface Volume {
     boolean active(Vector3f point);
 
-    static Volume sphere(Vector3f center, float radius) {
+    static Volume sphere(Vector3f center, double radius) {
         return p -> {
-            float dist = p.sub(center).length();
+            double dist = p.sub(center).length();
             return dist <= radius;
         };
     }

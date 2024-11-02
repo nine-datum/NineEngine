@@ -2,9 +2,9 @@ package nine.math;
 
 public class Rectf
 {
-    public final float x, y, w, h;
+    public final double x, y, w, h;
 
-    private Rectf(float x, float y, float w, float h)
+    private Rectf(double x, double y, double w, double h)
     {
         this.x = x;
         this.y = y;
@@ -21,16 +21,16 @@ public class Rectf
     {
         return new Rectf(location.x, location.y, size.x, size.y);
     }
-    public static Rectf fromLocationSize(float x, float y, float w, float h)
+    public static Rectf fromLocationSize(double x, double y, double w, double h)
     {
         return new Rectf(x, y, w, h);
     }
     public Rectf normalized()
     {
-        float x = this.x;
-        float y = this.y;
-        float w = this.w;
-        float h = this.h;
+        double x = this.x;
+        double y = this.y;
+        double w = this.w;
+        double h = this.h;
         if (w < 0)
         {
             x += w;

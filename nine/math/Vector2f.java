@@ -5,9 +5,9 @@ import nine.input.Keyboard;
 
 public class Vector2f
 {
-    public final float x, y;
+    public final double x, y;
 
-    private Vector2f(float x, float y)
+    private Vector2f(double x, double y)
     {
         this.x = x;
         this.y = y;
@@ -15,7 +15,7 @@ public class Vector2f
 
     public interface XYAction
     {
-        void call(float x, float y);
+        void call(double x, double y);
     }
     
     public void accept(XYAction acceptor)
@@ -30,9 +30,9 @@ public class Vector2f
         return String.format("%f, %f", x, y);
     }
 
-    public Vector2f clampLength(float limit)
+    public Vector2f clampLength(double limit)
     {
-        float length = length();
+        double length = length();
         if(length > limit)
         {
             return normalized().mul(length);
@@ -41,8 +41,8 @@ public class Vector2f
     }
     public Vector2f clampRect(Rectf rect)
     {
-        float rx = x;
-        float ry = y;
+        double rx = x;
+        double ry = y;
         if (rx < x) rx = x;
         else if (rx > (x + rect.w)) rx = x + rect.w;
         if (ry < y) ry = y;
@@ -51,31 +51,31 @@ public class Vector2f
     }
     public Vector2f clamp(Vector2f min, Vector2f max)
     {
-        float x = this.x;
-        float y = this.y;
+        double x = this.x;
+        double y = this.y;
         if(x < min.x) x = min.x; 
         if(y < min.y) y = min.y;
         if(x > max.x) x = max.x; 
         if(y > max.y) y = max.y; 
         return new Vector2f(x, y);
     }
-    public Vector2f clampX(float min, float max)
+    public Vector2f clampX(double min, double max)
     {
-        float x = this.x;
+        double x = this.x;
         if(x < min) x = min; 
         if(x > max) x = max; 
         return new Vector2f(x, y);
     }
-    public Vector2f clampY(float min, float max)
+    public Vector2f clampY(double min, double max)
     {
-        float y = this.y;
+        double y = this.y;
         if(y < min) y = min; 
         if(y > max) y = max; 
         return new Vector2f(x, y);
     }
-    public float length()
+    public double length()
     {
-        return (float)Math.sqrt(x * x + y * y);
+        return Math.sqrt(x * x + y * y);
     }
     public Vector2f normalized()
     {
@@ -83,7 +83,7 @@ public class Vector2f
         if(length == 0) return new Vector2f(0f, 0f);
         return new Vector2f(x / length, y / length);
     }
-    public float dot(Vector2f b)
+    public double dot(Vector2f b)
     {
         return x * b.x + y * b.y;
     }
@@ -99,11 +99,11 @@ public class Vector2f
     {
         return new Vector2f(x / b.x, y / b.y);
     }
-    public Vector2f mul(float f)
+    public Vector2f mul(double f)
     {
         return new Vector2f(x * f, y * f);
     }
-    public Vector2f div(float f)
+    public Vector2f div(double f)
     {
         if(f == 0) return new Vector2f(0f, 0f);
         else return new Vector2f(x / f, y / f);
@@ -116,31 +116,31 @@ public class Vector2f
     {
         return new Vector2f(x + b.x, y + b.y);
     }
-    public Vector2f rotate(float angle)
+    public Vector2f rotate(double angle)
     {
-        float cos = (float)Math.cos(angle);
-        float sin = (float)Math.sin(angle);
+        double cos = Math.cos(angle);
+        double sin = Math.sin(angle);
         return new Vector2f(cos * x + sin * y, sin * x + cos * y);
     }
-    public float angle()
+    public double angle()
     {
         if (x == 0f && y == 0f) return 0f;
         else
         {
-		    return (float)Math.acos(x) * (y > 0 ? 1f : -1f);
+		    return Math.acos(x) * (y > 0 ? 1f : -1f);
         }
     }
     public Vector2f transformPoint(Matrix3f m)
     {
-        float x = this.x * m.at(0) + this.y * m.at(3) + m.at(6);
-        float y = this.x * m.at(1) + this.y * m.at(4) + m.at(7);
+        double x = this.x * m.at(0) + this.y * m.at(3) + m.at(6);
+        double y = this.x * m.at(1) + this.y * m.at(4) + m.at(7);
         return new Vector2f(x, y);
     }
     public int compareLength(Vector2f v)
     {
-        return Float.compare(length(), v.length());
+        return Double.compare(length(), v.length());
     }
-    public static Vector2f newXY(float x, float y)
+    public static Vector2f newXY(double x, double y)
     {
         return new Vector2f(x, y);
     }
@@ -150,8 +150,8 @@ public class Vector2f
         Key a = keyboard.keyOf('a');
         Key s = keyboard.keyOf('s');
         Key d = keyboard.keyOf('d');
-        float x = 0f;
-        float y = 0f;
+        double x = 0f;
+        double y = 0f;
         if(w.isDown()) y++;
         if(s.isDown()) y--;
         if(d.isDown()) x++;

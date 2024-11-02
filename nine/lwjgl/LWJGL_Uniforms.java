@@ -29,7 +29,7 @@ public class LWJGL_Uniforms implements Uniforms
         float[] buffer = new float[16];
         return matrix ->
         {
-            for(int i = 0; i < 16; i++) buffer[i] = matrix.at(i);
+            for(int i = 0; i < 16; i++) buffer[i] = (float)matrix.at(i);
             GL20.glUniformMatrix4fv(location, false, buffer);
         };
     }
@@ -46,7 +46,7 @@ public class LWJGL_Uniforms implements Uniforms
             {
                 int mat = m;
                 var matrix = matrices.at(m);
-                for(int i = 0; i < 16; i++) buffer[mat * 16 + i] = matrix.at(i);
+                for(int i = 0; i < 16; i++) buffer[mat * 16 + i] = (float)matrix.at(i);
             }
             GL20.glUniformMatrix4fv(location, false, buffer);
         };
@@ -58,7 +58,7 @@ public class LWJGL_Uniforms implements Uniforms
         int location = GL20.glGetUniformLocation(program, name);
         return vector ->
         {
-            GL20.glUniform3f(location, vector.x, vector.y, vector.z);
+            GL20.glUniform3f(location, (float)vector.x, (float)vector.y, (float)vector.z);
         };
     }
 

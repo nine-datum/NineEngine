@@ -21,20 +21,20 @@ public class Geometry
         {
             position.accept((x, y, z) ->
             {
-                positions.add(x);
-                positions.add(y);
-                positions.add(z);
+                positions.add((float)x);
+                positions.add((float)y);
+                positions.add((float)z);
             });
             uv.accept((x, y) ->
             {
-                uvs.add(x);
-                uvs.add(y);
+                uvs.add((float)x);
+                uvs.add((float)y);
             });
             normal.accept((x, y, z) ->
             {
-                normals.add(x);
-                normals.add(y);
-                normals.add(z);
+                normals.add((float)x);
+                normals.add((float)y);
+                normals.add((float)z);
             });
         }));
 
