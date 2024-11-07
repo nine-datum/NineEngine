@@ -35,6 +35,7 @@ public class KeyFrameAnimation implements Animation
         float dist = keys.at(1) - keys.at(0);
         
         int current = (int)(frac / dist);
+        if (current < 0) current = (current % keysLength) + keysLength;
         int next = current + 1;
         if(next >= keysLength) next = 0;
         
