@@ -85,8 +85,8 @@ public class ColladaSkinnedModel implements SkinnedModelAsset
     {
     	return shader -> materials ->
     	{
-    		Material mat = profiler.profile("materials.material", () -> materials.material(material));
-    		return profiler.profile("mat.apply", () -> mat.apply(shader, drawing));
+    		Material mat = materials.material(material);
+    		return mat.apply(shader, drawing);
     	};
     }
 
@@ -196,22 +196,18 @@ public class ColladaSkinnedModel implements SkinnedModelAsset
 
             return (skinAnimation, objectsAnimation, root, materials, shaderInitializer) ->
             {
-            	var skinDrawing = profiler.profile("making skin drawing", () ->
+            	var skinDrawing = 
             	new CompositeDrawing(
 	        		skinnedModels
 	        			.stream()
 	        			.map(m -> m.instance(skinShader).materialize(materials))
-	        			.toArray(Drawing[]::new)));
+	        			.toArray(Drawing[]::new));
             
-                Matrix4f[] bones = profiler.profile("new Matrix4f[MAX_MATRICES]", () -> new Matrix4f[MAX_MATRICES]);
-                profiler.profile("loading matrices identity", () ->
-                {
-                	for(int i = 0; i < MAX_MATRICES; i++) bones[i] = Matrix4f.identity;
-                });
-                
-                Skeleton invBind = profiler.profile("making invBind", () -> Skeleton.someOf(invBindPoses.values()));
+                Matrix4f[] bones = new Matrix4f[MAX_MATRICES];
+                for(int i = 0; i < MAX_MATRICES; i++) bones[i] = Matrix4f.identity;
 
-                profiler.profile("loading bone matrices", () ->
+                Skeleton invBind = Skeleton.someOf(invBindPoses.values());
+
                 Flow.iterable(boneIndices.entrySet()).read(bone ->
                 {
                     String key = bone.getKey();
@@ -223,28 +219,17 @@ public class ColladaSkinnedModel implements SkinnedModelAsset
                 	}
                     Matrix4f matrix = skinAnimation.transform(key).mul(invBindMat);
                     bones[index] = matrix;
-                }));
+                });
 
                 var shadedSkinDrawing = skinShader.play(() ->
                 {
-                	profiler.profile("drawing skin", () ->
-                	{
-	                	profiler.profile("shaderInitializer.draw", () -> {
 	                	shaderInitializer.draw();
-	                	});
-	                	profiler.profile("jointTransformsUniform.load", () -> {
-	                    jointTransformsUniform.load(new ArrayBuffer<>(bones));
-                		});
-	                    profiler.profile("skinDrawing.draw", () -> {
-                    	skinDrawing.draw();
-	                    });
-                	});
-                });
-                
+                    jointTransformsUniform.load(new ArrayBuffer<>(bones));
+                  	skinDrawing.draw();
+              	});
+
                 var shadedObjectsDrawing = staticShader.play(() ->
                 {
-                	profiler.profile("drawing simple models", () ->
-                	{
 	                	shaderInitializer.draw();
 	                	for(RawModel model : simpleModels)
 	                	{
@@ -252,15 +237,12 @@ public class ColladaSkinnedModel implements SkinnedModelAsset
 	                		Matrix4f mat = animKey == null ? Matrix4f.identity : objectsAnimation.transform(animKey);
 	                		mat = root.mul(mat);
 	                		staticTransformUniform.load(mat);
-	                		profiler.profile("exact draw call (simple model)", () -> {
-	                			var instance = profiler.profile("model.instance", () -> model.instance(staticShader));
-	                			var matz = profiler.profile("instance.materialize", () -> instance.materialize(materials));
-	                			profiler.profile("matz.draw", () -> matz.draw());
-	                		});
+                			var instance = model.instance(staticShader);
+                			var matz = instance.materialize(materials);
+                			matz.draw();
 	                	}
-                	});
                 });
-                
+
                 return new CompositeDrawing(shadedSkinDrawing, shadedObjectsDrawing);
             };
         };
