@@ -1,4 +1,6 @@
 *.class
+*.swp
+*.log
 build/lib
 build/manifest.txt
 build/sourcelist.txt

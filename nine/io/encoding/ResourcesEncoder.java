@@ -15,12 +15,15 @@ public class ResourcesEncoder implements Encodable
 {
     Map<String, StorageResource> resources;
 
-    public ResourcesEncoder()
+    public ResourcesEncoder(String path)
     {
-        File root = new File("resources");
+        File root = new File(path);
+        var abs = Paths.get(root.getAbsolutePath());
         try
         {
-            resources = Files.find(Paths.get(root.getAbsolutePath()), 1024, (a, b) -> b.isRegularFile()).map(p -> p.toFile()).map(file -> file.getAbsolutePath().replace(root.getAbsolutePath() + "\\", "").replace("\\", "/")).collect(Collectors.toMap(file -> file, file -> new FileStorageResource(file)));
+            resources = Files.find(abs, 1024, (a, b) -> b.isRegularFile())
+              .map(p -> path + "/" + abs.relativize(p).toString())
+              .collect(Collectors.toMap(file -> file, file -> new FileStorageResource(file)));
         }
         catch(Throwable error)
         {
@@ -40,7 +43,7 @@ public class ResourcesEncoder implements Encodable
                 try(InputStream inputStream = new InputStreamFromFlow(input))
                 {
                     byte[] bytes = inputStream.readAllBytes();
-                    
+
                     stream.writeText(name);
                     stream.writeByteArray(bytes);
                 }
