@@ -8,7 +8,7 @@ public interface OpenGL
     DrawingBuffer vao(Buffer<Integer> elements);
     ShaderCompiler compiler();
     Texture texture(StorageResource input, boolean mipmaps);
-    Texture texture(byte[] data, int width, int height, boolean mipmaps);
+    Texture texture(byte[] data, int width, int height, boolean alpha, boolean mipmaps);
     Texture blankTexture();
 
     Drawing depthOn(Drawing drawing);
@@ -24,8 +24,8 @@ public interface OpenGL
     {
         return texture(input, true);
     }
-    default Texture texture(byte[] data, int width, int height)
+    default Texture texture(byte[] data, int width, int height, boolean alpha)
     {
-        return texture(data, width, height, true);
+        return texture(data, width, height, alpha, true);
     }
 }

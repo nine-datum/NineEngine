@@ -164,10 +164,10 @@ public class LWJGL_OpenGL implements OpenGL
         actualImage = new BufferedImage(model,raster,false,new Hashtable<>());
 
         byte[] data = ((DataBufferByte)actualImage.getRaster().getDataBuffer()).getData();
-        return texture(data, width, height, mipmaps);
+        return texture(data, width, height, image.getColorModel().hasAlpha(), mipmaps);
     }
     @Override
-    public Texture texture(byte[] data, int width, int height, boolean mipmaps) {
+    public Texture texture(byte[] data, int width, int height, boolean alpha, boolean mipmaps) {
         int id = GL11.glGenTextures();
         ByteBuffer buffer = ByteBuffer.allocateDirect(data.length);
         buffer.order(ByteOrder.nativeOrder());
@@ -185,7 +185,7 @@ public class LWJGL_OpenGL implements OpenGL
             width,
             height,
             0,
-            GL15.GL_RGBA,
+            alpha ? GL15.GL_RGBA : GL15.GL_RGB,
             GL11.GL_UNSIGNED_BYTE,
             buffer);
         if(mipmaps) GL30.glGenerateMipmap(GL11.GL_TEXTURE_2D);
