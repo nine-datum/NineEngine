@@ -1,7 +1,5 @@
 package nine.opengl;
 
-import java.awt.image.BufferedImage;
-
 import nine.buffer.Buffer;
 import nine.io.StorageResource;
 
@@ -10,7 +8,7 @@ public interface OpenGL
     DrawingBuffer vao(Buffer<Integer> elements);
     ShaderCompiler compiler();
     Texture texture(StorageResource input, boolean mipmaps);
-    Texture texture(BufferedImage image, boolean mipmaps);
+    Texture texture(byte[] data, int width, int height, boolean mipmaps);
     Texture blankTexture();
 
     Drawing depthOn(Drawing drawing);
@@ -26,8 +24,8 @@ public interface OpenGL
     {
         return texture(input, true);
     }
-    default Texture texture(BufferedImage image)
+    default Texture texture(byte[] data, int width, int height)
     {
-        return texture(image, true);
+        return texture(data, width, height, true);
     }
 }

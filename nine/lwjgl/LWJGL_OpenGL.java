@@ -130,11 +130,8 @@ public class LWJGL_OpenGL implements OpenGL
 
         return texture[0];
     }
-
-    @Override
     public Texture texture(BufferedImage image, boolean mipmaps)
     {
-        int id = GL11.glGenTextures();
         BufferedImage actualImage;
         ColorModel model;
         int bands;
@@ -165,8 +162,13 @@ public class LWJGL_OpenGL implements OpenGL
             }
         }
         actualImage = new BufferedImage(model,raster,false,new Hashtable<>());
-    
+
         byte[] data = ((DataBufferByte)actualImage.getRaster().getDataBuffer()).getData();
+        return texture(data, width, height, mipmaps);
+    }
+    @Override
+    public Texture texture(byte[] data, int width, int height, boolean mipmaps) {
+        int id = GL11.glGenTextures();
         ByteBuffer buffer = ByteBuffer.allocateDirect(data.length);
         buffer.order(ByteOrder.nativeOrder());
         buffer.put(data);
@@ -174,22 +176,22 @@ public class LWJGL_OpenGL implements OpenGL
 
         GL11.glBindTexture(GL11.GL_TEXTURE_2D, id);
         GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
-	    GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, mipmaps ? GL11.GL_LINEAR_MIPMAP_NEAREST : GL11.GL_LINEAR);
-		GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL11.GL_REPEAT);
-		GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL11.GL_REPEAT);
+  	    GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, mipmaps ? GL11.GL_LINEAR_MIPMAP_NEAREST : GL11.GL_LINEAR);
+    		GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL11.GL_REPEAT);
+    		GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL11.GL_REPEAT);
         GL11.glTexImage2D(GL11.GL_TEXTURE_2D,
             0,
             GL11.GL_RGBA,
             width,
             height,
             0,
-            image.getColorModel().hasAlpha() ? GL15.GL_RGBA : GL15.GL_RGB,
+            GL15.GL_RGBA,
             GL11.GL_UNSIGNED_BYTE,
             buffer);
         if(mipmaps) GL30.glGenerateMipmap(GL11.GL_TEXTURE_2D);
         GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
 
-		return new Texture()
+    		return new Texture()
         {
             @Override
             public Drawing apply(Drawing drawing)
