@@ -11,6 +11,6 @@ public interface Texture
     static Texture blank(OpenGL gl)
     {
       byte[] data = new byte[] { -1, -1, -1, -1 };
-    	return gl.texture(data, 1, 1, false);
+    	return gl.texture(data, 1, 1, false, false);
     }
 }
