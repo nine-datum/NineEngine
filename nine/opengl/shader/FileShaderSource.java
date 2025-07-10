@@ -13,11 +13,13 @@ import nine.opengl.ShaderSourceAcceptor;
 public class FileShaderSource implements ShaderSource
 {
     StorageResource file;
+    ShaderProcess process;
     ShaderMacro[] macros;
 
-    public FileShaderSource(StorageResource file, ShaderMacro... macros)
+    public FileShaderSource(StorageResource file, ShaderProcess process, ShaderMacro... macros)
     {
         this.file = file;
+        this.process = process;
         this.macros = macros;
     }
 
@@ -36,14 +38,14 @@ public class FileShaderSource implements ShaderSource
             @Override
             public void prependStart(String line)
             {
-                prependStart.add(line);   
+                prependStart.add(line);
             }
         };
         for(ShaderMacro macro : macros) macro.edit(editable);
         String header = String.join("\n", Stream.concat(prependStart.stream(), appendStart.stream()).collect(Collectors.toList()));
-        new TextFileReader(file).read(lines -> 
+        new TextFileReader(file).read(lines ->
         {
-            String source = String.join("\n", lines);
+            String source = String.join("\n", process.process(lines));
             acceptor.call(String.join("\n", header, source));
         },
         System.out::println);

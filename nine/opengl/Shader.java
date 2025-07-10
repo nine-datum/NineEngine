@@ -4,6 +4,7 @@ import nine.io.Storage;
 import nine.opengl.shader.FileShaderSource;
 import nine.opengl.shader.ShaderVersionMacro;
 import nine.opengl.shader.ShaderPrecisionMacro;
+import nine.opengl.shader.ShaderProcess;
 import nine.opengl.shader.ShaderSourceMacro;
 
 public interface Shader
@@ -14,10 +15,12 @@ public interface Shader
     {
         return (vertex, fragment) -> gl.compiler().createProgram(
 			new FileShaderSource(storage.open(vertex),
+			  ShaderProcess.explicitLayout,
 			  new ShaderVersionMacro("300 es"),
 			  new ShaderPrecisionMacro(),
 			  new ShaderSourceMacro(vertex)),
 			new FileShaderSource(storage.open(fragment),
+			  lines -> lines,
 			  new ShaderVersionMacro("300 es"),
 			  new ShaderPrecisionMacro(),
 			  new ShaderSourceMacro(fragment)),
