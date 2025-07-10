@@ -28,4 +28,17 @@ public class TextFileReader
             scannerAcceptor.call(lines);
         }, errorHandler);
     }
+    public String readString () {
+      List<String> lines = new ArrayList<String>();
+      file.read(flow ->
+      {
+          Scanner scanner = new Scanner(new InputStreamFromFlow(flow));
+          while(scanner.hasNextLine())
+          {
+              lines.add(scanner.nextLine());
+          }
+          scanner.close();
+      }, e -> { throw new RuntimeException(e); });
+      return String.join("\n", lines);
+    }
 }
