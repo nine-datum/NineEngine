@@ -25,7 +25,7 @@ public class LWJGL_ShaderCompiler implements ShaderCompiler
 
             String[] lines = source.toString().split("\n");
             System.out.println(new Exception(String.format("Shader compile error\n%s\n%s", message,
-                String.join("\n", IntStream.range(0, lines.length).boxed().map(i -> String.format("%d\t%s", i, lines[i])).collect(Collectors.toList())))));
+                String.join("\n", IntStream.range(0, lines.length).boxed().map(i -> String.format("%d\t%s", i + 1, lines[i])).collect(Collectors.toList())))));
         }
         return shaderID;
     }
